@@ -32,6 +32,19 @@ Let's start digging into the code step by step spread over nine part.
 
 During this phase we are going to initialise a bunch of variables to let the raft works properly. The first four variables **currentTerm**, **votedFor**, **log** and **commitLenght** has to be store in a persistent storage. These variables must be updated on disk before the node do anything else; this is important for the crash recovery strategy. The other five variable should be stored in memory because they are going to initialized during a recovery from crash.
 
+- **currentTerm** is just an integer that is incremented every time a leader election happen
+- **votedFor** is to ensure that the node only vote once within a particular term
+- **log** is a sequence of entries, every entry in the log consists of two things: a **message** we want to deliver broadcast and the **term** of the leader at the time we broadcast. What we have to ensure is that all the nodes have the same copy of the log. This assumption could be uncertain so we have a concept of commit, in terms of, a certain piece of log from the start to a certain point will be committed so that entries are not going to change anymore.
+- **commitLength** tells us how far we have committed the log entries (as we said before)
+
+We can start evaluating the election phase: as we seen before the election phase starts if the node suspects the leader has failed or in case of election time out. In this phase the node increment currentTerm, transition to candidate and vote for itself, putting immediately the vote for itself into the list of votes received. The node compute the lastTerm putting it to zero, or in case of log not empty the terrm of the last entry in the log.  
+
+After packaging all the gathered information into a message, a message of **VoteRequest** meaning a candidate with **nodeId** is asking for vote, and then it will be delivered to all the nodes in the cluster. 
+
+After sending the message to all the nodes, the node start the timeout timer of the election.
+
+
+
  
 
 

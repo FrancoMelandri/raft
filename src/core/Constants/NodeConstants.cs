@@ -1,4 +1,4 @@
-﻿
+﻿using RaftCore.Models;
 using RaftCore.Node;
 using System;
 
@@ -8,7 +8,7 @@ namespace RaftCore.Constants
     {
         public static readonly int INIT_TERM = 0;
         public static readonly int INIT_VOTED_FOR = -1;
-        public static readonly object[] INIT_LOG = Array.Empty<object>();
+        public static readonly LogEntry[] INIT_LOG = Array.Empty<LogEntry>();
         public static readonly int INIT_COMMIT_LENGTH = 0;
         public static readonly States INIT_STATE = States.Follower;
         public static readonly int INIT_CURRENT_LEADER = -1;

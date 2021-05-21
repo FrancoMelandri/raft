@@ -4,13 +4,15 @@ namespace RaftCore.Node
 {
     public class Agent
     {
+        public int NodeId { get; private set; }
         public Descriptor Descriptor { get; private set; }
 
         private Agent() { }
 
-        public static Agent OnInitialise()
+        public static Agent OnInitialise(int nodeId)
             => new()
             {
+                NodeId = nodeId,
                 Descriptor = new Descriptor 
                 {
                     CurrentTerm = INIT_TERM,
@@ -25,9 +27,10 @@ namespace RaftCore.Node
                 }
             };
 
-        public static Agent OnRecoverFromCrash(Descriptor descriptor)
+        public static Agent OnRecoverFromCrash(int nodeId, Descriptor descriptor)
             => new()
             {
+                NodeId = nodeId,
                 Descriptor = new Descriptor
                 {
                     CurrentTerm = descriptor.CurrentTerm,

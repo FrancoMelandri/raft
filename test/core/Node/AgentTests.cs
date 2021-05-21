@@ -1,5 +1,6 @@
 ﻿using FluentAssertions;
 using NUnit.Framework;
+using RaftCore.Models;
 using RaftCore.Node;
 
 namespace RaftCoreTest.Node
@@ -10,11 +11,12 @@ namespace RaftCoreTest.Node
         [Test]
         public void OnInitialise_SetTheRightValues()
         {
-            var agent = Agent.OnInitialise();
+            var agent = Agent.OnInitialise(42);
 
+            agent.NodeId.Should().Be(42);
             agent.Descriptor.CurrentTerm.Should().Be(0);
             agent.Descriptor.VotedFor.Should().Be(-1);
-            agent.Descriptor.Log.Should().BeEquivalentTo(new object[] { });
+            agent.Descriptor.Log.Should().BeEquivalentTo(new LogEntry[] { });
             agent.Descriptor.CommitLenght.Should().Be(0);
             agent.Descriptor.CurrentRole.Should().Be(States.Follower);
             agent.Descriptor.CurrentLeader.Should().Be(-1);
@@ -30,7 +32,7 @@ namespace RaftCoreTest.Node
             {
                 CurrentTerm = 42,
                 VotedFor = 42,
-                Log = new object[] { new object() },
+                Log = new LogEntry[] { new LogEntry() },
                 CommitLenght = 42,
                 CurrentRole = States.Leader,
                 CurrentLeader = 42,
@@ -39,8 +41,9 @@ namespace RaftCoreTest.Node
                 AckedLength = new object[] { new object() }
             };
 
-            var agent = Agent.OnRecoverFromCrash(descriptor);
+            var agent = Agent.OnRecoverFromCrash(42, descriptor);
 
+            agent.NodeId.Should().Be(42);
             agent.Descriptor.CurrentTerm.Should().Be(42);
             agent.Descriptor.VotedFor.Should().Be(42);
             agent.Descriptor.Log.Length.Should().Be(1);

@@ -1,10 +1,12 @@
-﻿namespace RaftCore.Node
+﻿using RaftCore.Models;
+
+namespace RaftCore.Node
 {
     public struct Descriptor
     {
         public int CurrentTerm { get; set; }
         public int VotedFor { get; set; }
-        public object[] Log { get; set; }
+        public LogEntry[] Log { get; set; }
         public int CommitLenght { get; set; }
         public States CurrentRole { get; set; }
         public int CurrentLeader { get; set; }
