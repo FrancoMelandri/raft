@@ -2,6 +2,14 @@
 {
     public struct Descriptor
     {
-        public States State { get; set; } 
+        public int CurrentTerm { get; set; }
+        public int VotedFor { get; set; }
+        public object[] Log { get; set; }
+        public int CommitLenght { get; set; }
+        public States CurrentRole { get; set; }
+        public int CurrentLeader { get; set; }
+        public object VotesReceived { get; set; }
+        public object[] SentLength { get; set; }
+        public object[] AckedLength { get; set; }
     }
 }

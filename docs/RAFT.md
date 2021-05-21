@@ -18,9 +18,25 @@ When a node becomes a candidate it asks for votes from the other nodes, and if s
 
 Once a node is leader it remains leader for potentially a very long time, until that node crashes, get shut down or another candidate starts a new election phase with a higher term.
 
-![image-20210113092002671](./imgs/raft-state-machine.png)
+![raft-state-machine](./imgs/raft-state-machine.png)
 
 > State transitions displayed
+
+## Code
+
+Let's start digging into the code step by step spread over nine part.
+
+### Initialisation
+
+![raft-code-1](./imgs/raft-code-1.png)
+
+During this phase we are going to initialise a bunch of variables to let the raft works properly. The first four variables **currentTerm**, **votedFor**, **log** and **commitLenght** has to be store in a persistent storage. These variables must be updated on disk before the node do anything else; this is important for the crash recovery strategy. The other five variable should be stored in memory because they are going to initialized during a recovery from crash.
+
+ 
+
+
+
+
 
 
 
