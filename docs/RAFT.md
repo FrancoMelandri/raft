@@ -43,6 +43,16 @@ After packaging all the gathered information into a message, a message of **Vote
 
 After sending the message to all the nodes, the node start the timeout timer of the election.
 
+### Voting a new leader
+
+![raft-code-1](./imgs/raft-code-2.png)
+
+What happens to a node that receives this vote request for a certain candidate Id, candidate term, candidate log lenght and candidate log term?
+
+
+
+
+
 
 
  
