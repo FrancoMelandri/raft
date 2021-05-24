@@ -77,11 +77,24 @@ namespace RaftCore.Node
             => OnLedaerHasFailed();
 
         public Unit OnReceivedVotedRequest(VoteRequestMessage message)
-            => ValidateLogTerm(Descriptor, message)
-                .Map(_ => _.Match(_ => _, _ => ValidateLogLength(Descriptor, message)))
+            => ValidateLog(Descriptor, message)
+                .Bind(_ => ValidateTerm(Descriptor, message))
                 .Match(
-                    _ => _cluster.SendMessage(BuildMessage(MessageType.VoteResponse, 0, true)),
-                    _ => _cluster.SendMessage(BuildMessage(MessageType.VoteResponse, 0, false))
+                    _ => new Descriptor
+                            {
+                                CurrentTerm = message.CurrentTerm,
+                                VotedFor = message.NodeId,
+                                Log = Descriptor.Log,
+                                CommitLenght = Descriptor.CommitLenght,
+                                CurrentRole = States.Follower,
+                                CurrentLeader = Descriptor.CurrentLeader,
+                                VotesReceived = Descriptor.VotesReceived,
+                                SentLength = Descriptor.SentLength,
+                                AckedLength = Descriptor.AckedLength
+                            }
+                            .Tee(descriptor => Descriptor = descriptor)
+                            .Map(_ => _cluster.SendMessage(BuildMessage(MessageType.VoteResponse, Descriptor.CurrentTerm, true))),
+                    _ => _cluster.SendMessage(BuildMessage(MessageType.VoteResponse, Descriptor.CurrentTerm, false))
                 );
 
         private Message BuildMessage(MessageType type, int lastTerm, bool inFavour)

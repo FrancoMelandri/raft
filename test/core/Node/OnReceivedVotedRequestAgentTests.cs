@@ -81,16 +81,21 @@ namespace RaftCoreTest.Node
             var message = new VoteRequestMessage
             {
                 Type = MessageType.VoteRequest,
+                NodeId = 99,
                 LastTerm = 12,
-                LogLength = 1
+                LogLength = 1,
+                CurrentTerm = 12
             };
             agent.OnReceivedVotedRequest(message);
 
             _cluster
                 .Verify(m => m.SendMessage(It.Is<VoteResponseMessage>(
                                                 p => p.NodeId == 42 &&
-                                                p.CurrentTerm == 11 &&
+                                                p.CurrentTerm == 12 &&
                                                 p.InFavour == true)), Times.Once);
+            agent.Descriptor.CurrentTerm.Should().Be(12);
+            agent.Descriptor.VotedFor.Should().Be(99);
+            agent.Descriptor.CurrentRole.Should().Be(States.Follower);
         }
 
         [Test]
@@ -118,16 +123,21 @@ namespace RaftCoreTest.Node
             var message = new VoteRequestMessage
             {
                 Type = MessageType.VoteRequest,
+                NodeId = 99,
                 LastTerm = 12,
-                LogLength = 1
+                LogLength = 1,
+                CurrentTerm = 12
             };
             agent.OnReceivedVotedRequest(message);
 
             _cluster
                 .Verify(m => m.SendMessage(It.Is<VoteResponseMessage>(
                                                 p => p.NodeId == 42 &&
-                                                p.CurrentTerm == 11 &&
+                                                p.CurrentTerm == 12 &&
                                                 p.InFavour == true)), Times.Once);
+            agent.Descriptor.CurrentTerm.Should().Be(12);
+            agent.Descriptor.VotedFor.Should().Be(99);
+            agent.Descriptor.CurrentRole.Should().Be(States.Follower);
         }
 
         [Test]
@@ -192,16 +202,145 @@ namespace RaftCoreTest.Node
             var message = new VoteRequestMessage
             {
                 Type = MessageType.VoteRequest,
+                NodeId = 99,
                 LastTerm = 11,
-                LogLength = 2
+                LogLength = 2,
+                CurrentTerm = 12
             };
             agent.OnReceivedVotedRequest(message);
 
             _cluster
                 .Verify(m => m.SendMessage(It.Is<VoteResponseMessage>(
                                                 p => p.NodeId == 42 &&
-                                                p.CurrentTerm == 11 &&
+                                                p.CurrentTerm == 12 &&
                                                 p.InFavour == true)), Times.Once);
+            agent.Descriptor.CurrentTerm.Should().Be(12);
+            agent.Descriptor.VotedFor.Should().Be(99);
+            agent.Descriptor.CurrentRole.Should().Be(States.Follower);
+        }
+
+        [Test]
+        public void CurrentTerm_Lessthan_CandidateTerm_RespondWithTrue()
+        {
+            var nodeConfig = new NodeConfiguration
+            {
+                Id = 42
+            };
+
+            var descriptor = new Descriptor
+            {
+                CurrentTerm = 4,
+                VotedFor = -1,
+                Log = new LogEntry[] { new LogEntry { Term = 10 } },
+                CommitLenght = 0,
+                CurrentRole = States.Follower,
+                CurrentLeader = 2,
+                VotesReceived = null,
+                SentLength = new object[] { new object() },
+                AckedLength = new object[] { new object() }
+            };
+
+            var agent = _sut.OnRecoverFromCrash(nodeConfig, descriptor);
+            var message = new VoteRequestMessage
+            {
+                Type = MessageType.VoteRequest,
+                NodeId = 99,
+                LastTerm = 12,
+                LogLength = 1,
+                CurrentTerm = 5
+            };
+            agent.OnReceivedVotedRequest(message);
+
+            _cluster
+                .Verify(m => m.SendMessage(It.Is<VoteResponseMessage>(
+                                                p => p.NodeId == 42 &&
+                                                p.CurrentTerm == 5 &&
+                                                p.InFavour == true)), Times.Once);
+            agent.Descriptor.CurrentTerm.Should().Be(5);
+            agent.Descriptor.VotedFor.Should().Be(99);
+            agent.Descriptor.CurrentRole.Should().Be(States.Follower);
+        }
+
+        [Test]
+        public void CurrentTerm_Ok__And_Already_VotedFor_RespondWithFalse()
+        {
+            var nodeConfig = new NodeConfiguration
+            {
+                Id = 42
+            };
+
+            var descriptor = new Descriptor
+            {
+                CurrentTerm = 6,
+                VotedFor = 1,
+                Log = new LogEntry[] { new LogEntry { Term = 10 } },
+                CommitLenght = 0,
+                CurrentRole = States.Follower,
+                CurrentLeader = 2,
+                VotesReceived = null,
+                SentLength = new object[] { new object() },
+                AckedLength = new object[] { new object() }
+            };
+
+            var agent = _sut.OnRecoverFromCrash(nodeConfig, descriptor);
+            var message = new VoteRequestMessage
+            {
+                Type = MessageType.VoteRequest,
+                NodeId = 1,
+                LastTerm = 12,
+                LogLength = 1,
+                CurrentTerm = 5
+            };
+            agent.OnReceivedVotedRequest(message);
+
+            _cluster
+                .Verify(m => m.SendMessage(It.Is<VoteResponseMessage>(
+                                                p => p.NodeId == 42 &&
+                                                p.CurrentTerm == 6 &&
+                                                p.InFavour == false)), Times.Once);
+        }
+
+        [TestCase(-1)]
+        [TestCase(2)]
+        public void CurrentTerm_Ok_And_Not_VotedFor_RespondWithTrue(int voteFor)
+        {
+            var nodeConfig = new NodeConfiguration
+            {
+                Id = 42
+            };
+
+            var descriptor = new Descriptor
+            {
+                CurrentTerm = 6,
+                VotedFor = voteFor,
+                Log = new LogEntry[] { new LogEntry { Term = 10 } },
+                CommitLenght = 0,
+                CurrentRole = States.Follower,
+                CurrentLeader = 2,
+                VotesReceived = null,
+                SentLength = new object[] { new object() },
+                AckedLength = new object[] { new object() }
+            };
+
+            var agent = _sut.OnRecoverFromCrash(nodeConfig, descriptor);
+            var message = new VoteRequestMessage
+            {
+                Type = MessageType.VoteRequest,
+                NodeId = 1,
+                LastTerm = 12,
+                LogLength = 1,
+                CurrentTerm = 5
+            };
+            agent.OnReceivedVotedRequest(message);
+
+            _cluster
+                .Verify(m => m.SendMessage(It.Is<VoteResponseMessage>(
+                                                p => p.NodeId == 42 &&
+                                                p.CurrentTerm == 6 &&
+                                                p.InFavour == false)), Times.Once);
+            agent.Descriptor.CurrentTerm.Should().Be(6);
+            agent.Descriptor.VotedFor.Should().Be(voteFor);
+            agent.Descriptor.CurrentRole.Should().Be(States.Follower);
         }
     }
 }
