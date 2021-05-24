@@ -6,6 +6,7 @@ MinimumVisualStudioVersion = 15.0.26124.0
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "docs", "docs", "{3FAB6086-27FC-4C81-8483-378D9A7A8E85}"
 	ProjectSection(SolutionItems) = preProject
 		docs\RAFT.md = docs\RAFT.md
+		README.md = README.md
 	EndProjectSection
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "src", "src", "{5A10C03B-FF0F-45ED-95EF-E75DF0576104}"

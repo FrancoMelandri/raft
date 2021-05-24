@@ -7,6 +7,7 @@ using RaftCore.Node;
 
 namespace RaftCoreTest.Node
 {
+
     [TestFixture]
     public class AgentTests
     {
@@ -104,7 +105,7 @@ namespace RaftCoreTest.Node
             agent.Descriptor.CurrentRole.Should().Be(States.Candidate);
             agent.Descriptor.VotedFor.Should().Be(42);
             _cluster
-                .Verify(m => m.SendMessage(It.Is<Message>(
+                .Verify(m => m.SendMessage(It.Is<VoteRequestMessage>(
                                                 p => p.NodeId == 42 &&
                                                 p.LastTerm == 0 &&
                                                 p.LogLength == 0 &&
@@ -139,7 +140,7 @@ namespace RaftCoreTest.Node
             agent.Descriptor.CurrentRole.Should().Be(States.Candidate);
             agent.Descriptor.VotedFor.Should().Be(42);
             _cluster
-                .Verify(m => m.SendMessage(It.Is<Message>(
+                .Verify(m => m.SendMessage(It.Is<VoteRequestMessage>(
                                                 p => p.NodeId == 42 &&
                                                 p.LastTerm == 10 &&
                                                 p.LogLength == 1 &&
@@ -174,7 +175,7 @@ namespace RaftCoreTest.Node
             agent.Descriptor.CurrentRole.Should().Be(States.Candidate);
             agent.Descriptor.VotedFor.Should().Be(42);
             _cluster
-                .Verify(m => m.SendMessage(It.Is<Message>(
+                .Verify(m => m.SendMessage(It.Is<VoteRequestMessage>(
                                                 p => p.NodeId == 42 &&
                                                 p.LastTerm == 0 &&
                                                 p.LogLength == 0 &&
@@ -209,7 +210,7 @@ namespace RaftCoreTest.Node
             agent.Descriptor.CurrentRole.Should().Be(States.Candidate);
             agent.Descriptor.VotedFor.Should().Be(42);
             _cluster
-                .Verify(m => m.SendMessage(It.Is<Message>(
+                .Verify(m => m.SendMessage(It.Is<VoteRequestMessage>(
                                                 p => p.NodeId == 42 &&
                                                 p.LastTerm == 10 &&
                                                 p.LogLength == 1 &&

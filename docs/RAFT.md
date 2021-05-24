@@ -47,7 +47,18 @@ After sending the message to all the nodes, the node start the timeout timer of 
 
 ![raft-code-1](./imgs/raft-code-2.png)
 
-What happens to a node that receives this vote request for a certain candidate Id, candidate term, candidate log lenght and candidate log term?
+What happens to a node (nodeId is the recipient of this message) that receives this vote request for a certain candidate Id, candidate term, candidate log length and candidate log term?
+
+First of all the node check if the local log is consistent with the candidate said: the recipient of the message get the last log entry term and compare it with the incoming values
+
+- the log is ok if the candidate term log is greater then the own log term
+- if the candidate has the same term, but the candidate log length is greater or equal to the own log length
+
+In this way we are ensuring the candidate has an up to date log. 
+
+We have to ensure also that we are not allowed to vote more then one candidate in a different term, and this is what **termOk** is going to do. So if the candidate term is greater the the currentTerm or we have not voted yet for the candidate nodeId or we have not voted yet for anyone. So in case the candidate term is lower then my current term is not possible to vote for.
+
+If both are ok then we are going to vote in favour for the candidate.
 
 
 

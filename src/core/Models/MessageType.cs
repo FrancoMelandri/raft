@@ -2,6 +2,8 @@
 {
     public enum MessageType
     {
-        VoteRequest
+        None,
+        VoteRequest,
+        VoteResponse
     }
 }
