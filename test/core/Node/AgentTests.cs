@@ -11,9 +11,13 @@ namespace RaftCoreTest.Node
         [Test]
         public void OnInitialise_SetTheRightValues()
         {
-            var agent = Agent.OnInitialise(42);
+            var nodeConfig = new NodeConfiguration
+            {
+                Id = 42
+            };
+            var agent = Agent.OnInitialise(nodeConfig);
 
-            agent.NodeId.Should().Be(42);
+            agent.Configuration.Id.Should().Be(42);
             agent.Descriptor.CurrentTerm.Should().Be(0);
             agent.Descriptor.VotedFor.Should().Be(-1);
             agent.Descriptor.Log.Should().BeEquivalentTo(new LogEntry[] { });
@@ -28,6 +32,11 @@ namespace RaftCoreTest.Node
         [Test]
         public void OnRecoverFromCrash_SetTheRightValues()
         {
+            var nodeConfig = new NodeConfiguration
+            {
+                Id = 42
+            };
+
             var descriptor = new Descriptor
             {
                 CurrentTerm = 42,
@@ -41,9 +50,9 @@ namespace RaftCoreTest.Node
                 AckedLength = new object[] { new object() }
             };
 
-            var agent = Agent.OnRecoverFromCrash(42, descriptor);
+            var agent = Agent.OnRecoverFromCrash(nodeConfig, descriptor);
 
-            agent.NodeId.Should().Be(42);
+            agent.Configuration.Id.Should().Be(42);
             agent.Descriptor.CurrentTerm.Should().Be(42);
             agent.Descriptor.VotedFor.Should().Be(42);
             agent.Descriptor.Log.Length.Should().Be(1);

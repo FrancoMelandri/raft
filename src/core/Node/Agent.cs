@@ -1,18 +1,19 @@
-﻿using static RaftCore.Constants.NodeConstants;
+﻿using RaftCore.Models;
+using static RaftCore.Constants.NodeConstants;
 
 namespace RaftCore.Node
 {
     public class Agent
     {
-        public int NodeId { get; private set; }
+        public NodeConfiguration Configuration { get; private set; }
         public Descriptor Descriptor { get; private set; }
 
         private Agent() { }
 
-        public static Agent OnInitialise(int nodeId)
+        public static Agent OnInitialise(NodeConfiguration nodeConfiguration)
             => new()
             {
-                NodeId = nodeId,
+                Configuration = nodeConfiguration,
                 Descriptor = new Descriptor 
                 {
                     CurrentTerm = INIT_TERM,
@@ -27,10 +28,10 @@ namespace RaftCore.Node
                 }
             };
 
-        public static Agent OnRecoverFromCrash(int nodeId, Descriptor descriptor)
+        public static Agent OnRecoverFromCrash(NodeConfiguration nodeConfiguration, Descriptor descriptor)
             => new()
             {
-                NodeId = nodeId,
+                Configuration = nodeConfiguration,
                 Descriptor = new Descriptor
                 {
                     CurrentTerm = descriptor.CurrentTerm,
