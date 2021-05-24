@@ -1,9 +1,10 @@
 ﻿using RaftCore.Models;
+using TinyFp;
 
 namespace RaftCore.Cluster
 {
     public interface ICluster
     {
-        void SendMessage(Message message);
+        Unit SendMessage(Message message);
     }
 }
