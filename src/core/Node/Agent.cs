@@ -3,6 +3,8 @@ using RaftCore.Models;
 using TinyFp;
 using TinyFp.Extensions;
 using static RaftCore.Constants.NodeConstants;
+using static RaftCore.Node.Validations;
+using static RaftCore.Node.Utils;
 
 namespace RaftCore.Node
 {
@@ -75,8 +77,8 @@ namespace RaftCore.Node
             => OnLedaerHasFailed();
 
         public Unit OnReceivedVotedRequest(VoteRequestMessage message)
-            => ValidateLogTerm(message)
-                .Map(_ => _.Match(_ => _, _ => ValidateLogLength(message)))
+            => ValidateLogTerm(Descriptor, message)
+                .Map(_ => _.Match(_ => _, _ => ValidateLogLength(Descriptor, message)))
                 .Match(
                     _ => _cluster.SendMessage(BuildMessage(MessageType.VoteResponse, 0, true)),
                     _ => _cluster.SendMessage(BuildMessage(MessageType.VoteResponse, 0, false))
@@ -102,23 +104,5 @@ namespace RaftCore.Node
                 },
                 _ => Message.Empty
             };
-
-
-        private Either<string, int> ValidateLogTerm(VoteRequestMessage message)
-            => message.LastTerm > LastEntryOrZero(Descriptor.Log) ?
-                Either<string, int>.Right(0) :
-                Either<string, int>.Left("");
-
-        private Either<string, int> ValidateLogLength(VoteRequestMessage message)
-            => message.LastTerm == LastEntryOrZero(Descriptor.Log) &&
-               message.LogLength >= Descriptor.Log.Length ?
-                Either<string, int>.Right(0) :
-                Either<string, int>.Left("");
-
-        private static int LastEntryOrZero(LogEntry[] Log)
-            => Log
-                .ToOption(_ => _.Length == 0)
-                .Map(_ => _[^1].Term)
-                .OnNone(0);
     }
 }
