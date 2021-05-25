@@ -21,6 +21,11 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "core", "core", "{71566FE9-F
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "core-test", "test\core\core-test.csproj", "{21FA8459-AAF3-44D3-8BB0-0D3F62638AE2}"
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "files", "files", "{9977F8ED-D5D9-471A-BB30-50269FF81007}"
+	ProjectSection(SolutionItems) = preProject
+		.github\workflows\ci.yaml = .github\workflows\ci.yaml
+	EndProjectSection
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU

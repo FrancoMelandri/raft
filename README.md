@@ -1,16 +1,17 @@
 # The Raft Consensus Algorithm
 
+
+[![build](https://github.com/FrancoMelandri/raft/actions/workflows/ci.yaml/badge.svg)](https://github.com/FrancoMelandri/raft/actions/workflows/ci.yaml/badge.svg)
+
+
+Home page **RAFT** algorithm:
 https://raft.github.io/
 
 
-
 **Martin Kleppmann** video:
-
 https://www.youtube.com/watch?v=IPnesACYRck&list=PLeKd45zvjcDFUEv_ohr_HdUFe97RItdiB&index=18
 
 
-
 How to define additional source for nuget packages:
-
 https://docs.github.com/en/packages/working-with-a-github-packages-registry/working-with-the-nuget-registry
 
