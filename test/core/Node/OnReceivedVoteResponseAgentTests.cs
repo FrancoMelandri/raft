@@ -238,9 +238,16 @@ namespace RaftCoreTest.Node
         [Test]
         public void CurrentRole_Candidate_And_Term_Equals_CurrentTerm_And_Granted_WithQuorum_PromoteAsLeader()
         {
+            var node1 = new Mock<INode>();
+            node1.Setup(m => m.Id).Returns(1);
+            var node2 = new Mock<INode>();
+            node2.Setup(m => m.Id).Returns(2);
+            var node3 = new Mock<INode>();
+            node3.Setup(m => m.Id).Returns(99);
+
             _cluster
                 .Setup(m => m.Nodes)
-                .Returns(new INode[] { null, null });
+                .Returns(new INode[] { node1.Object, node2.Object, node3.Object });
 
             var nodeConfig = new NodeConfiguration
             {
@@ -251,7 +258,7 @@ namespace RaftCoreTest.Node
             {
                 CurrentTerm = 10,
                 VotedFor = 1,
-                Log = new LogEntry[] { new LogEntry { Term = 10 } },
+                Log = new LogEntry[] { new LogEntry { Term = 9 }, new LogEntry { Term = 10 } },
                 CommitLenght = 0,
                 CurrentRole = States.Leader,
                 CurrentLeader = 2,
@@ -265,7 +272,15 @@ namespace RaftCoreTest.Node
             var message = new VoteResponseMessage
             {
                 Type = MessageType.VoteResponse,
-                NodeId = 99,
+                NodeId = 1,
+                CurrentTerm = 11,
+                Granted = true
+            };
+            descriptor = _sut.OnReceivedVoteResponse(message);
+            message = new VoteResponseMessage
+            {
+                Type = MessageType.VoteResponse,
+                NodeId = 2,
                 CurrentTerm = 11,
                 Granted = true
             };
@@ -275,11 +290,22 @@ namespace RaftCoreTest.Node
             descriptor.CurrentRole.Should().Be(States.Leader);
             descriptor.CurrentLeader.Should().Be(42);
             descriptor.VotedFor.Should().Be(42);
-            descriptor.SentLength.Should().BeEmpty();
-            descriptor.AckedLength.Should().BeEmpty();
-            descriptor.VotesReceived.Should().Contain(42).And.Contain(99);
+            descriptor.SentLength[1].Should().Be(2);
+            descriptor.SentLength[2].Should().Be(2);
+            descriptor.AckedLength[1].Should().Be(0);
+            descriptor.AckedLength[2].Should().Be(0);
+            descriptor.VotesReceived.Should().Contain(42)
+                                              .And.Contain(1)
+                                              .And.Contain(2);
+
             _election
                 .Verify(m => m.Cancel(), Times.Once);
+            _cluster
+                .Verify(m => m.ReplicateLog(42, 1), Times.Once);
+            _cluster
+                .Verify(m => m.ReplicateLog(42, 2), Times.Once);
+            _cluster
+                .Verify(m => m.ReplicateLog(42, 42), Times.Never);
         }
     }
 }

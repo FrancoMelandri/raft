@@ -2,5 +2,6 @@
 {
     public interface INode
     {
+        int Id { get;  }
     }
 }

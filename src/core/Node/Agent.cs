@@ -7,6 +7,7 @@ using static RaftCore.Constants.NodeConstants;
 using static RaftCore.Constants.MessageConstants;
 using static RaftCore.Node.Validations;
 using static RaftCore.Node.Utils;
+using System.Collections.Generic;
 
 namespace RaftCore.Node
 {
@@ -130,7 +131,31 @@ namespace RaftCore.Node
                 SentLength = descriptor.SentLength,
                 AckedLength = descriptor.AckedLength
             }
-            .Tee(_ => _election.Cancel());
+            .Tee(_ => _election.Cancel())
+            .Tee(_ => ReceivedVoteResponseGrantedUpdateFollowers(_));
+
+        private Descriptor ReceivedVoteResponseGrantedUpdateFollowers(Descriptor descriptor)
+            => _cluster.Nodes
+                .Filter(_ => _.Id != Configuration.Id)
+                .Map(_ => (_.Id, descriptor.Log.Length))
+                .Fold((SetLength: new Dictionary<int, int>(), AckedLength: new Dictionary<int, int>()),
+                      (a, i) => a.Tee(_ => a.SetLength.Add(i.Id, i.Length))
+                                 .Tee(_ => a.AckedLength.Add(i.Id, 0)))
+                .Map(_ => (Descriptor: new Descriptor
+                                    {
+                                        CurrentTerm = descriptor.CurrentTerm,
+                                        VotedFor = descriptor.VotedFor,
+                                        Log = descriptor.Log,
+                                        CommitLenght = descriptor.CommitLenght,
+                                        CurrentRole = descriptor.CurrentRole,
+                                        CurrentLeader = descriptor.CurrentLeader,
+                                        VotesReceived = descriptor.VotesReceived,
+                                        SentLength = _.SetLength,
+                                        AckedLength = _.AckedLength
+                                    }, 
+                            Followers: _.SetLength.Keys))
+                .Tee(_ => _.Followers.ForEach(follower => _cluster.ReplicateLog(descriptor.CurrentLeader, follower)))
+                .Map(_ =>_.Descriptor);
 
         private Unit ReceivedVoteResponseNoGrantedUpdateDescriptor(VoteResponseMessage message)
             => new Descriptor
