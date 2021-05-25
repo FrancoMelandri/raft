@@ -8,16 +8,19 @@ using RaftCore.Node;
 namespace RaftCoreTest.Node
 {
     [TestFixture]
-    public class OnReceivedVotedRequestAgentTests
+    public class OnReceivedVoteRequestAgentTests
     {
         private Agent _sut;
         private Mock<ICluster> _cluster;
+        private Mock<IElection> _election;
 
         [SetUp]
         public void SetUp()
         {
             _cluster = new Mock<ICluster>();
-            _sut = Agent.Create(_cluster.Object);
+            _election = new Mock<IElection>();
+            _sut = Agent.Create(_cluster.Object,
+                                _election.Object);
         }
 
         [Test]
@@ -45,12 +48,13 @@ namespace RaftCoreTest.Node
             var message = new VoteRequestMessage
             {
                 Type = MessageType.VoteRequest,
+                NodeId = 1,
                 LastTerm = 9
             };
-            agent.OnReceivedVotedRequest(message);
+            agent.OnReceivedVoteRequest(message);
 
             _cluster
-                .Verify(m => m.SendMessage(It.Is<VoteResponseMessage>(
+                .Verify(m => m.SendMessage(1, It.Is<VoteResponseMessage>(
                                                 p => p.NodeId == 42 &&
                                                 p.CurrentTerm == 11 &&
                                                 p.InFavour == false)), Times.Once);
@@ -86,10 +90,10 @@ namespace RaftCoreTest.Node
                 LogLength = 1,
                 CurrentTerm = 12
             };
-            agent.OnReceivedVotedRequest(message);
+            agent.OnReceivedVoteRequest(message);
 
             _cluster
-                .Verify(m => m.SendMessage(It.Is<VoteResponseMessage>(
+                .Verify(m => m.SendMessage(99, It.Is<VoteResponseMessage>(
                                                 p => p.NodeId == 42 &&
                                                 p.CurrentTerm == 12 &&
                                                 p.InFavour == true)), Times.Once);
@@ -128,10 +132,10 @@ namespace RaftCoreTest.Node
                 LogLength = 1,
                 CurrentTerm = 12
             };
-            agent.OnReceivedVotedRequest(message);
+            agent.OnReceivedVoteRequest(message);
 
             _cluster
-                .Verify(m => m.SendMessage(It.Is<VoteResponseMessage>(
+                .Verify(m => m.SendMessage(99, It.Is<VoteResponseMessage>(
                                                 p => p.NodeId == 42 &&
                                                 p.CurrentTerm == 12 &&
                                                 p.InFavour == true)), Times.Once);
@@ -165,13 +169,14 @@ namespace RaftCoreTest.Node
             var message = new VoteRequestMessage
             {
                 Type = MessageType.VoteRequest,
+                NodeId = 1,
                 LastTerm = 11,
                 LogLength = 1
             };
-            agent.OnReceivedVotedRequest(message);
+            agent.OnReceivedVoteRequest(message);
 
             _cluster
-                .Verify(m => m.SendMessage(It.Is<VoteResponseMessage>(
+                .Verify(m => m.SendMessage(1, It.Is<VoteResponseMessage>(
                                                 p => p.NodeId == 42 &&
                                                 p.CurrentTerm == 11 &&
                                                 p.InFavour == false)), Times.Once);
@@ -207,10 +212,10 @@ namespace RaftCoreTest.Node
                 LogLength = 2,
                 CurrentTerm = 12
             };
-            agent.OnReceivedVotedRequest(message);
+            agent.OnReceivedVoteRequest(message);
 
             _cluster
-                .Verify(m => m.SendMessage(It.Is<VoteResponseMessage>(
+                .Verify(m => m.SendMessage(99, It.Is<VoteResponseMessage>(
                                                 p => p.NodeId == 42 &&
                                                 p.CurrentTerm == 12 &&
                                                 p.InFavour == true)), Times.Once);
@@ -249,10 +254,10 @@ namespace RaftCoreTest.Node
                 LogLength = 1,
                 CurrentTerm = 5
             };
-            agent.OnReceivedVotedRequest(message);
+            agent.OnReceivedVoteRequest(message);
 
             _cluster
-                .Verify(m => m.SendMessage(It.Is<VoteResponseMessage>(
+                .Verify(m => m.SendMessage(99, It.Is<VoteResponseMessage>(
                                                 p => p.NodeId == 42 &&
                                                 p.CurrentTerm == 5 &&
                                                 p.InFavour == true)), Times.Once);
@@ -291,10 +296,10 @@ namespace RaftCoreTest.Node
                 LogLength = 1,
                 CurrentTerm = 5
             };
-            agent.OnReceivedVotedRequest(message);
+            agent.OnReceivedVoteRequest(message);
 
             _cluster
-                .Verify(m => m.SendMessage(It.Is<VoteResponseMessage>(
+                .Verify(m => m.SendMessage(1, It.Is<VoteResponseMessage>(
                                                 p => p.NodeId == 42 &&
                                                 p.CurrentTerm == 6 &&
                                                 p.InFavour == false)), Times.Once);
@@ -331,10 +336,10 @@ namespace RaftCoreTest.Node
                 LogLength = 1,
                 CurrentTerm = 5
             };
-            agent.OnReceivedVotedRequest(message);
+            agent.OnReceivedVoteRequest(message);
 
             _cluster
-                .Verify(m => m.SendMessage(It.Is<VoteResponseMessage>(
+                .Verify(m => m.SendMessage(1, It.Is<VoteResponseMessage>(
                                                 p => p.NodeId == 42 &&
                                                 p.CurrentTerm == 6 &&
                                                 p.InFavour == false)), Times.Once);

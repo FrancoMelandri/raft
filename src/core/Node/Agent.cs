@@ -14,14 +14,16 @@ namespace RaftCore.Node
         public Descriptor Descriptor { get; private set; }
 
         private readonly ICluster _cluster;
+        private readonly IElection _election;
 
-        private Agent(ICluster cluster)
+        private Agent(ICluster cluster, IElection election)
         {
             _cluster = cluster;
+            _election = election;
         }
 
-        public static Agent Create(ICluster cluster)
-            => new(cluster);
+        public static Agent Create(ICluster cluster, IElection election)
+            => new(cluster, election);
 
         public Agent OnInitialise(NodeConfiguration nodeConfiguration)
             => this
@@ -71,12 +73,13 @@ namespace RaftCore.Node
                 .Tee(descriptor => Descriptor = descriptor)
                 .Tee(descriptor => LastEntryOrZero(Descriptor.Log)
                                     .Map(_ => BuildMessage(MessageType.VoteRequest, _, true))
-                                    .Do(_ => _cluster.SendMessage(_)));
+                                    .Tee(_ => _cluster.SendBroadcastMessage(_))
+                                    .Tee(_ => _election.Start()));
 
         public void OnElectionTimeOut()
             => OnLedaerHasFailed();
 
-        public Unit OnReceivedVotedRequest(VoteRequestMessage message)
+        public Unit OnReceivedVoteRequest(VoteRequestMessage message)
             => ValidateLog(Descriptor, message)
                 .Bind(_ => ValidateTerm(Descriptor, message))
                 .Match(
@@ -93,9 +96,12 @@ namespace RaftCore.Node
                                 AckedLength = Descriptor.AckedLength
                             }
                             .Tee(descriptor => Descriptor = descriptor)
-                            .Map(_ => _cluster.SendMessage(BuildMessage(MessageType.VoteResponse, Descriptor.CurrentTerm, true))),
-                    _ => _cluster.SendMessage(BuildMessage(MessageType.VoteResponse, Descriptor.CurrentTerm, false))
+                            .Map(_ => _cluster.SendMessage(message.NodeId, BuildMessage(MessageType.VoteResponse, Descriptor.CurrentTerm, true))),
+                    _ => _cluster.SendMessage(message.NodeId, BuildMessage(MessageType.VoteResponse, Descriptor.CurrentTerm, false))
                 );
+
+        public Unit OnReceivedVoteResponse(VoteResponseMessage message)
+            => Unit.Default;
 
         private Message BuildMessage(MessageType type, int lastTerm, bool inFavour)
             => type switch

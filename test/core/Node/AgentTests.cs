@@ -12,12 +12,15 @@ namespace RaftCoreTest.Node
     {
         private Agent _sut;
         private Mock<ICluster> _cluster;
+        private Mock<IElection> _election;
 
         [SetUp]
         public void SetUp()
         {
             _cluster = new Mock<ICluster>();
-            _sut = Agent.Create(_cluster.Object);
+            _election = new Mock<IElection>();
+            _sut = Agent.Create(_cluster.Object,
+                                _election.Object);
         }
 
         [Test]

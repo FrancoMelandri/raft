@@ -7,17 +7,21 @@ using RaftCore.Node;
 
 namespace RaftCoreTest.Node
 {
+
     [TestFixture]
     public class OnLedaerHasFailedAgentTests
-        {
+    {
         private Agent _sut;
         private Mock<ICluster> _cluster;
+        private Mock<IElection> _election;
 
         [SetUp]
         public void SetUp()
         {
             _cluster = new Mock<ICluster>();
-            _sut = Agent.Create(_cluster.Object);
+            _election = new Mock<IElection>();
+            _sut = Agent.Create(_cluster.Object,
+                                _election.Object);
         }
 
         [Test]
@@ -48,11 +52,13 @@ namespace RaftCoreTest.Node
             agent.Descriptor.CurrentRole.Should().Be(States.Candidate);
             agent.Descriptor.VotedFor.Should().Be(42);
             _cluster
-                .Verify(m => m.SendMessage(It.Is<VoteRequestMessage>(
-                                                p => p.NodeId == 42 &&
-                                                p.LastTerm == 0 &&
-                                                p.LogLength == 0 &&
-                                                p.CurrentTerm == 43)), Times.Once);
+                .Verify(m => m.SendBroadcastMessage(It.Is<VoteRequestMessage>(
+                                                    p => p.NodeId == 42 &&
+                                                    p.LastTerm == 0 &&
+                                                    p.LogLength == 0 &&
+                                                    p.CurrentTerm == 43)), Times.Once);
+            _election
+                .Verify(m => m.Start(), Times.Once);
         }
 
         [Test]
@@ -83,11 +89,13 @@ namespace RaftCoreTest.Node
             agent.Descriptor.CurrentRole.Should().Be(States.Candidate);
             agent.Descriptor.VotedFor.Should().Be(42);
             _cluster
-                .Verify(m => m.SendMessage(It.Is<VoteRequestMessage>(
-                                                p => p.NodeId == 42 &&
-                                                p.LastTerm == 10 &&
-                                                p.LogLength == 1 &&
-                                                p.CurrentTerm == 43)), Times.Once);
-        }    
+                .Verify(m => m.SendBroadcastMessage(It.Is<VoteRequestMessage>(
+                                                    p => p.NodeId == 42 &&
+                                                    p.LastTerm == 10 &&
+                                                    p.LogLength == 1 &&
+                                                    p.CurrentTerm == 43)), Times.Once);
+            _election
+                .Verify(m => m.Start(), Times.Once);
+        }
     }
 }

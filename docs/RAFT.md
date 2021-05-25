@@ -56,11 +56,19 @@ First of all the node check if the local log is consistent with the candidate sa
 
 In this way we are ensuring the candidate has an up to date log. 
 
-We have to ensure also that we are not allowed to vote more then one candidate in a different term, and this is what **termOk** is going to do. So if the candidate term is greater the the currentTerm or we have not voted yet for the candidate nodeId or we have not voted yet for anyone. So in case the candidate term is lower then my current term is not possible to vote for.
+We have to ensure also that we are not allowed to vote more then one candidate in a different term, and this is what **termOk** is going to do. So if the candidate term is greater the the **currentTerm** or we have not voted yet for the candidate **nodeId** or we have not voted yet for anyone. So in case the candidate term is lower then my current term is not possible to vote for.
 
 If both are ok then we are going to vote in favour for the candidate.
 
+### Collecting votes
 
+![raft-code-1](./imgs/raft-code-3.png)
+
+Back on the candidate side to look to all responses.
+
+We have a successful vote when the currentRole of the node is candidate, the term coming from response is equal to currentTerm and the vote is granted. So in this case first of all we have to add the **voterId** to the set of the votes we received (we have to count the unique vote). If the set of votes is a quorum (the number of votes is greater than the half of the number of the nodes round up) then we can transition to **leader** state and we can cancel the election timer because we reached the quorum of votes we need to became a leader. Becoming a leader means we have to initialize some internal state and notify all the nodes the node is the new leader.
+
+ 
 
 
 
