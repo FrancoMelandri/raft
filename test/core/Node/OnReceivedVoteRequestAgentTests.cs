@@ -44,20 +44,20 @@ namespace RaftCoreTest.Node
                 AckedLength = new object[] { new object() }
             };
 
-            var agent = _sut.OnRecoverFromCrash(nodeConfig, descriptor);
+            descriptor = _sut.OnRecoverFromCrash(nodeConfig, descriptor);
             var message = new VoteRequestMessage
             {
                 Type = MessageType.VoteRequest,
                 NodeId = 1,
                 LastTerm = 9
             };
-            agent.OnReceivedVoteRequest(message);
+            _sut.OnReceivedVoteRequest(message);
 
             _cluster
                 .Verify(m => m.SendMessage(1, It.Is<VoteResponseMessage>(
                                                 p => p.NodeId == 42 &&
                                                 p.CurrentTerm == 11 &&
-                                                p.InFavour == false)), Times.Once);
+                                                p.Granted == false)), Times.Once);
         }
 
         [Test]
@@ -81,7 +81,7 @@ namespace RaftCoreTest.Node
                 AckedLength = new object[] { new object() }
             };
 
-            var agent = _sut.OnRecoverFromCrash(nodeConfig, descriptor);
+            descriptor = _sut.OnRecoverFromCrash(nodeConfig, descriptor);
             var message = new VoteRequestMessage
             {
                 Type = MessageType.VoteRequest,
@@ -90,16 +90,16 @@ namespace RaftCoreTest.Node
                 LogLength = 1,
                 CurrentTerm = 12
             };
-            agent.OnReceivedVoteRequest(message);
+            descriptor = _sut.OnReceivedVoteRequest(message);
 
             _cluster
                 .Verify(m => m.SendMessage(99, It.Is<VoteResponseMessage>(
                                                 p => p.NodeId == 42 &&
                                                 p.CurrentTerm == 12 &&
-                                                p.InFavour == true)), Times.Once);
-            agent.Descriptor.CurrentTerm.Should().Be(12);
-            agent.Descriptor.VotedFor.Should().Be(99);
-            agent.Descriptor.CurrentRole.Should().Be(States.Follower);
+                                                p.Granted == true)), Times.Once);
+            descriptor.CurrentTerm.Should().Be(12);
+            descriptor.VotedFor.Should().Be(99);
+            descriptor.CurrentRole.Should().Be(States.Follower);
         }
 
         [Test]
@@ -123,7 +123,7 @@ namespace RaftCoreTest.Node
                 AckedLength = new object[] { new object() }
             };
 
-            var agent = _sut.OnRecoverFromCrash(nodeConfig, descriptor);
+            descriptor = _sut.OnRecoverFromCrash(nodeConfig, descriptor);
             var message = new VoteRequestMessage
             {
                 Type = MessageType.VoteRequest,
@@ -132,16 +132,16 @@ namespace RaftCoreTest.Node
                 LogLength = 1,
                 CurrentTerm = 12
             };
-            agent.OnReceivedVoteRequest(message);
+            descriptor = _sut.OnReceivedVoteRequest(message);
 
             _cluster
                 .Verify(m => m.SendMessage(99, It.Is<VoteResponseMessage>(
                                                 p => p.NodeId == 42 &&
                                                 p.CurrentTerm == 12 &&
-                                                p.InFavour == true)), Times.Once);
-            agent.Descriptor.CurrentTerm.Should().Be(12);
-            agent.Descriptor.VotedFor.Should().Be(99);
-            agent.Descriptor.CurrentRole.Should().Be(States.Follower);
+                                                p.Granted == true)), Times.Once);
+            descriptor.CurrentTerm.Should().Be(12);
+            descriptor.VotedFor.Should().Be(99);
+            descriptor.CurrentRole.Should().Be(States.Follower);
         }
 
         [Test]
@@ -165,7 +165,7 @@ namespace RaftCoreTest.Node
                 AckedLength = new object[] { new object() }
             };
 
-            var agent = _sut.OnRecoverFromCrash(nodeConfig, descriptor);
+            descriptor = _sut.OnRecoverFromCrash(nodeConfig, descriptor);
             var message = new VoteRequestMessage
             {
                 Type = MessageType.VoteRequest,
@@ -173,13 +173,13 @@ namespace RaftCoreTest.Node
                 LastTerm = 11,
                 LogLength = 1
             };
-            agent.OnReceivedVoteRequest(message);
+            _sut.OnReceivedVoteRequest(message);
 
             _cluster
                 .Verify(m => m.SendMessage(1, It.Is<VoteResponseMessage>(
                                                 p => p.NodeId == 42 &&
                                                 p.CurrentTerm == 11 &&
-                                                p.InFavour == false)), Times.Once);
+                                                p.Granted == false)), Times.Once);
         }
 
         [Test]
@@ -203,7 +203,7 @@ namespace RaftCoreTest.Node
                 AckedLength = new object[] { new object() }
             };
 
-            var agent = _sut.OnRecoverFromCrash(nodeConfig, descriptor);
+            descriptor = _sut.OnRecoverFromCrash(nodeConfig, descriptor);
             var message = new VoteRequestMessage
             {
                 Type = MessageType.VoteRequest,
@@ -212,16 +212,16 @@ namespace RaftCoreTest.Node
                 LogLength = 2,
                 CurrentTerm = 12
             };
-            agent.OnReceivedVoteRequest(message);
+            descriptor = _sut.OnReceivedVoteRequest(message);
 
             _cluster
                 .Verify(m => m.SendMessage(99, It.Is<VoteResponseMessage>(
                                                 p => p.NodeId == 42 &&
                                                 p.CurrentTerm == 12 &&
-                                                p.InFavour == true)), Times.Once);
-            agent.Descriptor.CurrentTerm.Should().Be(12);
-            agent.Descriptor.VotedFor.Should().Be(99);
-            agent.Descriptor.CurrentRole.Should().Be(States.Follower);
+                                                p.Granted == true)), Times.Once);
+            descriptor.CurrentTerm.Should().Be(12);
+            descriptor.VotedFor.Should().Be(99);
+            descriptor.CurrentRole.Should().Be(States.Follower);
         }
 
         [Test]
@@ -245,7 +245,7 @@ namespace RaftCoreTest.Node
                 AckedLength = new object[] { new object() }
             };
 
-            var agent = _sut.OnRecoverFromCrash(nodeConfig, descriptor);
+            descriptor = _sut.OnRecoverFromCrash(nodeConfig, descriptor);
             var message = new VoteRequestMessage
             {
                 Type = MessageType.VoteRequest,
@@ -254,16 +254,16 @@ namespace RaftCoreTest.Node
                 LogLength = 1,
                 CurrentTerm = 5
             };
-            agent.OnReceivedVoteRequest(message);
+            descriptor = _sut.OnReceivedVoteRequest(message);
 
             _cluster
                 .Verify(m => m.SendMessage(99, It.Is<VoteResponseMessage>(
                                                 p => p.NodeId == 42 &&
                                                 p.CurrentTerm == 5 &&
-                                                p.InFavour == true)), Times.Once);
-            agent.Descriptor.CurrentTerm.Should().Be(5);
-            agent.Descriptor.VotedFor.Should().Be(99);
-            agent.Descriptor.CurrentRole.Should().Be(States.Follower);
+                                                p.Granted == true)), Times.Once);
+            descriptor.CurrentTerm.Should().Be(5);
+            descriptor.VotedFor.Should().Be(99);
+            descriptor.CurrentRole.Should().Be(States.Follower);
         }
 
         [Test]
@@ -287,7 +287,7 @@ namespace RaftCoreTest.Node
                 AckedLength = new object[] { new object() }
             };
 
-            var agent = _sut.OnRecoverFromCrash(nodeConfig, descriptor);
+            descriptor = _sut.OnRecoverFromCrash(nodeConfig, descriptor);
             var message = new VoteRequestMessage
             {
                 Type = MessageType.VoteRequest,
@@ -296,13 +296,13 @@ namespace RaftCoreTest.Node
                 LogLength = 1,
                 CurrentTerm = 5
             };
-            agent.OnReceivedVoteRequest(message);
+            _sut.OnReceivedVoteRequest(message);
 
             _cluster
                 .Verify(m => m.SendMessage(1, It.Is<VoteResponseMessage>(
                                                 p => p.NodeId == 42 &&
                                                 p.CurrentTerm == 6 &&
-                                                p.InFavour == false)), Times.Once);
+                                                p.Granted == false)), Times.Once);
         }
 
         [TestCase(-1)]
@@ -327,7 +327,7 @@ namespace RaftCoreTest.Node
                 AckedLength = new object[] { new object() }
             };
 
-            var agent = _sut.OnRecoverFromCrash(nodeConfig, descriptor);
+            descriptor = _sut.OnRecoverFromCrash(nodeConfig, descriptor);
             var message = new VoteRequestMessage
             {
                 Type = MessageType.VoteRequest,
@@ -336,16 +336,16 @@ namespace RaftCoreTest.Node
                 LogLength = 1,
                 CurrentTerm = 5
             };
-            agent.OnReceivedVoteRequest(message);
+            _sut.OnReceivedVoteRequest(message);
 
             _cluster
                 .Verify(m => m.SendMessage(1, It.Is<VoteResponseMessage>(
                                                 p => p.NodeId == 42 &&
                                                 p.CurrentTerm == 6 &&
-                                                p.InFavour == false)), Times.Once);
-            agent.Descriptor.CurrentTerm.Should().Be(6);
-            agent.Descriptor.VotedFor.Should().Be(voteFor);
-            agent.Descriptor.CurrentRole.Should().Be(States.Follower);
+                                                p.Granted == false)), Times.Once);
+            descriptor.CurrentTerm.Should().Be(6);
+            descriptor.VotedFor.Should().Be(voteFor);
+            descriptor.CurrentRole.Should().Be(States.Follower);
         }
     }
 }

@@ -44,12 +44,12 @@ namespace RaftCoreTest.Node
                 AckedLength = new object[] { new object() }
             };
 
-            var agent = _sut.OnRecoverFromCrash(nodeConfig, descriptor);
-            agent.OnLedaerHasFailed();
+            descriptor = _sut.OnRecoverFromCrash(nodeConfig, descriptor);
+            descriptor = _sut.OnLedaerHasFailed();
 
-            agent.Descriptor.CurrentTerm.Should().Be(43);
-            agent.Descriptor.CurrentRole.Should().Be(States.Candidate);
-            agent.Descriptor.VotedFor.Should().Be(42);
+            descriptor.CurrentTerm.Should().Be(43);
+            descriptor.CurrentRole.Should().Be(States.Candidate);
+            descriptor.VotedFor.Should().Be(42);
             _cluster
                 .Verify(m => m.SendBroadcastMessage(It.Is<VoteRequestMessage>(
                                                     p => p.NodeId == 42 &&
@@ -79,12 +79,12 @@ namespace RaftCoreTest.Node
                 AckedLength = new object[] { new object() }
             };
 
-            var agent = _sut.OnRecoverFromCrash(nodeConfig, descriptor);
-            agent.OnLedaerHasFailed();
+            descriptor = _sut.OnRecoverFromCrash(nodeConfig, descriptor);
+            descriptor = _sut.OnLedaerHasFailed();
 
-            agent.Descriptor.CurrentTerm.Should().Be(43);
-            agent.Descriptor.CurrentRole.Should().Be(States.Candidate);
-            agent.Descriptor.VotedFor.Should().Be(42);
+            descriptor.CurrentTerm.Should().Be(43);
+            descriptor.CurrentRole.Should().Be(States.Candidate);
+            descriptor.VotedFor.Should().Be(42);
             _cluster
                 .Verify(m => m.SendBroadcastMessage(It.Is<VoteRequestMessage>(
                                                     p => p.NodeId == 42 &&

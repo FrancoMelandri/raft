@@ -30,18 +30,18 @@ namespace RaftCoreTest.Node
             {
                 Id = 42
             };
-            var agent = _sut.OnInitialise(nodeConfig);
+            var descriptor = _sut.OnInitialise(nodeConfig);
 
-            agent.Configuration.Id.Should().Be(42);
-            agent.Descriptor.CurrentTerm.Should().Be(0);
-            agent.Descriptor.VotedFor.Should().Be(-1);
-            agent.Descriptor.Log.Should().BeEquivalentTo(new LogEntry[] { });
-            agent.Descriptor.CommitLenght.Should().Be(0);
-            agent.Descriptor.CurrentRole.Should().Be(States.Follower);
-            agent.Descriptor.CurrentLeader.Should().Be(-1);
-            agent.Descriptor.VotesReceived.Should().NotBeNull();
-            agent.Descriptor.SentLength.Should().BeEquivalentTo(new object[] { });
-            agent.Descriptor.AckedLength.Should().BeEquivalentTo(new object[] { });
+            _sut.Configuration.Id.Should().Be(42);
+            descriptor.CurrentTerm.Should().Be(0);
+            descriptor.VotedFor.Should().Be(-1);
+            descriptor.Log.Should().BeEquivalentTo(new LogEntry[] { });
+            descriptor.CommitLenght.Should().Be(0);
+            descriptor.CurrentRole.Should().Be(States.Follower);
+            descriptor.CurrentLeader.Should().Be(-1);
+            descriptor.VotesReceived.Should().NotBeNull();
+            descriptor.SentLength.Should().BeEquivalentTo(new object[] { });
+            descriptor.AckedLength.Should().BeEquivalentTo(new object[] { });
         }
 
         [Test]
@@ -65,18 +65,18 @@ namespace RaftCoreTest.Node
                 AckedLength = new object[] { new object() }
             };
 
-            var agent = _sut.OnRecoverFromCrash(nodeConfig, descriptor);
+            descriptor = _sut.OnRecoverFromCrash(nodeConfig, descriptor);
 
-            agent.Configuration.Id.Should().Be(42);
-            agent.Descriptor.CurrentTerm.Should().Be(42);
-            agent.Descriptor.VotedFor.Should().Be(42);
-            agent.Descriptor.Log.Length.Should().Be(1);
-            agent.Descriptor.CommitLenght.Should().Be(42);
-            agent.Descriptor.CurrentRole.Should().Be(States.Follower);
-            agent.Descriptor.CurrentLeader.Should().Be(-1);
-            agent.Descriptor.VotesReceived.Should().NotBeNull();
-            agent.Descriptor.SentLength.Should().BeEquivalentTo(new object[] { });
-            agent.Descriptor.AckedLength.Should().BeEquivalentTo(new object[] { });
+            _sut.Configuration.Id.Should().Be(42);
+            descriptor.CurrentTerm.Should().Be(42);
+            descriptor.VotedFor.Should().Be(42);
+            descriptor.Log.Length.Should().Be(1);
+            descriptor.CommitLenght.Should().Be(42);
+            descriptor.CurrentRole.Should().Be(States.Follower);
+            descriptor.CurrentLeader.Should().Be(-1);
+            descriptor.VotesReceived.Should().NotBeNull();
+            descriptor.SentLength.Should().BeEquivalentTo(new object[] { });
+            descriptor.AckedLength.Should().BeEquivalentTo(new object[] { });
         }
     }
 }
