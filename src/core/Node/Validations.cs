@@ -1,7 +1,9 @@
-﻿using RaftCore.Models;
+﻿using RaftCore.Cluster;
+using RaftCore.Models;
 using TinyFp;
 using TinyFp.Extensions;
 using static RaftCore.Node.Utils;
+using static System.Math;
 
 namespace RaftCore.Node
 {
@@ -48,5 +50,10 @@ namespace RaftCore.Node
             => message.CurrentTerm > descriptor.CurrentTerm ?
                 Either<string, int>.Right(0) :
                 Either<string, int>.Left("");
+
+        public static Either<string, int> ValidateVotesQuorum(Descriptor descriptor, ICluster cluster)
+        => descriptor.VotesReceived.ToOption(_ => _.Length, _ => _.Length == 0).OnNone(0) > (int)Floor(((decimal)cluster.Nodes.Length + 1) / 2) ?
+            Either<string, int>.Right(0) :
+            Either<string, int>.Left("");
     }
 }

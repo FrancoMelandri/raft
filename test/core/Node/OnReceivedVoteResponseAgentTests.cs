@@ -190,8 +190,11 @@ namespace RaftCoreTest.Node
         }
 
         [Test]
-        public void CurrentRole_Candidate_And_Term_Equals_CurrentTerm_And_Granted_()
+        public void CurrentRole_Candidate_And_Term_Equals_CurrentTerm_And_Granted_WithNoQuorum_UpdateVotereceived()
         {
+            _cluster
+                .Setup(m => m.Nodes)
+                .Returns(new INode[] { null, null, null, null, null });
             var nodeConfig = new NodeConfiguration
             {
                 Id = 42
@@ -229,6 +232,53 @@ namespace RaftCoreTest.Node
             descriptor.VotesReceived.Should().Contain(42).And.Contain(99);
             _election
                 .Verify(m => m.Cancel(), Times.Never);
+        }
+
+        [Test]
+        public void CurrentRole_Candidate_And_Term_Equals_CurrentTerm_And_Granted_WithQuorum_PromoteAsLeader()
+        {
+            _cluster
+                .Setup(m => m.Nodes)
+                .Returns(new INode[] { null, null });
+
+            var nodeConfig = new NodeConfiguration
+            {
+                Id = 42
+            };
+
+            var descriptor = new Descriptor
+            {
+                CurrentTerm = 10,
+                VotedFor = 1,
+                Log = new LogEntry[] { new LogEntry { Term = 10 } },
+                CommitLenght = 0,
+                CurrentRole = States.Leader,
+                CurrentLeader = 2,
+                VotesReceived = new int[] { },
+                SentLength = new object[] { },
+                AckedLength = new object[] { }
+            };
+
+            _ = _sut.OnRecoverFromCrash(nodeConfig, descriptor);
+            descriptor = _sut.OnLeaderHasFailed();
+            var message = new VoteResponseMessage
+            {
+                Type = MessageType.VoteResponse,
+                NodeId = 99,
+                CurrentTerm = 11,
+                Granted = true
+            };
+            descriptor = _sut.OnReceivedVoteResponse(message);
+
+            descriptor.CurrentTerm.Should().Be(11);
+            descriptor.CurrentRole.Should().Be(States.Leader);
+            descriptor.CurrentLeader.Should().Be(42);
+            descriptor.VotedFor.Should().Be(42);
+            descriptor.SentLength.Should().BeEmpty();
+            descriptor.AckedLength.Should().BeEmpty();
+            descriptor.VotesReceived.Should().Contain(42).And.Contain(99);
+            _election
+                .Verify(m => m.Cancel(), Times.Once);
         }
     }
 }
