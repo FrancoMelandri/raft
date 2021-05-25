@@ -45,7 +45,7 @@ namespace RaftCoreTest.Node
             };
 
             descriptor = _sut.OnRecoverFromCrash(nodeConfig, descriptor);
-            descriptor = _sut.OnLedaerHasFailed();
+            descriptor = _sut.OnLeaderHasFailed();
 
             descriptor.CurrentTerm.Should().Be(43);
             descriptor.CurrentRole.Should().Be(States.Candidate);
@@ -80,7 +80,7 @@ namespace RaftCoreTest.Node
             };
 
             descriptor = _sut.OnRecoverFromCrash(nodeConfig, descriptor);
-            descriptor = _sut.OnLedaerHasFailed();
+            descriptor = _sut.OnLeaderHasFailed();
 
             descriptor.CurrentTerm.Should().Be(43);
             descriptor.CurrentRole.Should().Be(States.Candidate);
