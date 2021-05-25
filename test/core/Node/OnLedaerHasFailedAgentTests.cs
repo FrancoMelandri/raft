@@ -4,6 +4,7 @@ using NUnit.Framework;
 using RaftCore.Cluster;
 using RaftCore.Models;
 using RaftCore.Node;
+using System.Collections.Generic;
 
 namespace RaftCoreTest.Node
 {
@@ -41,8 +42,8 @@ namespace RaftCoreTest.Node
                 CurrentRole = States.Leader,
                 CurrentLeader = 42,
                 VotesReceived = null,
-                SentLength = new object[] { new object() },
-                AckedLength = new object[] { new object() }
+                SentLength = new Dictionary<int, int>(),
+                AckedLength = new Dictionary<int, int>()
             };
 
             descriptor = _sut.OnRecoverFromCrash(nodeConfig, descriptor);
@@ -78,8 +79,8 @@ namespace RaftCoreTest.Node
                 CurrentRole = States.Leader,
                 CurrentLeader = 42,
                 VotesReceived = null,
-                SentLength = new object[] { new object() },
-                AckedLength = new object[] { new object() }
+                SentLength = new Dictionary<int, int>(),
+                AckedLength = new Dictionary<int, int>()
             };
 
             descriptor = _sut.OnRecoverFromCrash(nodeConfig, descriptor);

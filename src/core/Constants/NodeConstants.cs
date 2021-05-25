@@ -1,6 +1,7 @@
 ﻿using RaftCore.Models;
 using RaftCore.Node;
 using System;
+using System.Collections.Generic;
 
 namespace RaftCore.Constants
 {
@@ -13,7 +14,7 @@ namespace RaftCore.Constants
         public static readonly States INIT_STATE = States.Follower;
         public static readonly int INIT_CURRENT_LEADER = -1;
         public static readonly int[] INIT_VOTES_RECEIVED = Array.Empty<int>();
-        public static readonly object[] INIT_SENT_LENGTH = Array.Empty<object>();
-        public static readonly object[] INIT_ACKED_LENGTH = Array.Empty<object>();
+        public static readonly IDictionary<int, int> INIT_SENT_LENGTH = new Dictionary<int, int>();
+        public static readonly IDictionary<int, int> INIT_ACKED_LENGTH = new Dictionary<int, int>();
     }
 }

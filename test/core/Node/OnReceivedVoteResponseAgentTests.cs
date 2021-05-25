@@ -4,6 +4,7 @@ using NUnit.Framework;
 using RaftCore.Cluster;
 using RaftCore.Models;
 using RaftCore.Node;
+using System.Collections.Generic;
 
 namespace RaftCoreTest.Node
 {
@@ -40,8 +41,8 @@ namespace RaftCoreTest.Node
                 CurrentRole = States.Leader,
                 CurrentLeader = 2,
                 VotesReceived = new int[] { },
-                SentLength = new object[] { },
-                AckedLength = new object[] { }
+                SentLength = new Dictionary<int, int> (),
+                AckedLength = new Dictionary<int, int>()
             };
 
             _ = _sut.OnRecoverFromCrash(nodeConfig, descriptor);
@@ -81,8 +82,8 @@ namespace RaftCoreTest.Node
                 CurrentRole = States.Leader,
                 CurrentLeader = 2,
                 VotesReceived = new int[] { },
-                SentLength = new object[] { },
-                AckedLength = new object[] { }
+                SentLength = new Dictionary<int, int>(),
+                AckedLength = new Dictionary<int, int>()
             };
 
             _ = _sut.OnRecoverFromCrash(nodeConfig, descriptor);
@@ -122,8 +123,8 @@ namespace RaftCoreTest.Node
                 CurrentRole = States.Leader,
                 CurrentLeader = 2,
                 VotesReceived = new int[] { },
-                SentLength = new object[] { },
-                AckedLength = new object[] { }
+                SentLength = new Dictionary<int, int>(),
+                AckedLength = new Dictionary<int, int>()
             };
 
             _ = _sut.OnRecoverFromCrash(nodeConfig, descriptor);
@@ -164,8 +165,8 @@ namespace RaftCoreTest.Node
                 CurrentRole = States.Leader,
                 CurrentLeader = 2,
                 VotesReceived = new int[] { },
-                SentLength = new object[] { },
-                AckedLength = new object[] { }
+                SentLength = new Dictionary<int, int>(),
+                AckedLength = new Dictionary<int, int>()
             };
 
             _ = _sut.OnRecoverFromCrash(nodeConfig, descriptor);
@@ -209,8 +210,8 @@ namespace RaftCoreTest.Node
                 CurrentRole = States.Leader,
                 CurrentLeader = 2,
                 VotesReceived = new int[] { },
-                SentLength = new object[] { },
-                AckedLength = new object[] { }
+                SentLength = new Dictionary<int, int>(),
+                AckedLength = new Dictionary<int, int>()
             };
 
             _ = _sut.OnRecoverFromCrash(nodeConfig, descriptor);
@@ -255,8 +256,8 @@ namespace RaftCoreTest.Node
                 CurrentRole = States.Leader,
                 CurrentLeader = 2,
                 VotesReceived = new int[] { },
-                SentLength = new object[] { },
-                AckedLength = new object[] { }
+                SentLength = new Dictionary<int, int>(),
+                AckedLength = new Dictionary<int, int>()
             };
 
             _ = _sut.OnRecoverFromCrash(nodeConfig, descriptor);

@@ -1,4 +1,5 @@
 ﻿using RaftCore.Models;
+using System.Collections.Generic;
 
 namespace RaftCore.Node
 {
@@ -11,7 +12,7 @@ namespace RaftCore.Node
         public States CurrentRole { get; set; }
         public int CurrentLeader { get; set; }
         public int[] VotesReceived { get; set; }
-        public object[] SentLength { get; set; }
-        public object[] AckedLength { get; set; }
+        public IDictionary<int, int> SentLength { get; set; }
+        public IDictionary<int, int> AckedLength { get; set; }
     }
 }
