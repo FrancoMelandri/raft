@@ -1,4 +1,5 @@
-﻿using RaftCore.Cluster;
+﻿using System.Linq;
+using RaftCore.Cluster;
 using RaftCore.Models;
 using TinyFp;
 using TinyFp.Extensions;
@@ -91,11 +92,27 @@ namespace RaftCore.Node
 
         public Descriptor OnReceivedVoteResponse(VoteResponseMessage message)
             => ValidateVoteGrant(_descriptor, message)
-                .Match(_ => Unit.Default,
+                .Match(_ => ReceivedVoteResponseGrantedUpdateDescriptor(message),
                        _ => ValidateTerm(_descriptor, message)
                                 .Match(_ => ReceivedVoteResponseNoGrantedUpdateDescriptor(message),
                                         _ => Unit.Default))
                 .Map(_ => _descriptor);
+
+        private Unit ReceivedVoteResponseGrantedUpdateDescriptor(VoteResponseMessage message)
+            => new Descriptor
+            {
+                CurrentTerm = _descriptor.CurrentTerm,
+                VotedFor = _descriptor.VotedFor,
+                Log = _descriptor.Log,
+                CommitLenght = _descriptor.CommitLenght,
+                CurrentRole = _descriptor.CurrentRole,
+                CurrentLeader = _descriptor.CurrentLeader,
+                VotesReceived = _descriptor.VotesReceived.Concat(new int[] { message.NodeId }).Distinct().ToArray(),
+                SentLength = _descriptor.SentLength,
+                AckedLength = _descriptor.AckedLength
+            }
+            .Tee(descriptor => _descriptor = descriptor)
+            .Map(_ => Unit.Default);
 
         private Unit ReceivedVoteResponseNoGrantedUpdateDescriptor(VoteResponseMessage message)
             => new Descriptor
@@ -140,7 +157,7 @@ namespace RaftCore.Node
                     Type = MessageType.VoteRequest,
                     NodeId = Configuration.Id,
                     CurrentTerm = _descriptor.CurrentTerm,
-                    LogLength = _descriptor.Log.Length,
+                    LogLength = _descriptor.Log.ToOption().Map(_ => _.Length).OnNone(0),
                     LastTerm = lastTerm
                 },
                 MessageType.VoteResponse => new VoteResponseMessage
