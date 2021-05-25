@@ -20,6 +20,10 @@ jobs:
       with:
         dotnet-version: '5.0.103'
 
+    - name: Add Github package repository
+      run: |
+        dotnet nuget add source --username FrancoMelandri --password ${{ secrets.GITHUB_TOKEN }} --store-password-in-clear-text --name github "https://nuget.pkg.github.com/FrancoMelandri/index.json"
+
     - name: Build
       run: |
         dotnet build
