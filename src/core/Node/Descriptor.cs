@@ -10,7 +10,7 @@ namespace RaftCore.Node
         public int CommitLenght { get; set; }
         public States CurrentRole { get; set; }
         public int CurrentLeader { get; set; }
-        public object VotesReceived { get; set; }
+        public int[] VotesReceived { get; set; }
         public object[] SentLength { get; set; }
         public object[] AckedLength { get; set; }
     }

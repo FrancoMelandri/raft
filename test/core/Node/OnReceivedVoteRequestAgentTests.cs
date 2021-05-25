@@ -51,13 +51,16 @@ namespace RaftCoreTest.Node
                 NodeId = 1,
                 LastTerm = 9
             };
-            _sut.OnReceivedVoteRequest(message);
+            descriptor = _sut.OnReceivedVoteRequest(message);
 
             _cluster
                 .Verify(m => m.SendMessage(1, It.Is<VoteResponseMessage>(
                                                 p => p.NodeId == 42 &&
                                                 p.CurrentTerm == 11 &&
                                                 p.Granted == false)), Times.Once);
+            descriptor.CurrentTerm.Should().Be(11);
+            descriptor.VotedFor.Should().Be(-1);
+            descriptor.CurrentRole.Should().Be(States.Follower);
         }
 
         [Test]
@@ -180,6 +183,9 @@ namespace RaftCoreTest.Node
                                                 p => p.NodeId == 42 &&
                                                 p.CurrentTerm == 11 &&
                                                 p.Granted == false)), Times.Once);
+            descriptor.CurrentTerm.Should().Be(11);
+            descriptor.VotedFor.Should().Be(-1);
+            descriptor.CurrentRole.Should().Be(States.Follower);
         }
 
         [Test]
@@ -303,6 +309,9 @@ namespace RaftCoreTest.Node
                                                 p => p.NodeId == 42 &&
                                                 p.CurrentTerm == 6 &&
                                                 p.Granted == false)), Times.Once);
+            descriptor.CurrentTerm.Should().Be(6);
+            descriptor.VotedFor.Should().Be(1);
+            descriptor.CurrentRole.Should().Be(States.Follower);
         }
 
         [TestCase(-1)]

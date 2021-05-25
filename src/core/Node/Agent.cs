@@ -67,7 +67,7 @@ namespace RaftCore.Node
                     CommitLenght = _descriptor.CommitLenght,
                     CurrentRole = States.Candidate,
                     CurrentLeader = _descriptor.CurrentLeader,
-                    VotesReceived = Configuration.Id,
+                    VotesReceived = new[] { Configuration.Id },
                     SentLength = _descriptor.SentLength,
                     AckedLength = _descriptor.AckedLength
                 }
@@ -103,8 +103,8 @@ namespace RaftCore.Node
                 )
                 .Map(_ => _descriptor);
 
-        public Unit OnReceivedVoteResponse(VoteResponseMessage message)
-            => Unit.Default;
+        public Descriptor OnReceivedVoteResponse(VoteResponseMessage message)
+            => _descriptor;
 
         private Message BuildMessage(MessageType type, int lastTerm, bool granted)
             => type switch
