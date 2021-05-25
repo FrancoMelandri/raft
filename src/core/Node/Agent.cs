@@ -104,7 +104,24 @@ namespace RaftCore.Node
                 .Map(_ => _descriptor);
 
         public Descriptor OnReceivedVoteResponse(VoteResponseMessage message)
-            => _descriptor;
+            => ValidateVoteGrant(_descriptor, message)
+                .Match(_ => _descriptor, 
+                       _ => ValidateTerm(_descriptor, message)
+                                .Match(_ => new Descriptor 
+                                            {
+                                                CurrentTerm = message.CurrentTerm,
+                                                VotedFor = INIT_VOTED_FOR,
+                                                Log = _descriptor.Log,
+                                                CommitLenght = _descriptor.CommitLenght,
+                                                CurrentRole = States.Follower,
+                                                CurrentLeader = _descriptor.CurrentLeader,
+                                                VotesReceived = _descriptor.VotesReceived,
+                                                SentLength = _descriptor.SentLength,
+                                                AckedLength = _descriptor.AckedLength
+                                            }
+                                            .Tee(descriptor => _descriptor = descriptor)
+                                            .Tee(descriptor => _election.Cancel()) ,
+                                        _ => _descriptor));
 
         private Message BuildMessage(MessageType type, int lastTerm, bool granted)
             => type switch

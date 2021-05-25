@@ -49,7 +49,7 @@ namespace RaftCoreTest.Node
             {
                 Type = MessageType.VoteRequest,
                 NodeId = 99,
-                CurrentTerm = 12,
+                CurrentTerm = 10,
                 Granted = false
             };
             descriptor = _sut.OnReceivedVoteResponse(message);
@@ -60,6 +60,49 @@ namespace RaftCoreTest.Node
             descriptor.SentLength.Should().BeEmpty();
             descriptor.AckedLength.Should().BeEmpty();
             descriptor.VotesReceived.Should().BeEmpty();
+            _election
+                .Verify(m => m.Cancel(), Times.Never);
+        }
+
+        [Test]
+        public void CurrentRole_Not_Candidate_And_Term_GreaterThan_CurrentTerm_UpadteDesccriptor()
+        {
+            var nodeConfig = new NodeConfiguration
+            {
+                Id = 42
+            };
+
+            var descriptor = new Descriptor
+            {
+                CurrentTerm = 11,
+                VotedFor = 1,
+                Log = new LogEntry[] { new LogEntry { Term = 10 } },
+                CommitLenght = 0,
+                CurrentRole = States.Leader,
+                CurrentLeader = 2,
+                VotesReceived = new int[] { },
+                SentLength = new object[] { },
+                AckedLength = new object[] { }
+            };
+
+            _ = _sut.OnRecoverFromCrash(nodeConfig, descriptor);
+            var message = new VoteResponseMessage
+            {
+                Type = MessageType.VoteRequest,
+                NodeId = 99,
+                CurrentTerm = 12,
+                Granted = false
+            };
+            descriptor = _sut.OnReceivedVoteResponse(message);
+
+            descriptor.CurrentTerm.Should().Be(12);
+            descriptor.CurrentRole.Should().Be(States.Follower);
+            descriptor.VotedFor.Should().Be(-1);
+            descriptor.SentLength.Should().BeEmpty();
+            descriptor.AckedLength.Should().BeEmpty();
+            descriptor.VotesReceived.Should().BeEmpty();
+            _election
+                .Verify(m => m.Cancel(), Times.Once);
         }
     }
 }

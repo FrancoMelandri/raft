@@ -36,5 +36,17 @@ namespace RaftCore.Node
                descriptor.VotedFor != message.NodeId ?
                 Either<string, int>.Right(0) :
                 Either<string, int>.Left("");
+
+        public static Either<string, int> ValidateVoteGrant(Descriptor descriptor, VoteResponseMessage message)
+            => descriptor.CurrentRole == States.Candidate && 
+               descriptor.CurrentTerm == message.CurrentTerm &&
+               message.Granted ?
+                Either<string, int>.Right(0) :
+                Either<string, int>.Left("");
+
+        public static Either<string, int> ValidateTerm(Descriptor descriptor, VoteResponseMessage message)
+            => message.CurrentTerm > descriptor.CurrentTerm ?
+                Either<string, int>.Right(0) :
+                Either<string, int>.Left("");
     }
 }
