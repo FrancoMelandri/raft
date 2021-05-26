@@ -68,13 +68,17 @@ Back on the candidate side to look to all responses.
 
 We have a successful vote when the currentRole of the node is candidate, the term coming from response is equal to currentTerm and the vote is granted. So in this case first of all we have to add the **voterId** to the set of the votes we received (we have to count the unique vote). If the set of votes is a quorum (the number of votes is greater than the half of the number of the nodes round up) then we can transition to **leader** state and we can cancel the election timer because we reached the quorum of votes we need to became a leader. Becoming a leader means we have to initialize some internal state and notify all the nodes the node is the new leader.
 
- 
+###  Broadcasting messages
+
+![raft-code-1](./imgs/raft-code-4.png)
+
+When a node receive a request the behaviour depends on the current role of the node itself. If the node is not a leader simply forward the request to the current leader and do nothing else. 
 
 
 
 
 
- 
+
 
 
 

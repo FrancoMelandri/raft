@@ -1,4 +1,5 @@
 ﻿using System.Linq;
+using System.Collections.Generic;
 using RaftCore.Cluster;
 using RaftCore.Models;
 using TinyFp;
@@ -7,11 +8,11 @@ using static RaftCore.Constants.NodeConstants;
 using static RaftCore.Constants.MessageConstants;
 using static RaftCore.Node.Validations;
 using static RaftCore.Node.Utils;
-using System.Collections.Generic;
+using static RaftCore.Node.Checks;
 
 namespace RaftCore.Node
 {
-    public class Agent
+    public class Agent : IAgent
     {
         public NodeConfiguration Configuration { get; private set; }
         private Descriptor _descriptor;
@@ -98,6 +99,11 @@ namespace RaftCore.Node
                                 .Match(_ => ReceivedVoteResponseNoGrantedUpdateDescriptor(message),
                                         _ => Unit.Default))
                 .Map(_ => _descriptor);
+
+        public Descriptor OnBroadcastMessage(Message message)
+            => IsLeader(_descriptor)
+                .Match(_ => _descriptor, 
+                       _ => _descriptor.Tee(descriptor => _cluster.SendMessage(descriptor.CurrentLeader, message)));
 
         private Unit ReceivedVoteResponseGranted(VoteResponseMessage message)
             => new Descriptor

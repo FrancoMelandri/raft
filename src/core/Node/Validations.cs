@@ -56,4 +56,10 @@ namespace RaftCore.Node
             Either<string, int>.Right(0) :
             Either<string, int>.Left("");
     }
+
+    public static class Checks
+    {
+        public static Either<string, int> IsLeader(Descriptor descriptor)
+            => descriptor.CurrentRole.ToEither(_ => 0, _ => _ != States.Leader, "");
+    }
 }
