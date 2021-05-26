@@ -64,20 +64,27 @@ namespace RaftCore.Node
 
         public Descriptor OnLeaderHasFailed()
             => new Descriptor
-            {
-                CurrentTerm = _descriptor.CurrentTerm + 1,
-                VotedFor = Configuration.Id,
-                Log = _descriptor.Log,
-                CommitLenght = _descriptor.CommitLenght,
-                CurrentRole = States.Candidate,
-                CurrentLeader = _descriptor.CurrentLeader,
-                VotesReceived = new[] { Configuration.Id },
-                SentLength = _descriptor.SentLength,
-                AckedLength = _descriptor.AckedLength
-            }
+                    {
+                        CurrentTerm = _descriptor.CurrentTerm + 1,
+                        VotedFor = Configuration.Id,
+                        Log = _descriptor.Log,
+                        CommitLenght = _descriptor.CommitLenght,
+                        CurrentRole = States.Candidate,
+                        CurrentLeader = _descriptor.CurrentLeader,
+                        VotesReceived = new[] { Configuration.Id },
+                        SentLength = _descriptor.SentLength,
+                        AckedLength = _descriptor.AckedLength
+                    }
                 .Tee(descriptor => _descriptor = descriptor)
                 .Tee(descriptor => LastEntryOrZero(descriptor.Log)
-                                    .Map(_ => BuildMessage(MessageType.VoteRequest, _, GRANT))
+                                    .Map(lastTerm => new VoteRequestMessage
+                                                    {
+                                                        Type = MessageType.VoteRequest,
+                                                        NodeId = Configuration.Id,
+                                                        CurrentTerm = _descriptor.CurrentTerm,
+                                                        LogLength = _descriptor.Log.ToOption().Map(_ => _.Length).OnNone(0),
+                                                        LastTerm = lastTerm
+                                    })
                                     .Tee(_ => _cluster.SendBroadcastMessage(_))
                                     .Tee(_ => _election.Start()))
                 .Map(_ => _descriptor);
@@ -237,30 +244,21 @@ namespace RaftCore.Node
                         AckedLength = _descriptor.AckedLength
                     }
                 .Tee(descriptor => _descriptor = descriptor)
-                .Map(descriptor => _cluster.SendMessage(message.NodeId, BuildMessage(MessageType.VoteResponse, descriptor.CurrentTerm, GRANT)));
+                .Map(descriptor => _cluster.SendMessage(message.NodeId, new VoteResponseMessage
+                                                                            {
+                                                                                Type = MessageType.VoteResponse,
+                                                                                NodeId = Configuration.Id,
+                                                                                CurrentTerm = _descriptor.CurrentTerm,
+                                                                                Granted = GRANT
+                                                                            }));
 
         private Unit ReceivedVoteRequestDontGrantResponse(VoteRequestMessage message)
-            => _cluster.SendMessage(message.NodeId, BuildMessage(MessageType.VoteResponse, _descriptor.CurrentTerm, NO_GRANT));
-
-        private Message BuildMessage(MessageType type, int lastTerm, bool granted)
-            => type switch
-            {
-                MessageType.VoteRequest => new VoteRequestMessage
-                {
-                    Type = MessageType.VoteRequest,
-                    NodeId = Configuration.Id,
-                    CurrentTerm = _descriptor.CurrentTerm,
-                    LogLength = _descriptor.Log.ToOption().Map(_ => _.Length).OnNone(0),
-                    LastTerm = lastTerm
-                },
-                MessageType.VoteResponse => new VoteResponseMessage
-                {
-                    Type = MessageType.VoteResponse,
-                    NodeId = Configuration.Id,
-                    CurrentTerm = _descriptor.CurrentTerm,
-                    Granted = granted
-                },
-                _ => Message.Empty
-            };
+            => _cluster.SendMessage(message.NodeId, new VoteResponseMessage
+                                                            {
+                                                                Type = MessageType.VoteResponse,
+                                                                NodeId = Configuration.Id,
+                                                                CurrentTerm = _descriptor.CurrentTerm,
+                                                                Granted = NO_GRANT
+                                                            });
     }
 }

@@ -9,21 +9,8 @@ using System.Collections.Generic;
 namespace RaftCoreTest.Node
 {
     [TestFixture]
-    public class OnReceivedVoteRequestAgentTests
+    public class OnReceivedVoteRequestAgentTests : BaseUseCases
     {
-        private Agent _sut;
-        private Mock<ICluster> _cluster;
-        private Mock<IElection> _election;
-
-        [SetUp]
-        public void SetUp()
-        {
-            _cluster = new Mock<ICluster>();
-            _election = new Mock<IElection>();
-            _sut = Agent.Create(_cluster.Object,
-                                _election.Object);
-        }
-
         [Test]
         public void NodeLogTerm_GreaterThan_CandidateLog_RespondWithFalse()
         {
