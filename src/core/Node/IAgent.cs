@@ -11,5 +11,6 @@ namespace RaftCore.Node
         Descriptor OnReceivedVoteRequest(VoteRequestMessage message);
         Descriptor OnReceivedVoteResponse(VoteResponseMessage message);
         Descriptor OnBroadcastMessage(Message message);
+        Descriptor OnReplicateLog();
     }
 }

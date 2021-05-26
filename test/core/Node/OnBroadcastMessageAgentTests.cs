@@ -1,7 +1,6 @@
 ﻿using FluentAssertions;
 using Moq;
 using NUnit.Framework;
-using RaftCore.Cluster;
 using RaftCore.Models;
 using RaftCore.Node;
 using System.Collections.Generic;
@@ -62,7 +61,7 @@ namespace RaftCoreTest.Node
                 Granted = false
             };
 
-            _cluster.Reset();
+            ResetCluster();
 
             var descriptor = _sut.OnBroadcastMessage(message);
 

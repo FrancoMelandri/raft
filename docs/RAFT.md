@@ -76,6 +76,8 @@ When a node receive a request the behaviour depends on the current role of the n
 
 In case the node receive the message is a leader, it append the message to the log using the current term of the leaders itself; then we need to tell all the follower about the message, and to do this we are going to use the **ReplicateLog** function we seen before.
 
+As long as the node is the leader, it periodically replicate the log to all the followers node.
+
 
 
 
