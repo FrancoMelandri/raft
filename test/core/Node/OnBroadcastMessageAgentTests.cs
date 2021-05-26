@@ -9,21 +9,8 @@ using System.Collections.Generic;
 namespace RaftCoreTest.Node
 {
     [TestFixture]
-    public class OnBroadcastMessageAgentTests
+    public class OnBroadcastMessageAgentTests : BaseUseCases
     {
-        private Agent _sut;
-        private Mock<ICluster> _cluster;
-        private Mock<IElection> _election;
-
-        [SetUp]
-        public void SetUp()
-        {
-            _cluster = new Mock<ICluster>();
-            _election = new Mock<IElection>();
-            _sut = Agent.Create(_cluster.Object,
-                                _election.Object);
-        }
-
         [Test]
         public void WhenNodeIsNotLeader_ForwardToLeader()
         {
@@ -60,6 +47,36 @@ namespace RaftCoreTest.Node
             descriptorResult.Should().BeEquivalentTo(descriptor);
             //_cluster
             //    .Verify(m => m.SendMessage(2, message));
+        }
+
+        [Test]
+        public void WhenNodeIsLeader_AppendMessageToLog_UpdateDescriptor_ReplicateLog()
+        {
+            _ = UseCase_NodeAsLeader();
+
+            var message = new VoteResponseMessage
+            {
+                Type = MessageType.VoteResponse,
+                NodeId = 99,
+                CurrentTerm = 11,
+                Granted = false
+            };
+
+            _cluster.Reset();
+
+            var descriptor = _sut.OnBroadcastMessage(message);
+
+            descriptor.Log.Should().HaveCount(3);
+            descriptor.Log[2].Message.Should().Be(message);
+            descriptor.Log[2].Term.Should().Be(11);
+
+            descriptor.AckedLength[42].Should().Be(3);
+            _cluster
+                .Verify(m => m.ReplicateLog(42, 1), Times.Once);
+            _cluster
+                .Verify(m => m.ReplicateLog(42, 2), Times.Once);
+            _cluster
+                .Verify(m => m.ReplicateLog(42, 42), Times.Never);
         }
     }
 }

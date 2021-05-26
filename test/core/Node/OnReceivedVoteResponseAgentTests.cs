@@ -9,21 +9,8 @@ using System.Collections.Generic;
 namespace RaftCoreTest.Node
 {
     [TestFixture]
-    public class OnReceivedVoteResponseAgentTests
+    public class OnReceivedVoteResponseAgentTests : BaseUseCases
     {
-        private Agent _sut;
-        private Mock<ICluster> _cluster;
-        private Mock<IElection> _election;
-
-        [SetUp]
-        public void SetUp()
-        {
-            _cluster = new Mock<ICluster>();
-            _election = new Mock<IElection>();
-            _sut = Agent.Create(_cluster.Object,
-                                _election.Object);
-        }
-
         [Test]
         public void CurrentRole_Not_Candidate_And_Term_LessOrEqual_CurrentTerm_DoNothing()
         {
@@ -238,53 +225,7 @@ namespace RaftCoreTest.Node
         [Test]
         public void CurrentRole_Candidate_And_Term_Equals_CurrentTerm_And_Granted_WithQuorum_PromoteAsLeader()
         {
-            var node1 = new Mock<INode>();
-            node1.Setup(m => m.Id).Returns(1);
-            var node2 = new Mock<INode>();
-            node2.Setup(m => m.Id).Returns(2);
-            var node3 = new Mock<INode>();
-            node3.Setup(m => m.Id).Returns(99);
-
-            _cluster
-                .Setup(m => m.Nodes)
-                .Returns(new INode[] { node1.Object, node2.Object, node3.Object });
-
-            var nodeConfig = new NodeConfiguration
-            {
-                Id = 42
-            };
-
-            var descriptor = new Descriptor
-            {
-                CurrentTerm = 10,
-                VotedFor = 1,
-                Log = new LogEntry[] { new LogEntry { Term = 9 }, new LogEntry { Term = 10 } },
-                CommitLenght = 0,
-                CurrentRole = States.Leader,
-                CurrentLeader = 2,
-                VotesReceived = new int[] { },
-                SentLength = new Dictionary<int, int>(),
-                AckedLength = new Dictionary<int, int>()
-            };
-
-            _ = _sut.OnRecoverFromCrash(nodeConfig, descriptor);
-            descriptor = _sut.OnLeaderHasFailed();
-            var message = new VoteResponseMessage
-            {
-                Type = MessageType.VoteResponse,
-                NodeId = 1,
-                CurrentTerm = 11,
-                Granted = true
-            };
-            descriptor = _sut.OnReceivedVoteResponse(message);
-            message = new VoteResponseMessage
-            {
-                Type = MessageType.VoteResponse,
-                NodeId = 2,
-                CurrentTerm = 11,
-                Granted = true
-            };
-            descriptor = _sut.OnReceivedVoteResponse(message);
+            var descriptor = UseCase_NodeAsLeader();
 
             descriptor.CurrentTerm.Should().Be(11);
             descriptor.CurrentRole.Should().Be(States.Leader);

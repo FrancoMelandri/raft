@@ -74,6 +74,8 @@ We have a successful vote when the currentRole of the node is candidate, the ter
 
 When a node receive a request the behaviour depends on the current role of the node itself. If the node is not a leader simply forward the request to the current leader and do nothing else. 
 
+In case the node receive the message is a leader, it append the message to the log using the current term of the leaders itself; then we need to tell all the follower about the message, and to do this we are going to use the **ReplicateLog** function we seen before.
+
 
 
 

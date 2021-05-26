@@ -9,6 +9,7 @@ using static RaftCore.Constants.MessageConstants;
 using static RaftCore.Node.Validations;
 using static RaftCore.Node.Utils;
 using static RaftCore.Node.Checks;
+using System;
 
 namespace RaftCore.Node
 {
@@ -102,8 +103,27 @@ namespace RaftCore.Node
 
         public Descriptor OnBroadcastMessage(Message message)
             => IsLeader(_descriptor)
-                .Match(_ => _descriptor, 
+                .Match(_ => HandleBroadcastMessageAsLeader(message), 
                        _ => _descriptor.Tee(descriptor => _cluster.SendMessage(descriptor.CurrentLeader, message)));
+
+        private Descriptor HandleBroadcastMessageAsLeader(Message message)
+            => (Log: _descriptor.Log.Concat(new LogEntry[] { new LogEntry { Message = message, Term = _descriptor.CurrentTerm } }).ToArray(),
+                AckedLength: _descriptor.AckedLength.Tee(_ => _[Configuration.Id] = _descriptor.Log.Length + 1))
+                .Map(_ => (Descriptor: new Descriptor
+                        {
+                            CurrentTerm = _descriptor.CurrentTerm,
+                            VotedFor = _descriptor.VotedFor,
+                            Log = _.Log,
+                            CommitLenght = _descriptor.CommitLenght,
+                            CurrentRole = _descriptor.CurrentRole,
+                            CurrentLeader = _descriptor.CurrentLeader,
+                            VotesReceived = _descriptor.VotesReceived,
+                            SentLength = _descriptor.SentLength,
+                            AckedLength = _.AckedLength
+                        },
+                        Followers: _.AckedLength.Keys.Filter(_ => _ != Configuration.Id)))
+                .Tee(_ => _.Followers.ForEach(follower => _cluster.ReplicateLog(_.Descriptor.CurrentLeader, follower)))
+                .Map(_ => _.Descriptor);
 
         private Unit ReceivedVoteResponseGranted(VoteResponseMessage message)
             => new Descriptor
@@ -144,8 +164,8 @@ namespace RaftCore.Node
             => _cluster.Nodes
                 .Filter(_ => _.Id != Configuration.Id)
                 .Map(_ => (_.Id, descriptor.Log.Length))
-                .Fold((SetLength: new Dictionary<int, int>(), AckedLength: new Dictionary<int, int>()),
-                      (a, i) => a.Tee(_ => a.SetLength.Add(i.Id, i.Length))
+                .Fold((SentLength: new Dictionary<int, int>(), AckedLength: new Dictionary<int, int>()),
+                      (a, i) => a.Tee(_ => a.SentLength.Add(i.Id, i.Length))
                                  .Tee(_ => a.AckedLength.Add(i.Id, 0)))
                 .Map(_ => (Descriptor: new Descriptor
                                     {
@@ -155,11 +175,11 @@ namespace RaftCore.Node
                                         CommitLenght = descriptor.CommitLenght,
                                         CurrentRole = descriptor.CurrentRole,
                                         CurrentLeader = descriptor.CurrentLeader,
-                                        VotesReceived = descriptor.VotesReceived,
-                                        SentLength = _.SetLength,
+                                        VotesReceived = descriptor.VotesReceived,   
+                                        SentLength = _.SentLength,
                                         AckedLength = _.AckedLength
                                     }, 
-                            Followers: _.SetLength.Keys))
+                            Followers: _.SentLength.Keys))
                 .Tee(_ => _.Followers.ForEach(follower => _cluster.ReplicateLog(descriptor.CurrentLeader, follower)))
                 .Map(_ =>_.Descriptor);
 
