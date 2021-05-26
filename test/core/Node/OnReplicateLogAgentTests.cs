@@ -1,5 +1,6 @@
 ﻿using Moq;
 using NUnit.Framework;
+using RaftCore.Models;
 
 namespace RaftCoreTest.Node
 {
@@ -13,7 +14,8 @@ namespace RaftCoreTest.Node
             _ = _sut.OnReplicateLog();
 
             _cluster
-                .Verify(m => m.ReplicateLog(42, It.IsAny<int>()), Times.Never);
+                .Verify(m => m.SendMessage(It.IsAny<int>(),
+                                            It.IsAny<LogRequestMessage>()), Times.Never);
         }
 
         [Test]
@@ -26,13 +28,30 @@ namespace RaftCoreTest.Node
             _ = _sut.OnReplicateLog();
 
             _cluster
-                .Verify(m => m.ReplicateLog(42, 1), Times.Once);
+                .Verify(m => m.SendMessage(1, 
+                                            It.Is<LogRequestMessage>(p => 
+                                                p.Type == MessageType.LogRequest &&
+                                                p.LeaderId == 42 &&
+                                                p.PrevTerm == 11 &&
+                                                p.StartLength == 6)), Times.Once);
             _cluster
-                .Verify(m => m.ReplicateLog(42, 2), Times.Once);
+                .Verify(m => m.SendMessage(2,
+                                            It.Is<LogRequestMessage>(p =>
+                                                p.Type == MessageType.LogRequest &&
+                                                p.LeaderId == 42 &&
+                                                p.PrevTerm == 11 &&
+                                                p.StartLength == 6)), Times.Once);
             _cluster
-                .Verify(m => m.ReplicateLog(42, 99), Times.Once);
+                .Verify(m => m.SendMessage(3,
+                                            It.Is<LogRequestMessage>(p =>
+                                                p.Type == MessageType.LogRequest &&
+                                                p.LeaderId == 42 &&
+                                                p.PrevTerm == 11 &&
+                                                p.StartLength == 6)), Times.Once);
+
             _cluster
-                .Verify(m => m.ReplicateLog(42, 42), Times.Never);
+                .Verify(m => m.SendMessage(42,
+                                            It.IsAny<LogRequestMessage>()), Times.Never);
         }
     }
 }

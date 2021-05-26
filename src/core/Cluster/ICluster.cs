@@ -8,6 +8,5 @@ namespace RaftCore.Cluster
         INode[] Nodes { get; }
         Unit SendBroadcastMessage(Message message);
         Unit SendMessage(int nodeId, Message message);
-        Unit ReplicateLog(int nodeId, int follower);
     }
 }

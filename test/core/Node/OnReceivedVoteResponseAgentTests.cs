@@ -231,8 +231,8 @@ namespace RaftCoreTest.Node
             descriptor.CurrentRole.Should().Be(States.Leader);
             descriptor.CurrentLeader.Should().Be(42);
             descriptor.VotedFor.Should().Be(42);
-            descriptor.SentLength[1].Should().Be(2);
-            descriptor.SentLength[2].Should().Be(2);
+            descriptor.SentLength[1].Should().Be(6);
+            descriptor.SentLength[2].Should().Be(6);
             descriptor.AckedLength[1].Should().Be(0);
             descriptor.AckedLength[2].Should().Be(0);
             descriptor.VotesReceived.Should().Contain(42)
@@ -242,11 +242,29 @@ namespace RaftCoreTest.Node
             _election
                 .Verify(m => m.Cancel(), Times.Once);
             _cluster
-                .Verify(m => m.ReplicateLog(42, 1), Times.Once);
+                .Verify(m => m.SendMessage(1,
+                                            It.Is<LogRequestMessage>(p =>
+                                                p.Type == MessageType.LogRequest &&
+                                                p.LeaderId == 42 &&
+                                                p.PrevTerm == 11 &&
+                                                p.StartLength == 6)), Times.Once);
             _cluster
-                .Verify(m => m.ReplicateLog(42, 2), Times.Once);
+                .Verify(m => m.SendMessage(2,
+                                            It.Is<LogRequestMessage>(p =>
+                                                p.Type == MessageType.LogRequest &&
+                                                p.LeaderId == 42 &&
+                                                p.PrevTerm == 11 &&
+                                                p.StartLength == 6)), Times.Once);
             _cluster
-                .Verify(m => m.ReplicateLog(42, 42), Times.Never);
+                .Verify(m => m.SendMessage(3,
+                                            It.Is<LogRequestMessage>(p =>
+                                                p.Type == MessageType.LogRequest &&
+                                                p.LeaderId == 42 &&
+                                                p.PrevTerm == 11 &&
+                                                p.StartLength == 6)), Times.Once);
+            _cluster
+                .Verify(m => m.SendMessage(42,
+                                            It.IsAny<LogRequestMessage>()), Times.Never);
         }
     }
 }

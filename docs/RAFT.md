@@ -76,9 +76,17 @@ When a node receive a request the behaviour depends on the current role of the n
 
 In case the node receive the message is a leader, it append the message to the log using the current term of the leaders itself; then we need to tell all the follower about the message, and to do this we are going to use the **ReplicateLog** function we seen before.
 
-As long as the node is the leader, it periodically replicate the log to all the followers node.
+As long as the node is the leader, it periodically replicate the log to all the followers node. We can consider this function as an heart beat to let know the follower node the leader is alive. Another proposes to send this replication log periodically i because some message could be loss in the network. 
 
+### Replicating from leader to followers
 
+![raft-code-1](./imgs/raft-code-5.png)
+
+The variable **i** indicate the number of log that we already have sent to the follower. So once we have found the index i we are able to retrieve all the log entries we didn't sent to the follower, and this might be empty. We need also to get the last term before i in order to perform some consistency check to the log that we will se later. 
+
+### Followers receiving LogRequest message
+
+![raft-code-1](./imgs/raft-code-6.png)
 
 
 

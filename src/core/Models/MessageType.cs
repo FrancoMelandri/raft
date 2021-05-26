@@ -4,6 +4,7 @@
     {
         None,
         VoteRequest,
-        VoteResponse
+        VoteResponse,
+        LogRequest
     }
 }

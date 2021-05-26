@@ -26,7 +26,7 @@ namespace RaftCoreTest.Node
             _node2.Setup(m => m.Id).Returns(2);
             
             _node3 = new Mock<INode>();
-            _node3.Setup(m => m.Id).Returns(99);
+            _node3.Setup(m => m.Id).Returns(3);
 
             _cluster = new Mock<ICluster>();
             _election = new Mock<IElection>();
@@ -55,7 +55,13 @@ namespace RaftCoreTest.Node
             {
                 CurrentTerm = 10,
                 VotedFor = 1,
-                Log = new LogEntry[] { new LogEntry { Term = 9 }, new LogEntry { Term = 10 } },
+                Log = new LogEntry[] {
+                        new LogEntry { Term = 9 },
+                        new LogEntry { Term = 9 },
+                        new LogEntry { Term = 9 },
+                        new LogEntry { Term = 9 }, 
+                        new LogEntry { Term = 10 },
+                        new LogEntry { Term = 11 } },
                 CommitLenght = 0,
                 CurrentRole = States.Leader,
                 CurrentLeader = 2,
@@ -65,7 +71,8 @@ namespace RaftCoreTest.Node
             };
 
             _ = _sut.OnRecoverFromCrash(nodeConfig, descriptor);
-            descriptor = _sut.OnLeaderHasFailed();
+            _ = _sut.OnLeaderHasFailed();
+
             var message = new VoteResponseMessage
             {
                 Type = MessageType.VoteResponse,
@@ -73,11 +80,21 @@ namespace RaftCoreTest.Node
                 CurrentTerm = 11,
                 Granted = true
             };
-            descriptor = _sut.OnReceivedVoteResponse(message);
+            _ = _sut.OnReceivedVoteResponse(message);
+
             message = new VoteResponseMessage
             {
                 Type = MessageType.VoteResponse,
                 NodeId = 2,
+                CurrentTerm = 11,
+                Granted = true
+            };
+            _ = _sut.OnReceivedVoteResponse(message);
+
+            message = new VoteResponseMessage
+            {
+                Type = MessageType.VoteResponse,
+                NodeId = 3,
                 CurrentTerm = 11,
                 Granted = true
             };

@@ -107,14 +107,29 @@ namespace RaftCore.Node
 
         public Descriptor OnReplicateLog()
             => IsLeader(_descriptor)
-                .Match(_ => _descriptor.Tee(descriptor => ReplicateLog(descriptor)),
+                .Match(_ => _descriptor.Tee(descriptor => ReplicateLogToFollowers(descriptor)),
                        _ => _descriptor);
 
-        private Descriptor ReplicateLog(Descriptor descriptor)
+        private Unit ReplicateLogToFollower(Descriptor descriptor, int follower)
+            => descriptor.SentLength[follower]
+                .Map(length => (Length: length, PrevLogTerm: length > 0 ? descriptor.Log[length - 1].Term : 0))
+                .Tee(_ =>  _cluster.SendMessage(follower, new LogRequestMessage
+                                    {
+                                        Type = MessageType.LogRequest,
+                                        LeaderId = Configuration.Id,
+                                        CurrentTerm = descriptor.CurrentTerm,
+                                        StartLength = _.Length,
+                                        PrevTerm = _.PrevLogTerm,
+                                        CommitLength = descriptor.CommitLenght,
+                                        Entries = descriptor.Log.TakeLast(descriptor.Log.Length - descriptor.SentLength[follower] - 1).ToArray()
+                                    }))
+                .Map(_ => Unit.Default);
+
+        private Descriptor ReplicateLogToFollowers(Descriptor descriptor)
             => _cluster
                     .Nodes
                     .Filter(_ => _.Id != Configuration.Id)
-                    .ForEach(follower => _cluster.ReplicateLog(descriptor.CurrentLeader, follower.Id))
+                    .ForEach(follower => ReplicateLogToFollower(descriptor, follower.Id))
                     .Map(_ => descriptor);        
 
         private Descriptor HandleBroadcastMessageAsLeader(Message message)
@@ -132,7 +147,7 @@ namespace RaftCore.Node
                             SentLength = _descriptor.SentLength,
                             AckedLength = _.AckedLength
                         })
-                .Tee(_ => ReplicateLog(_));
+                .Tee(_ => ReplicateLogToFollowers(_));
 
         private Unit ReceivedVoteResponseGranted(VoteResponseMessage message)
             => new Descriptor
@@ -155,19 +170,19 @@ namespace RaftCore.Node
 
         private Descriptor ReceivedVoteResponseGrantedPromoteAsLeader(Descriptor descriptor)
             => new Descriptor
-            {
-                CurrentTerm = descriptor.CurrentTerm,
-                VotedFor = descriptor.VotedFor,
-                Log = descriptor.Log,
-                CommitLenght = descriptor.CommitLenght,
-                CurrentRole = States.Leader,
-                CurrentLeader = Configuration.Id,
-                VotesReceived = descriptor.VotesReceived,
-                SentLength = descriptor.SentLength,
-                AckedLength = descriptor.AckedLength
-            }
-            .Tee(_ => _election.Cancel())
-            .Tee(_ => ReceivedVoteResponseGrantedUpdateFollowers(_));
+                    {
+                        CurrentTerm = descriptor.CurrentTerm,
+                        VotedFor = descriptor.VotedFor,
+                        Log = descriptor.Log,
+                        CommitLenght = descriptor.CommitLenght,
+                        CurrentRole = States.Leader,
+                        CurrentLeader = Configuration.Id,
+                        VotesReceived = descriptor.VotesReceived,
+                        SentLength = descriptor.SentLength,
+                        AckedLength = descriptor.AckedLength
+                    }
+                .Tee(_ => _election.Cancel())
+                .Tee(_ => ReceivedVoteResponseGrantedUpdateFollowers(_));
 
         private Descriptor ReceivedVoteResponseGrantedUpdateFollowers(Descriptor descriptor)
             => _cluster.Nodes
@@ -189,38 +204,38 @@ namespace RaftCore.Node
                                 AckedLength = _.AckedLength
                             },
                            Followers: _.SentLength.Keys))
-                .Tee(_ => _.Followers.ForEach(follower => _cluster.ReplicateLog(descriptor.CurrentLeader, follower)))
+                .Tee(_ => _.Followers.ForEach(follower => ReplicateLogToFollower(_.Descriptor, follower)))
                 .Map(_ => _.Descriptor);
 
         private Unit ReceivedVoteResponseNoGrantedUpdateDescriptor(VoteResponseMessage message)
             => new Descriptor
-            {
-                CurrentTerm = message.CurrentTerm,
-                VotedFor = INIT_VOTED_FOR,
-                Log = _descriptor.Log,
-                CommitLenght = _descriptor.CommitLenght,
-                CurrentRole = States.Follower,
-                CurrentLeader = _descriptor.CurrentLeader,
-                VotesReceived = _descriptor.VotesReceived,
-                SentLength = _descriptor.SentLength,
-                AckedLength = _descriptor.AckedLength
-            }
+                    {
+                        CurrentTerm = message.CurrentTerm,
+                        VotedFor = INIT_VOTED_FOR,
+                        Log = _descriptor.Log,
+                        CommitLenght = _descriptor.CommitLenght,
+                        CurrentRole = States.Follower,
+                        CurrentLeader = _descriptor.CurrentLeader,
+                        VotesReceived = _descriptor.VotesReceived,
+                        SentLength = _descriptor.SentLength,
+                        AckedLength = _descriptor.AckedLength
+                    }
                 .Tee(descriptor => _descriptor = descriptor)
                 .Map(_ => _election.Cancel());
 
         private Unit ReceivedVoteRequestGrantResponse(VoteRequestMessage message)
             => new Descriptor
-            {
-                CurrentTerm = message.CurrentTerm,
-                VotedFor = message.NodeId,
-                Log = _descriptor.Log,
-                CommitLenght = _descriptor.CommitLenght,
-                CurrentRole = States.Follower,
-                CurrentLeader = _descriptor.CurrentLeader,
-                VotesReceived = _descriptor.VotesReceived,
-                SentLength = _descriptor.SentLength,
-                AckedLength = _descriptor.AckedLength
-            }
+                    {
+                        CurrentTerm = message.CurrentTerm,
+                        VotedFor = message.NodeId,
+                        Log = _descriptor.Log,
+                        CommitLenght = _descriptor.CommitLenght,
+                        CurrentRole = States.Follower,
+                        CurrentLeader = _descriptor.CurrentLeader,
+                        VotesReceived = _descriptor.VotesReceived,
+                        SentLength = _descriptor.SentLength,
+                        AckedLength = _descriptor.AckedLength
+                    }
                 .Tee(descriptor => _descriptor = descriptor)
                 .Map(descriptor => _cluster.SendMessage(message.NodeId, BuildMessage(MessageType.VoteResponse, descriptor.CurrentTerm, GRANT)));
 
