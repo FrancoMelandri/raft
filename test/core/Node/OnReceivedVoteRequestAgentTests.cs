@@ -32,7 +32,7 @@ namespace RaftCoreTest.Node
                 AckedLength = new Dictionary<int, int>()
             };
 
-            descriptor = _sut.OnRecoverFromCrash(nodeConfig, descriptor);
+            descriptor = _sut.OnInitialise(nodeConfig, descriptor);
             var message = new VoteRequestMessage
             {
                 Type = MessageType.VoteRequest,
@@ -72,7 +72,7 @@ namespace RaftCoreTest.Node
                 AckedLength = new Dictionary<int, int>()
             };
 
-            descriptor = _sut.OnRecoverFromCrash(nodeConfig, descriptor);
+            descriptor = _sut.OnInitialise(nodeConfig, descriptor);
             var message = new VoteRequestMessage
             {
                 Type = MessageType.VoteRequest,
@@ -114,7 +114,7 @@ namespace RaftCoreTest.Node
                 AckedLength = new Dictionary<int, int>()
             };
 
-            descriptor = _sut.OnRecoverFromCrash(nodeConfig, descriptor);
+            descriptor = _sut.OnInitialise(nodeConfig, descriptor);
             var message = new VoteRequestMessage
             {
                 Type = MessageType.VoteRequest,
@@ -156,7 +156,7 @@ namespace RaftCoreTest.Node
                 AckedLength = new Dictionary<int, int>()
             };
 
-            descriptor = _sut.OnRecoverFromCrash(nodeConfig, descriptor);
+            descriptor = _sut.OnInitialise(nodeConfig, descriptor);
             var message = new VoteRequestMessage
             {
                 Type = MessageType.VoteRequest,
@@ -197,7 +197,7 @@ namespace RaftCoreTest.Node
                 AckedLength = new Dictionary<int, int>()
             };
 
-            descriptor = _sut.OnRecoverFromCrash(nodeConfig, descriptor);
+            descriptor = _sut.OnInitialise(nodeConfig, descriptor);
             var message = new VoteRequestMessage
             {
                 Type = MessageType.VoteRequest,
@@ -239,7 +239,7 @@ namespace RaftCoreTest.Node
                 AckedLength = new Dictionary<int, int>()
             };
 
-            descriptor = _sut.OnRecoverFromCrash(nodeConfig, descriptor);
+            descriptor = _sut.OnInitialise(nodeConfig, descriptor);
             var message = new VoteRequestMessage
             {
                 Type = MessageType.VoteRequest,
@@ -281,7 +281,7 @@ namespace RaftCoreTest.Node
                 AckedLength = new Dictionary<int, int>()
             };
 
-            descriptor = _sut.OnRecoverFromCrash(nodeConfig, descriptor);
+            descriptor = _sut.OnInitialise(nodeConfig, descriptor);
             var message = new VoteRequestMessage
             {
                 Type = MessageType.VoteRequest,
@@ -324,7 +324,7 @@ namespace RaftCoreTest.Node
                 AckedLength = new Dictionary<int, int>()
             };
 
-            descriptor = _sut.OnRecoverFromCrash(nodeConfig, descriptor);
+            descriptor = _sut.OnInitialise(nodeConfig, descriptor);
             var message = new VoteRequestMessage
             {
                 Type = MessageType.VoteRequest,

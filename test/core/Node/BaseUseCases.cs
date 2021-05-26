@@ -70,7 +70,7 @@ namespace RaftCoreTest.Node
                 AckedLength = new Dictionary<int, int>()
             };
 
-            _ = _sut.OnRecoverFromCrash(nodeConfig, descriptor);
+            _ = _sut.OnInitialise(nodeConfig, descriptor);
             _ = _sut.OnLeaderHasFailed();
 
             var message = new VoteResponseMessage
@@ -132,7 +132,7 @@ namespace RaftCoreTest.Node
                 AckedLength = new Dictionary<int, int>()
             };
 
-            return _sut.OnRecoverFromCrash(nodeConfig, descriptor);
+            return _sut.OnInitialise(nodeConfig, descriptor);
         }
     }
 }

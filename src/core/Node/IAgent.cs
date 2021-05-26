@@ -5,7 +5,7 @@ namespace RaftCore.Node
     public interface IAgent
     {
         Descriptor OnInitialise(NodeConfiguration nodeConfiguration);
-        Descriptor OnRecoverFromCrash(NodeConfiguration nodeConfiguration, Descriptor descriptor);
+        Descriptor OnInitialise(NodeConfiguration nodeConfiguration, Descriptor descriptor);
         Descriptor OnLeaderHasFailed();
         Descriptor OnElectionTimeOut();
         Descriptor OnReceivedVoteRequest(VoteRequestMessage message);

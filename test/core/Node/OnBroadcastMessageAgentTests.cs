@@ -31,7 +31,7 @@ namespace RaftCoreTest.Node
                 AckedLength = new Dictionary<int, int>()
             };
 
-            descriptor = _sut.OnRecoverFromCrash(nodeConfig, descriptor);
+            descriptor = _sut.OnInitialise(nodeConfig, descriptor);
             // TODO: how to set a leader
             var message = new VoteResponseMessage
             {

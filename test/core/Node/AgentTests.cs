@@ -66,7 +66,7 @@ namespace RaftCoreTest.Node
                 AckedLength = new Dictionary<int, int> { { 1, 1 } }
             };
 
-            descriptor = _sut.OnRecoverFromCrash(nodeConfig, descriptor);
+            descriptor = _sut.OnInitialise(nodeConfig, descriptor);
 
             _sut.Configuration.Id.Should().Be(42);
             descriptor.CurrentTerm.Should().Be(42);
