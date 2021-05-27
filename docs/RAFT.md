@@ -92,7 +92,25 @@ What happen when a follower receive a log request message.
 
 The first thing we have to do is to check the term. In case of the term coming from the message is greater than the current term we have to update the internal state in the fields of currentTerm and voteFor.
 
+The logLength is the length of the prefix on the leader, after that we send the suffix with the entries; the logLength consists of the log entries we are not sending to the followers. We can think the log is splitted into two different parts
 
+```
+------------------------------------------------------------------------------------
+|                                      |                                           |
+|         PREFIX                       |            SUFFIX                         |
+|                                      |                                           |
+------------------------------------------------------------------------------------
+                                       ^
+                                   LogLength
+         not sending                                  sending to
+         to follower                                    follower
+```
+
+> Log
+
+So we have to check if the follower own log is at least as as long as the prefix, because if the follower log is shorter is mean we have a gap in the log so we can't accept entries because we have missed some messages.  If the follower log is long enough  then we have to check the term, in particular we require that the **term** entry of the log at the same position of the logLength coming from leader must be the same coming from the leader. 
+
+**In this way we can guarantee the log before logLength contains the same entries in the leader and in the follower, so the log is consistent up to the logLength point.**
 
 
 

@@ -10,7 +10,7 @@ namespace RaftCoreTest.Node
         [Test]
         public void WhenReceivingTerm_IsGreaterThanTerm_UpdateTermAndVoetFor()
         {
-            var descritpor = UseCase_NodeAsFollower();
+            _ = UseCase_NodeAsFollower();
 
             var logRequestMerssage = new LogRequestMessage
             {
@@ -22,7 +22,7 @@ namespace RaftCoreTest.Node
                 Entries = new LogEntry[] { },
                 CommitLength = 5
             };
-            descritpor = _sut.OnReceivedLogRequest(logRequestMerssage);
+            var descritpor = _sut.OnReceivedLogRequest(logRequestMerssage);
 
             descritpor.CurrentTerm.Should().Be(15);
             descritpor.VotedFor.Should().Be(-1);
@@ -31,7 +31,7 @@ namespace RaftCoreTest.Node
         [Test]
         public void WhenReceivingTerm_IsLessOrEqualThanTerm_DontUpdateTermAndVoetFor()
         {
-            var descritpor = UseCase_NodeAsFollower();
+            _ = UseCase_NodeAsFollower();
 
             var logRequestMerssage = new LogRequestMessage
             {
@@ -43,7 +43,7 @@ namespace RaftCoreTest.Node
                 Entries = new LogEntry[] { },
                 CommitLength = 5
             };
-            descritpor = _sut.OnReceivedLogRequest(logRequestMerssage);
+            var descritpor = _sut.OnReceivedLogRequest(logRequestMerssage);
 
             descritpor.CurrentTerm.Should().Be(10);
             descritpor.VotedFor.Should().Be(1);

@@ -1,6 +1,7 @@
 ﻿using RaftCore.Models;
-using static RaftCore.Node.Checks;
+using TinyFp.Extensions;
 using static RaftCore.Constants.NodeConstants;
+using static RaftCore.Node.LogReceivedChecks;
 
 namespace RaftCore.Node
 {
@@ -8,21 +9,25 @@ namespace RaftCore.Node
     {
         public Descriptor OnReceivedLogRequest(LogRequestMessage message)
             => IsTermGreater(message, _descriptor)
-                .Map(_ => UpdateDescriptorDueTerm(message))
+                .Map(descriptor => UpdateDescriptorDueTerm(message, descriptor))
+                .Bind(descriptor => IsLengthOk(message, descriptor))
+                .Bind(descriptor => IsTermOk(message, descriptor))
+                .Bind(descriptor => IsCurrentTermOk(message, descriptor))
                 .Match(_ => _, _ => _descriptor);
 
-        private Descriptor UpdateDescriptorDueTerm(LogRequestMessage message)
+        private Descriptor UpdateDescriptorDueTerm(LogRequestMessage message, Descriptor descriptor)
             => new Descriptor
             {
                 CurrentTerm = message.Term,
                 VotedFor = INIT_VOTED_FOR,
-                Log = _descriptor.Log,
-                CommitLenght = _descriptor.CommitLenght,
-                CurrentRole = _descriptor.CurrentRole,
-                CurrentLeader = _descriptor.CurrentLeader,
-                VotesReceived = _descriptor.VotesReceived,
-                SentLength = _descriptor.SentLength,
-                AckedLength = _descriptor.AckedLength
-            };
+                Log = descriptor.Log,
+                CommitLenght = descriptor.CommitLenght,
+                CurrentRole = descriptor.CurrentRole,
+                CurrentLeader = descriptor.CurrentLeader,
+                VotesReceived = descriptor.VotesReceived,
+                SentLength = descriptor.SentLength,
+                AckedLength = descriptor.AckedLength
+            }
+            .Tee(descriptor => _descriptor = descriptor);
     }
 }
