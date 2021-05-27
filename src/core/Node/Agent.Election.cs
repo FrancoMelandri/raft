@@ -19,19 +19,19 @@ namespace RaftCore.Node
                 SentLength = _descriptor.SentLength,
                 AckedLength = _descriptor.AckedLength
             }
-                .Tee(descriptor => _descriptor = descriptor)
-                .Tee(descriptor => LastEntryOrZero(descriptor.Log)
-                                    .Map(lastTerm => new VoteRequestMessage
-                                    {
-                                        Type = MessageType.VoteRequest,
-                                        NodeId = _configuration.Id,
-                                        CurrentTerm = _descriptor.CurrentTerm,
-                                        LogLength = _descriptor.Log.ToOption().Map(_ => _.Length).OnNone(0),
-                                        LastTerm = lastTerm
-                                    })
-                                    .Tee(_ => _cluster.SendBroadcastMessage(_))
-                                    .Tee(_ => _election.Start()))
-                .Map(_ => _descriptor);
+            .Tee(descriptor => _descriptor = descriptor)
+            .Tee(descriptor => LastEntryOrZero(descriptor.Log)
+                                .Map(lastTerm => new VoteRequestMessage
+                                {
+                                    Type = MessageType.VoteRequest,
+                                    NodeId = _configuration.Id,
+                                    CurrentTerm = _descriptor.CurrentTerm,
+                                    LogLength = _descriptor.Log.ToOption().Map(_ => _.Length).OnNone(0),
+                                    LastTerm = lastTerm
+                                })
+                                .Tee(_ => _cluster.SendBroadcastMessage(_))
+                                .Tee(_ => _election.Start()))
+            .Map(_ => _descriptor);
 
         public Descriptor OnElectionTimeOut()
             => OnLeaderHasFailed();

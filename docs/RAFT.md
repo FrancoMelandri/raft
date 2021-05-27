@@ -136,6 +136,8 @@ As we saw previously, if the log request contains a set of data that is valid fo
 
 Next we want to append any new entry to log. 
 
+Next we can notify the application all the log entries that are not committed yet by the follower, but the leader. 
+
 
 
 

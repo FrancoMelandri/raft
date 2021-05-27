@@ -67,7 +67,7 @@ namespace RaftCore.Node
                     AckedLength = descriptor.AckedLength
                 }
                 .Tee(_ => _election.Cancel())
-                .Tee(_ => ReceivedVoteResponseGrantedUpdateFollowers(_));
+                .Tee(desc => ReceivedVoteResponseGrantedUpdateFollowers(desc));
 
         private Descriptor ReceivedVoteResponseGrantedUpdateFollowers(Descriptor descriptor)
             => _cluster.Nodes

@@ -31,29 +31,29 @@ namespace RaftCore.Node
                 SentLength = descriptor.SentLength,
                 AckedLength = descriptor.AckedLength
             }
-            .Tee(descriptor => _descriptor = descriptor);
+            .Tee(desc => _descriptor = desc);
 
         private Descriptor HandleReceivedLogRequestOk(LogRequestMessage message, Descriptor descriptor)
-            => descriptor.Tee(_ => new Descriptor
+            => descriptor.Map(desc => new Descriptor
             {
-                CurrentTerm = descriptor.CurrentTerm,
-                VotedFor = descriptor.VotedFor,
-                Log = descriptor.Log,
-                CommitLenght = descriptor.CommitLenght,
+                CurrentTerm = desc.CurrentTerm,
+                VotedFor = desc.VotedFor,
+                Log = desc.Log,
+                CommitLenght = desc.CommitLenght,
                 CurrentRole = States.Follower,
                 CurrentLeader = message.LeaderId,
-                VotesReceived = descriptor.VotesReceived,
-                SentLength = descriptor.SentLength,
-                AckedLength = descriptor.AckedLength
+                VotesReceived = desc.VotesReceived,
+                SentLength = desc.SentLength,
+                AckedLength = desc.AckedLength
             })
-            .Tee(descriptor => _descriptor = descriptor)
-            .Tee(descriptor => AppendEnries(message, descriptor))
-            .Tee(descriptor => _cluster.SendMessage(message.LeaderId,
+            .Tee(desc => _descriptor = desc)
+            .Tee(desc => AppendEnries(message, desc))
+            .Tee(desc => _cluster.SendMessage(message.LeaderId,
                                                         new LogResponseMessage
                                                         {
                                                             Type = MessageType.LogResponse,
                                                             NodeId = _configuration.Id,
-                                                            CurrentTerm = descriptor.CurrentTerm,
+                                                            CurrentTerm = desc.CurrentTerm,
                                                             Length = message.LogLength + message.Entries.Length,
                                                             Ack = OK_ACK
                                                         }));
@@ -64,49 +64,69 @@ namespace RaftCore.Node
                                                         {
                                                             Type = MessageType.LogResponse,
                                                             NodeId = _configuration.Id,
-                                                            CurrentTerm = descriptor.CurrentTerm,
+                                                            CurrentTerm = _.CurrentTerm,
                                                             Length = KO_LENGTH,
                                                             Ack = KO_ACK
                                                         }));
 
         private Descriptor AppendEnries(LogRequestMessage message, Descriptor descriptor)
             => TruncateLog(message, descriptor)
-                .Map(descriptor => AppendNewEnries(message, descriptor));
+                .Map(desc => AppendNewEnries(message, desc))
+                .Map(desc => NotifyApplication(message, desc));
 
         private Descriptor TruncateLog(LogRequestMessage message, Descriptor descriptor)
             => IsEntriesLogLengthOk(message, descriptor)
                 .Bind(_ => IsEntriesTermhNotOk(message, _))
-                .Match(_ => _.Tee(descriptor => new Descriptor
+                .Match(_ => _.Map(desc => new Descriptor
                             {
-                                CurrentTerm = descriptor.CurrentTerm,
-                                VotedFor = descriptor.VotedFor,
-                                Log = descriptor.Log.Take(message.LogLength).ToArray(),
-                                CommitLenght = descriptor.CommitLenght,
-                                CurrentRole = descriptor.CurrentRole,
-                                CurrentLeader = descriptor.CurrentLeader,
-                                VotesReceived = descriptor.VotesReceived,
-                                SentLength = descriptor.SentLength,
-                                AckedLength = descriptor.AckedLength
+                                CurrentTerm = desc.CurrentTerm,
+                                VotedFor = desc.VotedFor,
+                                Log = desc.Log.Take(message.LogLength).ToArray(),
+                                CommitLenght = desc.CommitLenght,
+                                CurrentRole = desc.CurrentRole,
+                                CurrentLeader = desc.CurrentLeader,
+                                VotesReceived = desc.VotesReceived,
+                                SentLength = desc.SentLength,
+                                AckedLength = desc.AckedLength
                             })
-                            .Tee(descriptor => _descriptor = descriptor), 
+                            .Tee(desc => _descriptor = desc), 
                        _ => descriptor);
 
         private Descriptor AppendNewEnries(LogRequestMessage message, Descriptor descriptor)
             => AreThereEntriesToAdd(message, descriptor)
-                .Match(_ => _.Tee(descriptor => new Descriptor
+                .Match(_ => _.Map(desc => new Descriptor
                             {
-                                CurrentTerm = descriptor.CurrentTerm,
-                                VotedFor = descriptor.VotedFor,
-                                Log = descriptor.Log.Concat(message.Entries).ToArray(),
-                                CommitLenght = descriptor.CommitLenght,
-                                CurrentRole = descriptor.CurrentRole,
-                                CurrentLeader = descriptor.CurrentLeader,
-                                VotesReceived = descriptor.VotesReceived,
-                                SentLength = descriptor.SentLength,
-                                AckedLength = descriptor.AckedLength
+                                CurrentTerm = desc.CurrentTerm,
+                                VotedFor = desc.VotedFor,
+                                Log = desc.Log.Concat(message.Entries).ToArray(),
+                                CommitLenght = desc.CommitLenght,
+                                CurrentRole = desc.CurrentRole,
+                                CurrentLeader = desc.CurrentLeader,
+                                VotesReceived = desc.VotesReceived,
+                                SentLength = desc.SentLength,
+                                AckedLength = desc.AckedLength
                             })
-                            .Tee(descriptor => _descriptor = descriptor),
+                            .Tee(desc => _descriptor = desc),
                        _ => descriptor);
 
+        private Descriptor NotifyApplication(LogRequestMessage message, Descriptor descriptor)
+            => AreThereUncommitedMessages(message, descriptor)
+                .Match(_ => _.Tee(desc => desc.Log
+                                            .TakeLast(message.CommitLength - descriptor.CommitLenght)
+                                            .ForEach(log => _application.NotifyMessage(log.Message)))
+                             .Map(desc => new Descriptor
+                                    {
+                                        CurrentTerm = desc.CurrentTerm,
+                                        VotedFor = desc.VotedFor,
+                                        Log = desc.Log,
+                                        CommitLenght = message.CommitLength,
+                                        CurrentRole = desc.CurrentRole,
+                                        CurrentLeader = desc.CurrentLeader,
+                                        VotesReceived = desc.VotesReceived,
+                                        SentLength = desc.SentLength,
+                                        AckedLength = desc.AckedLength
+                                    })
+                              .Tee(desc => _descriptor = desc),
+                       _ => descriptor);
     }
 }

@@ -13,6 +13,13 @@ namespace RaftCore.Node
                 .Match(_ => _descriptor.Tee(descriptor => ReplicateLogToFollowers(descriptor)),
                        _ => _descriptor);
 
+        private Descriptor ReplicateLogToFollowers(Descriptor descriptor)
+            => _cluster
+                .Nodes
+                .Filter(_ => _.Id != _configuration.Id)
+                .ForEach(follower => ReplicateLogToFollower(descriptor, follower.Id))
+                .Map(_ => descriptor);
+
         private Unit ReplicateLogToFollower(Descriptor descriptor, int follower)
             => descriptor.SentLength[follower]
                 .Map(length => (Length: length, PrevLogTerm: length > 0 ? descriptor.Log[length - 1].Term : 0))
@@ -27,12 +34,5 @@ namespace RaftCore.Node
                     Entries = descriptor.Log.TakeLast(descriptor.Log.Length - descriptor.SentLength[follower] - 1).ToArray()
                 }))
                 .Map(_ => Unit.Default);
-
-        private Descriptor ReplicateLogToFollowers(Descriptor descriptor)
-            => _cluster
-                .Nodes
-                .Filter(_ => _.Id != _configuration.Id)
-                .ForEach(follower => ReplicateLogToFollower(descriptor, follower.Id))
-                .Map(_ => descriptor);
     }
 }

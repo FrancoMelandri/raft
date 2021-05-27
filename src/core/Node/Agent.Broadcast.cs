@@ -1,6 +1,5 @@
 ﻿using System.Linq;
 using RaftCore.Models;
-using TinyFp;
 using TinyFp.Extensions;
 using static RaftCore.Node.Checks;
 

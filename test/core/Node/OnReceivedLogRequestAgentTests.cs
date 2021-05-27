@@ -244,5 +244,59 @@ namespace RaftCoreTest.Node
                                                     p.Length == 9 &&
                                                     p.Ack == true)), Times.Once);
         }
+
+        [Test]
+        public void WhenAll_IsOk_NotifyApplication()
+        {
+            _ = UseNodeAsLeader();
+
+            var logRequestMerssage = new LogRequestMessage
+            {
+                Type = MessageType.LogRequest,
+                LeaderId = 1,
+                Term = 15,
+                LogTerm = 11,
+                LogLength = 6,
+                Entries = new LogEntry[]
+                        {
+                            new LogEntry { Message = new Message{ Type = MessageType.None }, Term = 12 },
+                            new LogEntry { Message = new Message{ Type = MessageType.None }, Term = 13 },
+                            new LogEntry { Message = new Message{ Type = MessageType.None }, Term = 14 }
+                        },
+                CommitLength = 9
+            };
+            var descritpor = _sut.OnReceivedLogRequest(logRequestMerssage);
+
+            descritpor.CurrentTerm.Should().Be(15);
+            descritpor.VotedFor.Should().Be(-1);
+            descritpor.CurrentRole.Should().Be(States.Follower);
+            descritpor.CurrentLeader.Should().Be(1);
+            descritpor.Log.Should().BeEquivalentTo(new LogEntry[] {
+                        new LogEntry { Term = 6 },
+                        new LogEntry { Term = 7 },
+                        new LogEntry { Term = 8 },
+                        new LogEntry { Term = 9 },
+                        new LogEntry { Term = 10 },
+                        new LogEntry { Term = 11 },
+                        new LogEntry { Message = new Message{ Type = MessageType.None }, Term = 12 },
+                        new LogEntry { Message = new Message{ Type = MessageType.None }, Term = 13 },
+                        new LogEntry { Message = new Message{ Type = MessageType.None }, Term = 14 }});
+            descritpor.CommitLenght.Should().Be(9);
+            _cluster
+                .Verify(m => m.SendMessage(1, It.Is<LogResponseMessage>(p =>
+                                                    p.CurrentTerm == 15 &&
+                                                    p.NodeId == 42 &&
+                                                    p.Length == 0 &&
+                                                    p.Ack == false)), Times.Never);
+
+            _cluster
+                .Verify(m => m.SendMessage(1, It.Is<LogResponseMessage>(p =>
+                                                    p.CurrentTerm == 15 &&
+                                                    p.NodeId == 42 &&
+                                                    p.Length == 9 &&
+                                                    p.Ack == true)), Times.Once);
+            _application
+                .Verify(m => m.NotifyMessage(It.Is<Message>(p => p.Type == MessageType.None)), Times.Exactly(3));
+        }
     }
 }

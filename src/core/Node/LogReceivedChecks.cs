@@ -39,5 +39,10 @@ namespace RaftCore.Node
              => message.LogLength + message.Entries.Length > descriptor.Log.Length ?
                 Either<string, Descriptor>.Right(descriptor) :
                 Either<string, Descriptor>.Left("");
+
+        public static Either<string, Descriptor> AreThereUncommitedMessages(LogRequestMessage message, Descriptor descriptor)
+             => message.CommitLength > descriptor.CommitLenght ?
+                Either<string, Descriptor>.Right(descriptor) :
+                Either<string, Descriptor>.Left("");
     }
 }
