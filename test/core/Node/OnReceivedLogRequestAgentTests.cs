@@ -1,4 +1,5 @@
 ﻿using FluentAssertions;
+using Moq;
 using NUnit.Framework;
 using RaftCore.Models;
 
@@ -8,7 +9,7 @@ namespace RaftCoreTest.Node
     public class OnReceivedLogRequestAgentTests : BaseUseCases
     {
         [Test]
-        public void WhenReceivingTerm_IsGreaterThanTerm_UpdateTermAndVoetFor()
+        public void WhenReceivingTerm_IsGreaterThanTerm_UpdateTermAndVoteFor()
         {
             _ = UseCase_NodeAsFollower();
 
@@ -29,7 +30,7 @@ namespace RaftCoreTest.Node
         }
 
         [Test]
-        public void WhenReceivingTerm_IsLessOrEqualThanTerm_DontUpdateTermAndVoetFor()
+        public void WhenReceivingTerm_IsLessOrEqualThanTerm_DontUpdateTermAndVoteFor()
         {
             _ = UseCase_NodeAsFollower();
 
@@ -47,6 +48,12 @@ namespace RaftCoreTest.Node
 
             descritpor.CurrentTerm.Should().Be(10);
             descritpor.VotedFor.Should().Be(1);
+            _cluster
+                .Verify(m => m.SendMessage(1, It.Is<LogResponseMessage>(p =>
+                                                    p.CurrentTerm == 10 &&
+                                                    p.NodeId == 42 &&
+                                                    p.Length == 0 &&
+                                                    p.Ack == false)));
         }
     }
 }

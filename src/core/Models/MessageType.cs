@@ -5,6 +5,7 @@
         None,
         VoteRequest,
         VoteResponse,
-        LogRequest
+        LogRequest,
+        LogResponse
     }
 }

@@ -112,6 +112,8 @@ So we have to check if the follower own log is at least as as long as the prefix
 
 **In this way we can guarantee the log before logLength contains the same entries in the leader and in the follower, so the log is consistent up to the logLength point.**
 
+In case all the checks are ok, we can append the the entries we received in the current log and response back to the leader with an acknowledge message, otherwise we have to response back with a kind of nack, indicating the leader we are inconsistent with the log.
+
 
 
 

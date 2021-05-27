@@ -2,6 +2,7 @@
 using TinyFp.Extensions;
 using static RaftCore.Constants.NodeConstants;
 using static RaftCore.Node.LogReceivedChecks;
+using static RaftCore.Constants.MessageConstants;
 
 namespace RaftCore.Node
 {
@@ -13,7 +14,8 @@ namespace RaftCore.Node
                 .Bind(descriptor => IsLengthOk(message, descriptor))
                 .Bind(descriptor => IsTermOk(message, descriptor))
                 .Bind(descriptor => IsCurrentTermOk(message, descriptor))
-                .Match(_ => _, _ => _descriptor);
+                .Match(_ => HandleReceivedLogRequestOk(message, _), 
+                       _ => HandleReceivedLogRequestKo(message, _descriptor));
 
         private Descriptor UpdateDescriptorDueTerm(LogRequestMessage message, Descriptor descriptor)
             => new Descriptor
@@ -29,5 +31,19 @@ namespace RaftCore.Node
                 AckedLength = descriptor.AckedLength
             }
             .Tee(descriptor => _descriptor = descriptor);
+
+        private Descriptor HandleReceivedLogRequestOk(LogRequestMessage message, Descriptor descriptor)
+            => descriptor;
+
+        private Descriptor HandleReceivedLogRequestKo(LogRequestMessage message, Descriptor descriptor)
+            => descriptor.Tee(_ => _cluster.SendMessage(message.LeaderId, 
+                                                        new LogResponseMessage 
+                                                        {
+                                                            Type = MessageType.LogResponse,
+                                                            NodeId = _configuration.Id,
+                                                            CurrentTerm = descriptor.CurrentTerm,
+                                                            Length = KO_LENGTH,
+                                                            Ack = KO_ACK
+                                                        }));
     }
 }
