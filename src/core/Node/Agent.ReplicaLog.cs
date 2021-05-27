@@ -20,7 +20,7 @@ namespace RaftCore.Node
                 {
                     Type = MessageType.LogRequest,
                     LeaderId = _configuration.Id,
-                    CurrentTerm = descriptor.CurrentTerm,
+                    Term = descriptor.CurrentTerm,
                     LogLength = _.Length,
                     LogTerm = _.PrevLogTerm,
                     CommitLength = descriptor.CommitLenght,

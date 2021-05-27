@@ -88,6 +88,10 @@ The variable **i** indicate the number of log that we already have sent to the f
 
 ![raft-code-1](./imgs/raft-code-6.png)
 
+What happen when a follower receive a log request message. 
+
+The first thing we have to do is to check the term. In case of the term coming from the message is greater than the current term we have to update the internal state in the fields of currentTerm and voteFor.
+
 
 
 
