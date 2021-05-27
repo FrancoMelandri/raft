@@ -12,7 +12,7 @@ namespace RaftCoreTest.Node
         [Test]
         public void WhenReceivingTerm_IsGreaterThanTerm_UpdateTermAndVoteFor()
         {
-            _ = UseCase_NodeAsFollower();
+            _ = UseNodeAsFollower();
 
             var logRequestMerssage = new LogRequestMessage
             {
@@ -33,7 +33,7 @@ namespace RaftCoreTest.Node
         [Test]
         public void WhenReceivingTerm_IsLessOrEqualThanTerm_DontUpdateTermAndVoteFor()
         {
-            _ = UseCase_NodeAsFollower();
+            _ = UseNodeAsFollower();
 
             var logRequestMerssage = new LogRequestMessage
             {
@@ -54,7 +54,7 @@ namespace RaftCoreTest.Node
         [Test]
         public void WhenReceivingTerm_DescriptorLogLengthNotOk_UpdateTermAndVoteFor_AndNack()
         {
-            _ = UseCase_NodeAsLeader();
+            _ = UseNodeAsLeader();
 
             var logRequestMerssage = new LogRequestMessage
             {
@@ -81,7 +81,7 @@ namespace RaftCoreTest.Node
         [Test]
         public void WhenReceivingTerm_DescriptorLogLength_TermNotOk_UpdateTermAndVoteFor_AndNack()
         {
-            _ = UseCase_NodeAsLeader();
+            _ = UseNodeAsLeader();
 
             var logRequestMerssage = new LogRequestMessage
             {
@@ -108,7 +108,7 @@ namespace RaftCoreTest.Node
         [Test]
         public void WhenReceivingTerm_DescriptorLogLength_TermOk_UpdateTermAndVoteFor_AndAck()
         {
-            _ = UseCase_NodeAsLeader();
+            _ = UseNodeAsLeader();
 
             var logRequestMerssage = new LogRequestMessage
             {

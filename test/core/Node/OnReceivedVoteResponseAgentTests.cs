@@ -225,7 +225,7 @@ namespace RaftCoreTest.Node
         [Test]
         public void CurrentRole_Candidate_And_Term_Equals_CurrentTerm_And_Granted_WithQuorum_PromoteAsLeader()
         {
-            var descriptor = UseCase_NodeAsLeader();
+            var descriptor = UseNodeAsLeader();
 
             descriptor.CurrentTerm.Should().Be(11);
             descriptor.CurrentRole.Should().Be(States.Leader);

@@ -51,7 +51,7 @@ namespace RaftCoreTest.Node
         [Test]
         public void WhenNodeIsLeader_AppendMessageToLog_UpdateDescriptor_ReplicateLog()
         {
-            _ = UseCase_NodeAsLeader();
+            _ = UseNodeAsLeader();
 
             var message = new VoteResponseMessage
             {

@@ -43,7 +43,7 @@ namespace RaftCoreTest.Node
                 .Returns(new INode[] { _node1.Object, _node2.Object, _node3.Object });
         }
 
-        protected Descriptor UseCase_NodeAsLeader()
+        protected Descriptor UseNodeAsLeader()
         {
 
             var nodeConfig = new NodeConfiguration
@@ -101,7 +101,7 @@ namespace RaftCoreTest.Node
             return _sut.OnReceivedVoteResponse(message);
         }
 
-        protected Descriptor UseCase_NodeAsFollower()
+        protected Descriptor UseNodeAsFollower()
         {
             var node1 = new Mock<INode>();
             node1.Setup(m => m.Id).Returns(1);

@@ -10,7 +10,7 @@ namespace RaftCoreTest.Node
         [Test]
         public void WhenNodeIsFollwer_DontReplicateLog()
         {
-            _ = UseCase_NodeAsFollower();
+            _ = UseNodeAsFollower();
             _ = _sut.OnReplicateLog();
 
             _cluster
@@ -21,7 +21,7 @@ namespace RaftCoreTest.Node
         [Test]
         public void WhenNodeIsLeader_ReplicateLog()
         {
-            _ = UseCase_NodeAsLeader();
+            _ = UseNodeAsLeader();
 
             ResetCluster();
 
