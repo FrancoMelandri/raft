@@ -32,7 +32,7 @@ namespace RaftCore.Node
                 .Map(descriptor => _cluster.SendMessage(message.NodeId, new VoteResponseMessage
                 {
                     Type = MessageType.VoteResponse,
-                    NodeId = Configuration.Id,
+                    NodeId = _configuration.Id,
                     CurrentTerm = _descriptor.CurrentTerm,
                     Granted = GRANT
                 }));
@@ -41,7 +41,7 @@ namespace RaftCore.Node
             => _cluster.SendMessage(message.NodeId, new VoteResponseMessage
             {
                 Type = MessageType.VoteResponse,
-                NodeId = Configuration.Id,
+                NodeId = _configuration.Id,
                 CurrentTerm = _descriptor.CurrentTerm,
                 Granted = NO_GRANT
             });

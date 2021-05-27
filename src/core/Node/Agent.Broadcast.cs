@@ -15,7 +15,7 @@ namespace RaftCore.Node
 
         private Descriptor HandleBroadcastMessageAsLeader(Message message)
             => (Log: _descriptor.Log.Concat(new LogEntry[] { new LogEntry { Message = message, Term = _descriptor.CurrentTerm } }).ToArray(),
-                AckedLength: _descriptor.AckedLength.Tee(_ => _[Configuration.Id] = _descriptor.Log.Length + 1))
+                AckedLength: _descriptor.AckedLength.Tee(_ => _[_configuration.Id] = _descriptor.Log.Length + 1))
                 .Map(_ => new Descriptor
                 {
                     CurrentTerm = _descriptor.CurrentTerm,

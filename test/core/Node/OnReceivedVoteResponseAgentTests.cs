@@ -246,22 +246,22 @@ namespace RaftCoreTest.Node
                                             It.Is<LogRequestMessage>(p =>
                                                 p.Type == MessageType.LogRequest &&
                                                 p.LeaderId == 42 &&
-                                                p.PrevTerm == 11 &&
-                                                p.StartLength == 6)), Times.Once);
+                                                p.LogTerm == 11 &&
+                                                p.LogLength == 6)), Times.Once);
             _cluster
                 .Verify(m => m.SendMessage(2,
                                             It.Is<LogRequestMessage>(p =>
                                                 p.Type == MessageType.LogRequest &&
                                                 p.LeaderId == 42 &&
-                                                p.PrevTerm == 11 &&
-                                                p.StartLength == 6)), Times.Once);
+                                                p.LogTerm == 11 &&
+                                                p.LogLength == 6)), Times.Once);
             _cluster
                 .Verify(m => m.SendMessage(3,
                                             It.Is<LogRequestMessage>(p =>
                                                 p.Type == MessageType.LogRequest &&
                                                 p.LeaderId == 42 &&
-                                                p.PrevTerm == 11 &&
-                                                p.StartLength == 6)), Times.Once);
+                                                p.LogTerm == 11 &&
+                                                p.LogLength == 6)), Times.Once);
             _cluster
                 .Verify(m => m.SendMessage(42,
                                             It.IsAny<LogRequestMessage>()), Times.Never);

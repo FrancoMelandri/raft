@@ -8,7 +8,7 @@ namespace RaftCore.Node
     {
         public Descriptor OnInitialise(NodeConfiguration nodeConfiguration)
             => this
-                .Tee(_ => _.Configuration = nodeConfiguration)
+                .Tee(_ => _configuration = nodeConfiguration)
                 .Tee(_ => _descriptor = new Descriptor
                 {
                     CurrentTerm = INIT_TERM,
@@ -25,7 +25,7 @@ namespace RaftCore.Node
 
         public Descriptor OnInitialise(NodeConfiguration nodeConfiguration, Descriptor descriptor)
             => this
-                .Tee(_ => _.Configuration = nodeConfiguration)
+                .Tee(_ => _configuration = nodeConfiguration)
                 .Tee(_ => _descriptor = new Descriptor
                 {
                     CurrentTerm = descriptor.CurrentTerm,

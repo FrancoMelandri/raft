@@ -5,7 +5,7 @@ namespace RaftCore.Node
 {
     public partial class Agent : IAgent
     {
-        public NodeConfiguration Configuration { get; private set; }
+        private NodeConfiguration _configuration;
         private Descriptor _descriptor;
         private readonly ICluster _cluster;
         private readonly IElection _election;

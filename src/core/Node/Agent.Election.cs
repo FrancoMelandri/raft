@@ -10,12 +10,12 @@ namespace RaftCore.Node
             => new Descriptor
             {
                 CurrentTerm = _descriptor.CurrentTerm + 1,
-                VotedFor = Configuration.Id,
+                VotedFor = _configuration.Id,
                 Log = _descriptor.Log,
                 CommitLenght = _descriptor.CommitLenght,
                 CurrentRole = States.Candidate,
                 CurrentLeader = _descriptor.CurrentLeader,
-                VotesReceived = new[] { Configuration.Id },
+                VotesReceived = new[] { _configuration.Id },
                 SentLength = _descriptor.SentLength,
                 AckedLength = _descriptor.AckedLength
             }
@@ -24,7 +24,7 @@ namespace RaftCore.Node
                                     .Map(lastTerm => new VoteRequestMessage
                                     {
                                         Type = MessageType.VoteRequest,
-                                        NodeId = Configuration.Id,
+                                        NodeId = _configuration.Id,
                                         CurrentTerm = _descriptor.CurrentTerm,
                                         LogLength = _descriptor.Log.ToOption().Map(_ => _.Length).OnNone(0),
                                         LastTerm = lastTerm
