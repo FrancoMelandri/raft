@@ -134,7 +134,7 @@ As we saw previously, if the log request contains a set of data that is valid fo
 
  First thing we have to do is to check if the log are consistent for each other. In case of the follower log term at logLength position is different from first entry term in the incoming message we have to **truncate** the log; this means that we are going to take the first portions of the log till logLength position. 
 
-
+Next we want to append any new entry to log. 
 
 
 

@@ -70,7 +70,8 @@ namespace RaftCore.Node
                                                         }));
 
         private Descriptor AppendEnries(LogRequestMessage message, Descriptor descriptor)
-            => TruncateLog(message, descriptor);
+            => TruncateLog(message, descriptor)
+                .Map(descriptor => AppendNewEnries(message, descriptor));
 
         private Descriptor TruncateLog(LogRequestMessage message, Descriptor descriptor)
             => IsEntriesLogLengthOk(message, descriptor)
@@ -88,6 +89,24 @@ namespace RaftCore.Node
                                 AckedLength = descriptor.AckedLength
                             })
                             .Tee(descriptor => _descriptor = descriptor), 
-                       _ => _descriptor);
+                       _ => descriptor);
+
+        private Descriptor AppendNewEnries(LogRequestMessage message, Descriptor descriptor)
+            => AreThereEntriesToAdd(message, descriptor)
+                .Match(_ => _.Tee(descriptor => new Descriptor
+                            {
+                                CurrentTerm = descriptor.CurrentTerm,
+                                VotedFor = descriptor.VotedFor,
+                                Log = descriptor.Log.Concat(message.Entries).ToArray(),
+                                CommitLenght = descriptor.CommitLenght,
+                                CurrentRole = descriptor.CurrentRole,
+                                CurrentLeader = descriptor.CurrentLeader,
+                                VotesReceived = descriptor.VotesReceived,
+                                SentLength = descriptor.SentLength,
+                                AckedLength = descriptor.AckedLength
+                            })
+                            .Tee(descriptor => _descriptor = descriptor),
+                       _ => descriptor);
+
     }
 }

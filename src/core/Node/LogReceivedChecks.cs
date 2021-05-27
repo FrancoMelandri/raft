@@ -34,5 +34,10 @@ namespace RaftCore.Node
              => descriptor.Log[message.LogLength].Term != message.Entries[0].Term ?
                 Either<string, Descriptor>.Right(descriptor) :
                 Either<string, Descriptor>.Left("");
+
+        public static Either<string, Descriptor> AreThereEntriesToAdd(LogRequestMessage message, Descriptor descriptor)
+             => message.LogLength + message.Entries.Length > descriptor.Log.Length ?
+                Either<string, Descriptor>.Right(descriptor) :
+                Either<string, Descriptor>.Left("");
     }
 }
