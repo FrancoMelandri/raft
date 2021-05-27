@@ -7,5 +7,6 @@
 
         public static readonly int KO_LENGTH = 0;
         public static readonly bool KO_ACK = false;
+        public static readonly bool OK_ACK = true;
     }
 }

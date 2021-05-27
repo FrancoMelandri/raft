@@ -33,7 +33,28 @@ namespace RaftCore.Node
             .Tee(descriptor => _descriptor = descriptor);
 
         private Descriptor HandleReceivedLogRequestOk(LogRequestMessage message, Descriptor descriptor)
-            => descriptor;
+            => descriptor.Tee(_ => new Descriptor
+            {
+                CurrentTerm = descriptor.CurrentTerm,
+                VotedFor = descriptor.VotedFor,
+                Log = descriptor.Log,
+                CommitLenght = descriptor.CommitLenght,
+                CurrentRole = States.Follower,
+                CurrentLeader = message.LeaderId,
+                VotesReceived = descriptor.VotesReceived,
+                SentLength = descriptor.SentLength,
+                AckedLength = descriptor.AckedLength
+            })
+            .Tee(descriptor => _descriptor = descriptor)
+            .Tee(descriptor => _cluster.SendMessage(message.LeaderId,
+                                                        new LogResponseMessage
+                                                        {
+                                                            Type = MessageType.LogResponse,
+                                                            NodeId = _configuration.Id,
+                                                            CurrentTerm = descriptor.CurrentTerm,
+                                                            Length = message.LogLength + message.Entries.Length,
+                                                            Ack = OK_ACK
+                                                        }));
 
         private Descriptor HandleReceivedLogRequestKo(LogRequestMessage message, Descriptor descriptor)
             => descriptor.Tee(_ => _cluster.SendMessage(message.LeaderId, 
