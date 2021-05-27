@@ -26,6 +26,8 @@ Once a node is leader it remains leader for potentially a very long time, until 
 
 Let's start digging into the code step by step spread over nine part.
 
+
+
 ### Initialisation
 
 ![raft-code-1](./imgs/raft-code-1.png)
@@ -42,6 +44,8 @@ We can start evaluating the election phase: as we seen before the election phase
 After packaging all the gathered information into a message, a message of **VoteRequest** meaning a candidate with **nodeId** is asking for vote, and then it will be delivered to all the nodes in the cluster. 
 
 After sending the message to all the nodes, the node start the timeout timer of the election.
+
+
 
 ### Voting a new leader
 
@@ -60,6 +64,8 @@ We have to ensure also that we are not allowed to vote more then one candidate i
 
 If both are ok then we are going to vote in favour for the candidate.
 
+
+
 ### Collecting votes
 
 ![raft-code-1](./imgs/raft-code-3.png)
@@ -67,6 +73,8 @@ If both are ok then we are going to vote in favour for the candidate.
 Back on the candidate side to look to all responses.
 
 We have a successful vote when the currentRole of the node is candidate, the term coming from response is equal to currentTerm and the vote is granted. So in this case first of all we have to add the **voterId** to the set of the votes we received (we have to count the unique vote). If the set of votes is a quorum (the number of votes is greater than the half of the number of the nodes round up) then we can transition to **leader** state and we can cancel the election timer because we reached the quorum of votes we need to became a leader. Becoming a leader means we have to initialize some internal state and notify all the nodes the node is the new leader.
+
+
 
 ###  Broadcasting messages
 
@@ -83,6 +91,8 @@ As long as the node is the leader, it periodically replicate the log to all the 
 ![raft-code-1](./imgs/raft-code-5.png)
 
 The variable **i** indicate the number of log that we already have sent to the follower. So once we have found the index i we are able to retrieve all the log entries we didn't sent to the follower, and this might be empty. We need also to get the last term before i in order to perform some consistency check to the log that we will se later. 
+
+
 
 ### Followers receiving LogRequest message
 
@@ -115,6 +125,14 @@ So we have to check if the follower own log is at least as as long as the prefix
 In case all the checks are ok, we can append the the entries we received in the current log and response back to the leader with an acknowledge message, otherwise we have to response back with a kind of nack, indicating the leader we are inconsistent with the log.
 
 
+
+### Updating followers' log
+
+![raft-code-1](./imgs/raft-code-7.png)
+
+As we saw previously, if the log request contains a set of data that is valid for the follower, it response to the leader with an ack response and append all the log entries present in the message to the own log. Deep dive into this functionality.
+
+ First thing we have to do is to check if the log are consistent for each other. In case of the follower log term at logLength position is different from first entry term in the incoming message we have to **truncate** the log; this means that we are going to take the first portions of the log till logLength position. 
 
 
 

@@ -115,7 +115,7 @@ namespace RaftCoreTest.Node
                 Type = MessageType.LogRequest,
                 LeaderId = 1,
                 Term = 15,
-                LogTerm = 9,
+                LogTerm = 8,
                 LogLength = 3,
                 Entries = new LogEntry[] 
                         {
@@ -131,6 +131,51 @@ namespace RaftCoreTest.Node
             descritpor.VotedFor.Should().Be(-1);
             descritpor.CurrentRole.Should().Be(States.Follower);
             descritpor.CurrentLeader.Should().Be(1);
+            _cluster
+                .Verify(m => m.SendMessage(1, It.Is<LogResponseMessage>(p =>
+                                                    p.CurrentTerm == 15 &&
+                                                    p.NodeId == 42 &&
+                                                    p.Length == 0 &&
+                                                    p.Ack == false)), Times.Never);
+
+            _cluster
+                .Verify(m => m.SendMessage(1, It.Is<LogResponseMessage>(p =>
+                                                    p.CurrentTerm == 15 &&
+                                                    p.NodeId == 42 &&
+                                                    p.Length == 6 &&
+                                                    p.Ack == true)), Times.Once);
+        }
+
+        [Test]
+        public void WhenLogRequestOk_And_MistmatchInLogLength_TruncateTheLog()
+        {
+            _ = UseNodeAsLeader();
+
+            var logRequestMerssage = new LogRequestMessage
+            {
+                Type = MessageType.LogRequest,
+                LeaderId = 1,
+                Term = 15,
+                LogTerm = 8,
+                LogLength = 3,
+                Entries = new LogEntry[] 
+                        {
+                            new LogEntry { Term = 10 },
+                            new LogEntry { Term = 11 },
+                            new LogEntry { Term = 12 } 
+                        },
+                CommitLength = 2
+            };
+            var descritpor = _sut.OnReceivedLogRequest(logRequestMerssage);
+
+            descritpor.CurrentTerm.Should().Be(15);
+            descritpor.VotedFor.Should().Be(-1);
+            descritpor.CurrentRole.Should().Be(States.Follower);
+            descritpor.CurrentLeader.Should().Be(1);
+            descritpor.Log.Should().BeEquivalentTo(new LogEntry[] {
+                        new LogEntry { Term = 6 },
+                        new LogEntry { Term = 7 },
+                        new LogEntry { Term = 8 } });
             _cluster
                 .Verify(m => m.SendMessage(1, It.Is<LogResponseMessage>(p =>
                                                     p.CurrentTerm == 15 &&

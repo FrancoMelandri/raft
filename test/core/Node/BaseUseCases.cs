@@ -56,9 +56,9 @@ namespace RaftCoreTest.Node
                 CurrentTerm = 10,
                 VotedFor = 1,
                 Log = new LogEntry[] {
-                        new LogEntry { Term = 9 },
-                        new LogEntry { Term = 9 },
-                        new LogEntry { Term = 9 },
+                        new LogEntry { Term = 6 },
+                        new LogEntry { Term = 7 },
+                        new LogEntry { Term = 8 },
                         new LogEntry { Term = 9 }, 
                         new LogEntry { Term = 10 },
                         new LogEntry { Term = 11 } },

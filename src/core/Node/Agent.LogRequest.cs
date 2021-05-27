@@ -3,6 +3,7 @@ using TinyFp.Extensions;
 using static RaftCore.Constants.NodeConstants;
 using static RaftCore.Node.LogReceivedChecks;
 using static RaftCore.Constants.MessageConstants;
+using System.Linq;
 
 namespace RaftCore.Node
 {
@@ -46,6 +47,7 @@ namespace RaftCore.Node
                 AckedLength = descriptor.AckedLength
             })
             .Tee(descriptor => _descriptor = descriptor)
+            .Tee(descriptor => AppendEnries(message, descriptor))
             .Tee(descriptor => _cluster.SendMessage(message.LeaderId,
                                                         new LogResponseMessage
                                                         {
@@ -66,5 +68,26 @@ namespace RaftCore.Node
                                                             Length = KO_LENGTH,
                                                             Ack = KO_ACK
                                                         }));
+
+        private Descriptor AppendEnries(LogRequestMessage message, Descriptor descriptor)
+            => TruncateLog(message, descriptor);
+
+        private Descriptor TruncateLog(LogRequestMessage message, Descriptor descriptor)
+            => IsEntriesLogLengthOk(message, descriptor)
+                .Bind(_ => IsEntriesTermhNotOk(message, _))
+                .Match(_ => _.Tee(descriptor => new Descriptor
+                            {
+                                CurrentTerm = descriptor.CurrentTerm,
+                                VotedFor = descriptor.VotedFor,
+                                Log = descriptor.Log.Take(message.LogLength).ToArray(),
+                                CommitLenght = descriptor.CommitLenght,
+                                CurrentRole = descriptor.CurrentRole,
+                                CurrentLeader = descriptor.CurrentLeader,
+                                VotesReceived = descriptor.VotesReceived,
+                                SentLength = descriptor.SentLength,
+                                AckedLength = descriptor.AckedLength
+                            })
+                            .Tee(descriptor => _descriptor = descriptor), 
+                       _ => _descriptor);
     }
 }
