@@ -1,7 +1,6 @@
 ﻿using FluentAssertions;
 using Moq;
 using NUnit.Framework;
-using RaftCore.Cluster;
 using RaftCore.Models;
 using RaftCore.Node;
 using System.Collections.Generic;
@@ -23,17 +22,17 @@ namespace RaftCoreTest.Node
             {
                 CurrentTerm = 42,
                 VotedFor = 42,
-                Log = new LogEntry[] {  },
+                Log = new LogEntry[] { },
                 CommitLenght = 42,
                 CurrentRole = States.Leader,
                 CurrentLeader = 42,
                 VotesReceived = null,
-                SentLength = new Dictionary<int, int> { { 1, 1} },
+                SentLength = new Dictionary<int, int> { { 1, 1 } },
                 AckedLength = new Dictionary<int, int> { { 1, 1 } }
             };
 
             descriptor = _sut.OnInitialise(nodeConfig, descriptor);
-            descriptor = _sut.OnLeaderHasFailed();
+            descriptor = _sut.OnElectionTimeOut();
 
             descriptor.CurrentTerm.Should().Be(43);
             descriptor.CurrentRole.Should().Be(States.Candidate);
@@ -58,7 +57,7 @@ namespace RaftCoreTest.Node
             {
                 CurrentTerm = 42,
                 VotedFor = 42,
-                Log = new LogEntry[] { new LogEntry { Term = 10} },
+                Log = new LogEntry[] { new LogEntry { Term = 10 } },
                 CommitLenght = 42,
                 CurrentRole = States.Leader,
                 CurrentLeader = 42,
@@ -68,7 +67,7 @@ namespace RaftCoreTest.Node
             };
 
             descriptor = _sut.OnInitialise(nodeConfig, descriptor);
-            descriptor = _sut.OnLeaderHasFailed();
+            descriptor = _sut.OnElectionTimeOut();
 
             descriptor.CurrentTerm.Should().Be(43);
             descriptor.CurrentRole.Should().Be(States.Candidate);
