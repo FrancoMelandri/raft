@@ -12,6 +12,10 @@ https://raft.github.io/
 https://www.youtube.com/watch?v=IPnesACYRck&list=PLeKd45zvjcDFUEv_ohr_HdUFe97RItdiB&index=18
 
 
+My notes about the video:
+https://github.com/FrancoMelandri/raft/blob/main/docs/RAFT.md
+
+
 How to define additional source for nuget packages:
 https://docs.github.com/en/packages/working-with-a-github-packages-registry/working-with-the-nuget-registry
 
