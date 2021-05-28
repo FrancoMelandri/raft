@@ -14,5 +14,15 @@ namespace RaftCore.Node
             => message.Term == descriptor.CurrentTerm ?
                 Either<string, Descriptor>.Right(descriptor) :
                 Either<string, Descriptor>.Left("");
+
+        public static Either<string, Descriptor> IsSentLengthGreaterThanZero(LogResponseMessage message, Descriptor descriptor)
+            => descriptor.SentLength[message.NodeId] > 0 ?
+                Either<string, Descriptor>.Right(descriptor) :
+                Either<string, Descriptor>.Left("");
+
+        public static Either<string, Descriptor> IsSuccessLogReponse(LogResponseMessage message, Descriptor descriptor)
+            => message.Success ?
+                Either<string, Descriptor>.Right(descriptor) :
+                Either<string, Descriptor>.Left("");
     }
 }

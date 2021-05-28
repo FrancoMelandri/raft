@@ -150,6 +150,8 @@ As usual first of all we check the term in order to understand if we have to dis
 
 When the current term is equal to the term and the node is leader we have to check if the acknowledge flag is success or not. in case of **Success** means that follower has accepted these log entries and the ack fields contains the number of log accepted from the beginning of the log; so we need to update the sent length and the acked length fields for the related follower and then we can commit all the log entries. 
 
+When the log response report an unsuccess flag means that the log is inconsistent or there was a gap in the followers log; in this case the follower is asking the leader to give him more log entries. So in this case what the leader does is to decrement the sent length to the follower of one and replicate the log again (we are going to make the suffix we send to the follower bigger by one). If this action doesn't work we continue to send more log entries until the follower send us a success acknowledge message.
+
 
 
 

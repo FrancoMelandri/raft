@@ -1,4 +1,5 @@
 ﻿using FluentAssertions;
+using Moq;
 using NUnit.Framework;
 using RaftCore.Models;
 using RaftCore.Node;
@@ -66,6 +67,34 @@ namespace RaftCoreTest.Node
 
             descriptor.SentLength[1].Should().Be(3);
             descriptor.AckedLength[1].Should().Be(3);
+        }
+
+        [Test]
+        public void WhenTerm_EqualTo_CurrentTerm_And_Leader_AndUnSuccess_DecremebntSentLength_And_ReplicateLogToFollower()
+        {
+            _ = UseNodeAsLeader();
+
+            ResetCluster();
+
+            var logResponse = new LogResponseMessage
+            {
+                Type = MessageType.LogResponse,
+                Term = 11,
+                NodeId = 1,
+                Ack = 3,
+                Success = false
+            };
+
+            var descriptor = _sut.OnReceivedLogResponse(logResponse);
+
+            descriptor.SentLength[1].Should().Be(5);
+            _cluster
+                .Verify(m => m.SendMessage(1,
+                                            It.Is<LogRequestMessage>(p =>
+                                                p.Type == MessageType.LogRequest &&
+                                                p.LeaderId == 42 &&
+                                                p.LogTerm == 10 &&
+                                                p.LogLength == 5)), Times.Once);
         }
     }
 }

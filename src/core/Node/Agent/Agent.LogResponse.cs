@@ -31,10 +31,12 @@ namespace RaftCore.Node
         private Descriptor HandleReceivedLogResponseOk(LogResponseMessage message, Descriptor descriptor)
             => IsTermEqual(message, descriptor)
                 .Bind(desc => IsLeader(desc))
-                .Match(desc => UpdateDescriptorAndCommitEntries(message, desc), 
+                .Match(desc => IsSuccessLogReponse(message, descriptor)
+                                .Match(_ => HandleSuccessLogResponse(message, desc), 
+                                       _ => HandleUnSuccessLogResponse(message, desc)),
                        _ => descriptor);
 
-        private Descriptor UpdateDescriptorAndCommitEntries(LogResponseMessage message, Descriptor descriptor)
+        private Descriptor HandleSuccessLogResponse(LogResponseMessage message, Descriptor descriptor)
             => descriptor
                 .Tee(desc => desc.SentLength[message.NodeId] = message.Ack)
                 .Tee(desc => desc.AckedLength[message.NodeId] = message.Ack)
@@ -51,5 +53,26 @@ namespace RaftCore.Node
                     AckedLength = desc.AckedLength
                 })
                 .Tee(desc => _descriptor = desc);
+
+        private Descriptor HandleUnSuccessLogResponse(LogResponseMessage message, Descriptor descriptor)
+            => IsSentLengthGreaterThanZero(message, descriptor)
+                .Match(_ => _
+                            .Tee(desc => desc.SentLength[message.NodeId] = desc.SentLength[message.NodeId] - 1)
+                            .Map(desc => new Descriptor
+                            {
+                                CurrentTerm = desc.CurrentTerm,
+                                VotedFor = desc.VotedFor,
+                                Log = desc.Log,
+                                CommitLenght = desc.CommitLenght,
+                                CurrentRole = desc.CurrentRole,
+                                CurrentLeader = desc.CurrentLeader,
+                                VotesReceived = desc.VotesReceived,
+                                SentLength = desc.SentLength,
+                                AckedLength = desc.AckedLength
+                            })
+                            .Tee(desc => _descriptor = desc)
+                            .Tee(desc => ReplicateLogToFollower(desc, message.NodeId)), 
+                       _ => descriptor);
+
     }
 }
