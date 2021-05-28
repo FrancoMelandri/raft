@@ -1,7 +1,4 @@
-﻿using System.Linq;
-using RaftCore.Models;
-using TinyFp;
-using TinyFp.Extensions;
+﻿using TinyFp.Extensions;
 using static RaftCore.Node.Checks;
 
 namespace RaftCore.Node
@@ -17,22 +14,7 @@ namespace RaftCore.Node
             => _cluster
                 .Nodes
                 .Filter(_ => _.Id != _configuration.Id)
-                .ForEach(follower => ReplicateLogToFollower(descriptor, follower.Id))
+                .ForEach(follower => ReplicateLog(descriptor, follower.Id))
                 .Map(_ => descriptor);
-
-        private Unit ReplicateLogToFollower(Descriptor descriptor, int follower)
-            => descriptor.SentLength[follower]
-                .Map(length => (Length: length, PrevLogTerm: length > 0 ? descriptor.Log[length - 1].Term : 0))
-                .Tee(_ => _cluster.SendMessage(follower, new LogRequestMessage
-                {
-                    Type = MessageType.LogRequest,
-                    LeaderId = _configuration.Id,
-                    Term = descriptor.CurrentTerm,
-                    LogLength = _.Length,
-                    LogTerm = _.PrevLogTerm,
-                    CommitLength = descriptor.CommitLenght,
-                    Entries = descriptor.Log.TakeLast(descriptor.Log.Length - descriptor.SentLength[follower] - 1).ToArray()
-                }))
-                .Map(_ => Unit.Default);
     }
 }

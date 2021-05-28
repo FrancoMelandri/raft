@@ -89,7 +89,7 @@ namespace RaftCore.Node
                                     AckedLength = _.AckedLength
                                 },
                            Followers: _.SentLength.Keys))
-                .Tee(_ => _.Followers.ForEach(follower => ReplicateLogToFollower(_.Descriptor, follower)))
+                .Tee(_ => _.Followers.ForEach(follower => ReplicateLog(_.Descriptor, follower)))
                 .Map(_ => _.Descriptor);
     }
 }

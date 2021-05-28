@@ -152,7 +152,8 @@ When the current term is equal to the term and the node is leader we have to che
 
 When the log response report an unsuccess flag means that the log is inconsistent or there was a gap in the followers log; in this case the follower is asking the leader to give him more log entries. So in this case what the leader does is to decrement the sent length to the follower of one and replicate the log again (we are going to make the suffix we send to the follower bigger by one). If this action doesn't work we continue to send more log entries until the follower send us a success acknowledge message.
 
+### Leader committing log entries
 
+![raft-code-1](./imgs/raft-code-9.png)
 
-
-
+the function **acks** give us the set of node that has acknoledge the log to the **length** point or later.

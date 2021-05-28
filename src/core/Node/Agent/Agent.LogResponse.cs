@@ -52,7 +52,8 @@ namespace RaftCore.Node
                     SentLength = desc.SentLength,
                     AckedLength = desc.AckedLength
                 })
-                .Tee(desc => _descriptor = desc);
+                .Tee(desc => _descriptor = desc)
+                .Tee(desc => CommitLogEntries(desc));
 
         private Descriptor HandleUnSuccessLogResponse(LogResponseMessage message, Descriptor descriptor)
             => IsSentLengthGreaterThanZero(message, descriptor)
@@ -71,7 +72,7 @@ namespace RaftCore.Node
                                 AckedLength = desc.AckedLength
                             })
                             .Tee(desc => _descriptor = desc)
-                            .Tee(desc => ReplicateLogToFollower(desc, message.NodeId)), 
+                            .Tee(desc => ReplicateLog(desc, message.NodeId)), 
                        _ => descriptor);
 
     }
