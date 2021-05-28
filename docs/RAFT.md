@@ -146,3 +146,7 @@ Next we can notify the application all the log entries that are not committed ye
 
 this portion of code is related to the the leader receiving LogResponse from the followers.
 
+As usual first of all we check the term in order to understand if we have to discard the message in case of term lower then current term. In case of term coming from follower greater than current term we have to move into the state of follower and reset both the current term and the voting.
+
+
+

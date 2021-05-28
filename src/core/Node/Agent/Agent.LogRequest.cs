@@ -2,7 +2,7 @@
 using RaftCore.Models;
 using TinyFp.Extensions;
 using static RaftCore.Constants.NodeConstants;
-using static RaftCore.Node.LogReceivedChecks;
+using static RaftCore.Node.LogRequestChecks;
 using static RaftCore.Constants.MessageConstants;
 
 namespace RaftCore.Node
@@ -53,7 +53,7 @@ namespace RaftCore.Node
                                                         {
                                                             Type = MessageType.LogResponse,
                                                             NodeId = _configuration.Id,
-                                                            CurrentTerm = desc.CurrentTerm,
+                                                            Term = desc.CurrentTerm,
                                                             Ack = message.LogLength + message.Entries.Length,
                                                             Success = OK_ACK
                                                         })));
@@ -64,7 +64,7 @@ namespace RaftCore.Node
                                                         {
                                                             Type = MessageType.LogResponse,
                                                             NodeId = _configuration.Id,
-                                                            CurrentTerm = _.CurrentTerm,
+                                                            Term = _.CurrentTerm,
                                                             Ack = KO_LENGTH,
                                                             Success = KO_ACK
                                                         })));

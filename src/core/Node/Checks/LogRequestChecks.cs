@@ -3,7 +3,7 @@ using TinyFp;
 
 namespace RaftCore.Node
 {
-    public static class LogReceivedChecks
+    public static class LogRequestChecks
     {
         public static Either<string, Descriptor> IsTermGreater(LogRequestMessage message, Descriptor descriptor)
             => message.Term > descriptor.CurrentTerm ?
