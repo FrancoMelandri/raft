@@ -30,4 +30,10 @@ jobs:
 
     - name: Test
       run: |
-        dotnet test --no-restore test/core/core-test.csproj
+        dotnet test --no-restore test/core/core-test.csproj /p:CollectCoverage=true /p:CoverletOutput=TestResults/ /p:CoverletOutputFormat=lcov
+
+    - name: Publish results
+      uses: coverallsapp/github-action@master   
+      with:
+        github-token: ${{github.token}} 
+        path-to-lcov: test/TestResults/coverage.info

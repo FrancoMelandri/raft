@@ -2,7 +2,7 @@
 
 
 [![build](https://github.com/FrancoMelandri/raft/actions/workflows/ci.yaml/badge.svg)](https://github.com/FrancoMelandri/raft/actions/workflows/ci.yaml/badge.svg)
-
+[![Coverage Status](https://coveralls.io/repos/github/FrancoMelandri/raft/badge.svg?branch=main)](https://coveralls.io/github/FrancoMelandri/raft?branch=main)
 
 Home page **RAFT** algorithm:
 https://raft.github.io/
