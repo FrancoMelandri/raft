@@ -15,6 +15,9 @@ https://www.youtube.com/watch?v=IPnesACYRck&list=PLeKd45zvjcDFUEv_ohr_HdUFe97RIt
 My notes about the video:
 https://github.com/FrancoMelandri/raft/blob/main/docs/RAFT.md
 
+Using my **tiny-fp** library for FP code: 
+https://github.com/FrancoMelandri/tiny-fp
+
 
 How to define additional source for nuget packages:
 https://docs.github.com/en/packages/working-with-a-github-packages-registry/working-with-the-nuget-registry
