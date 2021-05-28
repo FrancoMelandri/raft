@@ -28,5 +28,44 @@ namespace RaftCoreTest.Node
             descriptor.VotedFor.Should().Be(-1);
             descriptor.CurrentTerm.Should().Be(12);
         }
+
+        [Test]
+        public void WhenTerm_EqualTo_CurrentTerm_AndNot_Leader_DiscardMessage()
+        {
+            var descriptor = UseNodeAsFollower();
+
+            var logResponse = new LogResponseMessage
+            {
+                Type = MessageType.LogResponse,
+                Term = 10,
+                NodeId = 1,
+                Ack = 3,
+                Success = false
+            };
+
+            var descriptorResult = _sut.OnReceivedLogResponse(logResponse);
+
+            descriptorResult.Should().BeEquivalentTo(descriptor);
+        }
+
+        [Test]
+        public void WhenTerm_EqualTo_CurrentTerm_And_Leader_AndSuccess_UpdateDescriptorAndCommitEntries()
+        {
+            _ = UseNodeAsLeader();
+
+            var logResponse = new LogResponseMessage
+            {
+                Type = MessageType.LogResponse,
+                Term = 11,
+                NodeId = 1,
+                Ack = 3,
+                Success = true
+            };
+
+            var descriptor = _sut.OnReceivedLogResponse(logResponse);
+
+            descriptor.SentLength[1].Should().Be(3);
+            descriptor.AckedLength[1].Should().Be(3);
+        }
     }
 }

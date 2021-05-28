@@ -9,5 +9,10 @@ namespace RaftCore.Node
             => message.Term > descriptor.CurrentTerm ?
                 Either<string, Descriptor>.Right(descriptor) :
                 Either<string, Descriptor>.Left("");
+
+        public static Either<string, Descriptor> IsTermEqual(LogResponseMessage message, Descriptor descriptor)
+            => message.Term == descriptor.CurrentTerm ?
+                Either<string, Descriptor>.Right(descriptor) :
+                Either<string, Descriptor>.Left("");
     }
 }

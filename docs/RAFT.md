@@ -148,5 +148,9 @@ this portion of code is related to the the leader receiving LogResponse from the
 
 As usual first of all we check the term in order to understand if we have to discard the message in case of term lower then current term. In case of term coming from follower greater than current term we have to move into the state of follower and reset both the current term and the voting.
 
+When the current term is equal to the term and the node is leader we have to check if the acknowledge flag is success or not. in case of **Success** means that follower has accepted these log entries and the ack fields contains the number of log accepted from the beginning of the log; so we need to update the sent length and the acked length fields for the related follower and then we can commit all the log entries. 
+
+
+
 
 
