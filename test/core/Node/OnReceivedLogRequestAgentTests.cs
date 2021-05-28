@@ -74,8 +74,8 @@ namespace RaftCoreTest.Node
                 .Verify(m => m.SendMessage(1, It.Is<LogResponseMessage>(p =>
                                                     p.CurrentTerm == 15 &&
                                                     p.NodeId == 42 &&
-                                                    p.Length == 0 &&
-                                                    p.Ack == false)));
+                                                    p.Ack == 0 &&
+                                                    p.Success == false)));
         }
 
         [Test]
@@ -101,8 +101,8 @@ namespace RaftCoreTest.Node
                 .Verify(m => m.SendMessage(1, It.Is<LogResponseMessage>(p =>
                                                     p.CurrentTerm == 15 &&
                                                     p.NodeId == 42 &&
-                                                    p.Length == 0 &&
-                                                    p.Ack == false)));
+                                                    p.Ack == 0 &&
+                                                    p.Success == false)));
         }
 
         [Test]
@@ -135,15 +135,15 @@ namespace RaftCoreTest.Node
                 .Verify(m => m.SendMessage(1, It.Is<LogResponseMessage>(p =>
                                                     p.CurrentTerm == 15 &&
                                                     p.NodeId == 42 &&
-                                                    p.Length == 0 &&
-                                                    p.Ack == false)), Times.Never);
+                                                    p.Ack == 0 &&
+                                                    p.Success == false)), Times.Never);
 
             _cluster
                 .Verify(m => m.SendMessage(1, It.Is<LogResponseMessage>(p =>
                                                     p.CurrentTerm == 15 &&
                                                     p.NodeId == 42 &&
-                                                    p.Length == 6 &&
-                                                    p.Ack == true)), Times.Once);
+                                                    p.Ack == 6 &&
+                                                    p.Success == true)), Times.Once);
         }
 
         [Test]
@@ -183,15 +183,15 @@ namespace RaftCoreTest.Node
                 .Verify(m => m.SendMessage(1, It.Is<LogResponseMessage>(p =>
                                                     p.CurrentTerm == 15 &&
                                                     p.NodeId == 42 &&
-                                                    p.Length == 0 &&
-                                                    p.Ack == false)), Times.Never);
+                                                    p.Ack == 0 &&
+                                                    p.Success == false)), Times.Never);
 
             _cluster
                 .Verify(m => m.SendMessage(1, It.Is<LogResponseMessage>(p =>
                                                     p.CurrentTerm == 15 &&
                                                     p.NodeId == 42 &&
-                                                    p.Length == 6 &&
-                                                    p.Ack == true)), Times.Once);
+                                                    p.Ack == 6 &&
+                                                    p.Success == true)), Times.Once);
         }
 
         [Test]
@@ -234,15 +234,15 @@ namespace RaftCoreTest.Node
                 .Verify(m => m.SendMessage(1, It.Is<LogResponseMessage>(p =>
                                                     p.CurrentTerm == 15 &&
                                                     p.NodeId == 42 &&
-                                                    p.Length == 0 &&
-                                                    p.Ack == false)), Times.Never);
+                                                    p.Ack == 0 &&
+                                                    p.Success == false)), Times.Never);
 
             _cluster
                 .Verify(m => m.SendMessage(1, It.Is<LogResponseMessage>(p =>
                                                     p.CurrentTerm == 15 &&
                                                     p.NodeId == 42 &&
-                                                    p.Length == 9 &&
-                                                    p.Ack == true)), Times.Once);
+                                                    p.Ack == 9 &&
+                                                    p.Success == true)), Times.Once);
         }
 
         [Test]
@@ -286,15 +286,15 @@ namespace RaftCoreTest.Node
                 .Verify(m => m.SendMessage(1, It.Is<LogResponseMessage>(p =>
                                                     p.CurrentTerm == 15 &&
                                                     p.NodeId == 42 &&
-                                                    p.Length == 0 &&
-                                                    p.Ack == false)), Times.Never);
+                                                    p.Ack == 0 &&
+                                                    p.Success == false)), Times.Never);
 
             _cluster
                 .Verify(m => m.SendMessage(1, It.Is<LogResponseMessage>(p =>
                                                     p.CurrentTerm == 15 &&
                                                     p.NodeId == 42 &&
-                                                    p.Length == 9 &&
-                                                    p.Ack == true)), Times.Once);
+                                                    p.Ack == 9 &&
+                                                    p.Success == true)), Times.Once);
             _application
                 .Verify(m => m.NotifyMessage(It.Is<Message>(p => p.Type == MessageType.None)), Times.Exactly(3));
         }

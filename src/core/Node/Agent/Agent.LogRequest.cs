@@ -1,9 +1,9 @@
-﻿using RaftCore.Models;
+﻿using System.Linq;
+using RaftCore.Models;
 using TinyFp.Extensions;
 using static RaftCore.Constants.NodeConstants;
 using static RaftCore.Node.LogReceivedChecks;
 using static RaftCore.Constants.MessageConstants;
-using System.Linq;
 
 namespace RaftCore.Node
 {
@@ -48,26 +48,26 @@ namespace RaftCore.Node
             })
             .Tee(desc => _descriptor = desc)
             .Tee(desc => AppendEnries(message, desc))
-            .Tee(desc => _cluster.SendMessage(message.LeaderId,
+            .Tee((System.Action<Descriptor>)(desc => _cluster.SendMessage(message.LeaderId,
                                                         new LogResponseMessage
                                                         {
                                                             Type = MessageType.LogResponse,
                                                             NodeId = _configuration.Id,
                                                             CurrentTerm = desc.CurrentTerm,
-                                                            Length = message.LogLength + message.Entries.Length,
-                                                            Ack = OK_ACK
-                                                        }));
+                                                            Ack = message.LogLength + message.Entries.Length,
+                                                            Success = OK_ACK
+                                                        })));
 
         private Descriptor HandleReceivedLogRequestKo(LogRequestMessage message, Descriptor descriptor)
-            => descriptor.Tee(_ => _cluster.SendMessage(message.LeaderId, 
-                                                        new LogResponseMessage 
+            => descriptor.Tee((System.Action<Descriptor>)(_ => _cluster.SendMessage(message.LeaderId, 
+                                                        new LogResponseMessage
                                                         {
                                                             Type = MessageType.LogResponse,
                                                             NodeId = _configuration.Id,
                                                             CurrentTerm = _.CurrentTerm,
-                                                            Length = KO_LENGTH,
-                                                            Ack = KO_ACK
-                                                        }));
+                                                            Ack = KO_LENGTH,
+                                                            Success = KO_ACK
+                                                        })));
 
         private Descriptor AppendEnries(LogRequestMessage message, Descriptor descriptor)
             => TruncateLog(message, descriptor)

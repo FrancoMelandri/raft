@@ -4,7 +4,7 @@
     {
         public int NodeId { get; set; }
         public int CurrentTerm { get; set; }
-        public int Length { get; set; }
-        public bool Ack { get; set; }
+        public int Ack { get; set; }
+        public bool Success { get; set; }
     }
 }

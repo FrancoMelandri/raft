@@ -13,5 +13,6 @@ namespace RaftCore.Node
         Descriptor OnBroadcastMessage(Message message);
         Descriptor OnReplicateLog();
         Descriptor OnReceivedLogRequest(LogRequestMessage message);
+        Descriptor OnReceivedLogResponse(LogResponseMessage message);
     }
 }

@@ -4,7 +4,7 @@ using RaftCore.Models;
 using TinyFp;
 using TinyFp.Extensions;
 using static RaftCore.Constants.NodeConstants;
-using static RaftCore.Node.Validations;
+using static RaftCore.Node.VoteResponseChecks;
 
 namespace RaftCore.Node
 {

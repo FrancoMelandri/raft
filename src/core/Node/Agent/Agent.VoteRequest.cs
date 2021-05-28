@@ -2,7 +2,8 @@
 using TinyFp;
 using TinyFp.Extensions;
 using static RaftCore.Constants.MessageConstants;
-using static RaftCore.Node.Validations;
+using static RaftCore.Node.VoteResponseChecks;
+using static RaftCore.Node.VoteRequesChecks;
 
 namespace RaftCore.Node
 {
