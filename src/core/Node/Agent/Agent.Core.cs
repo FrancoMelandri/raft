@@ -86,14 +86,11 @@ namespace RaftCore.Node
 
         public Descriptor CommitLogEntries(Descriptor descriptor)
         {
-            Func<int, int> acks = len => descriptor
-                                            .AckedLength
-                                            .Filter(_ => _.Value >= len)
-                                            .Count();
-
             var ready = Enumerable
                         .Range(1, descriptor.Log.Length)
-                        .Filter(_ => acks(_) >= GetQuorum(_cluster))
+                        .Filter(_ => descriptor.AckedLength
+                                            .Filter(ack => ack.Value >= _)
+                                            .Count() >= GetQuorum(_cluster))
                         .ToArray();
 
             if (ready.Length > 0 &&
