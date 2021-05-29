@@ -18,6 +18,42 @@ namespace RaftCoreTest.Node
                 .Should().Be(2);
 
         [Test]
+        public void CommitLogEntries_WhenReadyIsEmpty_DoNothing()
+        {
+            var descriptor = new Descriptor
+            {
+                Log = new LogEntry[] {
+                        new LogEntry { Message = new Message(), Term = 0 }, // 0
+                        new LogEntry { Message = new Message(), Term = 0 }, // 1
+                        new LogEntry { Message = new Message(), Term = 1 }, // 2
+                        new LogEntry { Message = new Message(), Term = 1 }, // 3
+                        new LogEntry { Message = new Message(), Term = 2 }, // 4
+                        new LogEntry { Message = new Message(), Term = 2 }, // 5
+
+                        new LogEntry { Message = new Message(), Term = 2 }, // 6
+                        new LogEntry { Message = new Message(), Term = 2 }, // 7
+                        new LogEntry { Message = new Message(), Term = 2 }, // 8
+                        new LogEntry { Message = new Message(), Term = 2 }, // 9
+                },
+                CommitLenght = 6,
+                CurrentRole = States.Leader,
+                CurrentTerm = 2,
+                AckedLength = new Dictionary<int, int>
+                {
+                    { 1, 0 },
+                    { 2, 0 },
+                    { 3, 0 },
+                }
+            };
+
+            descriptor = _sut.CommitLogEntries(descriptor);
+
+            descriptor.CommitLenght.Should().Be(6);
+            _application
+                .Verify(m => m.NotifyMessage(It.IsAny<Message>()), Times.Never);
+        }
+
+        [Test]
         public void CommitLogEntries_WhenReadyIsWrong_DueNoOneNodeHaveSussificentAcks_DoNothing()
         {
             var descriptor = new Descriptor

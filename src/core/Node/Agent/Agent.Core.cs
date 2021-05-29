@@ -1,5 +1,4 @@
-﻿using System;
-using System.Linq;
+﻿using System.Linq;
 using RaftCore.Models;
 using TinyFp.Extensions;
 using static RaftCore.Node.LogRequestChecks;
@@ -91,17 +90,20 @@ namespace RaftCore.Node
                         .Filter(_ => descriptor.AckedLength
                                             .Filter(ack => ack.Value >= _)
                                             .Count() >= GetQuorum(_cluster))
-                        .ToArray();
+                        .ToArray()
+                        .ToOption(_ => _.Length == 0)
+                        .Map(_ => _.Max())
+                        .OnNone(0);
 
-            if (ready.Length > 0 &&
-                ready.Max() > descriptor.CommitLenght &&
-                descriptor.Log[ready.Max() - 1].Term == descriptor.CurrentTerm)
+            if (ready > 0 &&
+                ready > descriptor.CommitLenght &&
+                descriptor.Log[ready - 1].Term == descriptor.CurrentTerm)
             {
                 Enumerable
-                    .Range(descriptor.CommitLenght, ready.Max() - descriptor.CommitLenght)
+                    .Range(descriptor.CommitLenght, ready - descriptor.CommitLenght)
                     .ForEach(_ => _application.NotifyMessage(descriptor.Log[_].Message));
 
-                descriptor.CommitLenght = ready.Max();
+                descriptor.CommitLenght = ready;
             }
             return descriptor;
         }
