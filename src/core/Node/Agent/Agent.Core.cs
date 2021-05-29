@@ -86,25 +86,23 @@ namespace RaftCore.Node
 
         public Descriptor CommitLogEntries(Descriptor descriptor)
         {
-            var minAcks = GetQuorum(_cluster);
             Func<int, int> acks = len => descriptor
                                             .AckedLength
                                             .Filter(_ => _.Value >= len)
                                             .Count();
-            var ready = Array.Empty<int>();
-            for (int i = 1; i <= descriptor.Log.Length; i++)
-            {
-                var a = acks(i);
-                if (a >= minAcks)
-                    ready = ready.Concat(new[] { i }).ToArray();
-            }
+
+            var ready = Enumerable
+                        .Range(1, descriptor.Log.Length)
+                        .Filter(_ => acks(_) >= GetQuorum(_cluster))
+                        .ToArray();
 
             if (ready.Length > 0 &&
                 ready.Max() > descriptor.CommitLenght &&
                 descriptor.Log[ready.Max() - 1].Term == descriptor.CurrentTerm)
             {
-                for (int i = descriptor.CommitLenght; i < ready.Max(); i++)
-                    _application.NotifyMessage(descriptor.Log[i].Message);
+                Enumerable
+                    .Range(descriptor.CommitLenght, ready.Max() - descriptor.CommitLenght)
+                    .ForEach(_ => _application.NotifyMessage(descriptor.Log[_].Message));
 
                 descriptor.CommitLenght = ready.Max();
             }
