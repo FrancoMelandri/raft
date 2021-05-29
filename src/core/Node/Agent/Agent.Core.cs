@@ -1,4 +1,5 @@
-﻿using System.Linq;
+﻿using System;
+using System.Linq;
 using RaftCore.Models;
 using TinyFp.Extensions;
 using static RaftCore.Node.LogRequestChecks;
@@ -8,7 +9,7 @@ namespace RaftCore.Node
 {
     public partial class Agent
     {
-        private Descriptor AppendEntries(LogRequestMessage message, Descriptor descriptor)
+        public Descriptor AppendEntries(LogRequestMessage message, Descriptor descriptor)
             => TruncateLog(message, descriptor)
                 .Map(desc => AppendNewEntries(message, desc))
                 .Map(desc => NotifyApplication(message, desc));
@@ -68,7 +69,7 @@ namespace RaftCore.Node
                               .Tee(desc => _descriptor = desc),
                        _ => descriptor);
 
-        private Descriptor ReplicateLog(Descriptor descriptor, int follower)
+        public Descriptor ReplicateLog(Descriptor descriptor, int follower)
             => descriptor.SentLength[follower]
                 .Map(length => (Length: length, PrevLogTerm: length > 0 ? descriptor.Log[length - 1].Term : 0))
                 .Tee(_ => _cluster.SendMessage(follower, new LogRequestMessage
@@ -83,7 +84,31 @@ namespace RaftCore.Node
                 }))
                 .Map(_ => descriptor);
 
-        private Descriptor CommitLogEntries(Descriptor descriptor)
-            => descriptor;
+        public Descriptor CommitLogEntries(Descriptor descriptor)
+        {
+            var minAcks = GetQuorum(_cluster);
+            Func<int, int> acks = len => descriptor
+                                            .AckedLength
+                                            .Filter(_ => _.Value >= len)
+                                            .Count();
+            var ready = Array.Empty<int>();
+            for (int i = 1; i <= descriptor.Log.Length; i++)
+            {
+                var a = acks(i);
+                if (a >= minAcks)
+                    ready = ready.Concat(new[] { i }).ToArray();
+            }
+
+            if (ready.Length > 0 &&
+                ready.Max() > descriptor.CommitLenght &&
+                descriptor.Log[ready.Max() - 1].Term == descriptor.CurrentTerm)
+            {
+                for (int i = descriptor.CommitLenght; i < ready.Max(); i++)
+                    _application.NotifyMessage(descriptor.Log[i].Message);
+
+                descriptor.CommitLenght = ready.Max();
+            }
+            return descriptor;
+        }
     }
 }

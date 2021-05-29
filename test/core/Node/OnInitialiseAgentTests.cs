@@ -29,6 +29,7 @@ namespace RaftCoreTest.Node
             descriptor.AckedLength.Should().BeEquivalentTo(new object[] { });
         }
 
+
         [Test]
         public void WhenDescriptor_RecoverFromCrash_SetTheRightValues()
         {
