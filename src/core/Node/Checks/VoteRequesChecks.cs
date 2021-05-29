@@ -1,7 +1,7 @@
 ﻿using RaftCore.Models;
 using TinyFp;
 using TinyFp.Extensions;
-using static RaftCore.Node.Utils;
+using static RaftCore.Utils;
 
 namespace RaftCore.Node
 {

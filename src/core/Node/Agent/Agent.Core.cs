@@ -2,6 +2,7 @@
 using RaftCore.Models;
 using TinyFp.Extensions;
 using static RaftCore.Node.LogRequestChecks;
+using static RaftCore.Utils;
 
 namespace RaftCore.Node
 {
