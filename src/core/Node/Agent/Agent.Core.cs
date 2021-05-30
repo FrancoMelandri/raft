@@ -18,34 +18,34 @@ namespace RaftCore.Node
             => IsEntriesLogLengthOk(message, descriptor)
                 .Bind(_ => IsEntriesTermhNotOk(message, _))
                 .Match(_ => _.Map(desc => new Descriptor
-                            {
-                                CurrentTerm = desc.CurrentTerm,
-                                VotedFor = desc.VotedFor,
-                                Log = desc.Log.Take(message.LogLength).ToArray(),
-                                CommitLenght = desc.CommitLenght,
-                                CurrentRole = desc.CurrentRole,
-                                CurrentLeader = desc.CurrentLeader,
-                                VotesReceived = desc.VotesReceived,
-                                SentLength = desc.SentLength,
-                                AckedLength = desc.AckedLength
-                            })
+                {
+                    CurrentTerm = desc.CurrentTerm,
+                    VotedFor = desc.VotedFor,
+                    Log = desc.Log.Take(message.LogLength).ToArray(),
+                    CommitLenght = desc.CommitLenght,
+                    CurrentRole = desc.CurrentRole,
+                    CurrentLeader = desc.CurrentLeader,
+                    VotesReceived = desc.VotesReceived,
+                    SentLength = desc.SentLength,
+                    AckedLength = desc.AckedLength
+                })
                             .Tee(desc => _descriptor = desc),
                        _ => descriptor);
 
         private Descriptor AppendNewEntries(LogRequestMessage message, Descriptor descriptor)
             => AreThereEntriesToAdd(message, descriptor)
                 .Match(_ => _.Map(desc => new Descriptor
-                            {
-                                CurrentTerm = desc.CurrentTerm,
-                                VotedFor = desc.VotedFor,
-                                Log = desc.Log.Concat(message.Entries).ToArray(),
-                                CommitLenght = desc.CommitLenght,
-                                CurrentRole = desc.CurrentRole,
-                                CurrentLeader = desc.CurrentLeader,
-                                VotesReceived = desc.VotesReceived,
-                                SentLength = desc.SentLength,
-                                AckedLength = desc.AckedLength
-                            })
+                {
+                    CurrentTerm = desc.CurrentTerm,
+                    VotedFor = desc.VotedFor,
+                    Log = desc.Log.Concat(message.Entries).ToArray(),
+                    CommitLenght = desc.CommitLenght,
+                    CurrentRole = desc.CurrentRole,
+                    CurrentLeader = desc.CurrentLeader,
+                    VotesReceived = desc.VotesReceived,
+                    SentLength = desc.SentLength,
+                    AckedLength = desc.AckedLength
+                })
                             .Tee(desc => _descriptor = desc),
                        _ => descriptor);
 
@@ -87,18 +87,22 @@ namespace RaftCore.Node
         public Descriptor CommitLogEntries(Descriptor descriptor)
             => Enumerable
                 .Range(1, descriptor.Log.Length)
-                .Filter(_ => descriptor.AckedLength
-                                    .Filter(ack => ack.Value >= _)
-                                    .Count() >= GetQuorum(_cluster))
+                .Filter(index => HasQuorum(descriptor, index))
                 .ToArray()
                 .ToOption(_ => _.Length == 0)
                 .Map(_ => _.Max())
                 .Match(
                     ready => IsApplicationToBeNotified(descriptor, ready)
-                                .Match(desc =>NotifyToApplication(desc, ready),
+                                .Match(desc => NotifyToApplication(desc, ready),
                                 _ => descriptor),
                     () => descriptor
                 );
+
+        private bool HasQuorum(Descriptor descriptor, int index)
+            => descriptor
+                .AckedLength
+                .Filter(ack => ack.Value >= index)
+                .Count() >= GetQuorum(_cluster);
 
         private Descriptor NotifyToApplication(Descriptor descriptor, int ready)
         {
