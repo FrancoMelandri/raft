@@ -85,28 +85,30 @@ namespace RaftCore.Node
                 .Map(_ => descriptor);
 
         public Descriptor CommitLogEntries(Descriptor descriptor)
+            => Enumerable
+                .Range(1, descriptor.Log.Length)
+                .Filter(_ => descriptor.AckedLength
+                                    .Filter(ack => ack.Value >= _)
+                                    .Count() >= GetQuorum(_cluster))
+                .ToArray()
+                .ToOption(_ => _.Length == 0)
+                .Map(_ => _.Max())
+                .Match(
+                    ready => IsApplicationToBeNotified(descriptor, ready)
+                                .Match(desc =>NotifyToApplication(desc, ready),
+                                _ => descriptor),
+                    () => descriptor
+                );
+
+        private Descriptor NotifyToApplication(Descriptor descriptor, int ready)
         {
-            var ready = Enumerable
-                        .Range(1, descriptor.Log.Length)
-                        .Filter(_ => descriptor.AckedLength
-                                            .Filter(ack => ack.Value >= _)
-                                            .Count() >= GetQuorum(_cluster))
-                        .ToArray()
-                        .ToOption(_ => _.Length == 0)
-                        .Map(_ => _.Max())
-                        .OnNone(0);
+            Enumerable
+                .Range(descriptor.CommitLenght, ready - descriptor.CommitLenght)
+                .ForEach(_ => _application.NotifyMessage(descriptor.Log[_].Message));
 
-            return IsApplicationToBeNotified(descriptor, ready)
-                    .Match(_ =>
-                            {
-                                Enumerable
-                                    .Range(descriptor.CommitLenght, ready - descriptor.CommitLenght)
-                                    .ForEach(_ => _application.NotifyMessage(descriptor.Log[_].Message));
-
-                                descriptor.CommitLenght = ready;
-                                return descriptor;
-                            },
-                           _ => descriptor);
+            descriptor.CommitLenght = ready;
+            _descriptor = descriptor;
+            return descriptor;
         }
     }
 }
