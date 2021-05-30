@@ -105,14 +105,22 @@ namespace RaftCore.Node
                 .Count() >= GetQuorum(_cluster);
 
         private Descriptor NotifyToApplication(Descriptor descriptor, int ready)
-        {
-            Enumerable
+            => Enumerable
                 .Range(descriptor.CommitLenght, ready - descriptor.CommitLenght)
-                .ForEach(_ => _application.NotifyMessage(descriptor.Log[_].Message));
-
-            descriptor.CommitLenght = ready;
-            _descriptor = descriptor;
-            return descriptor;
-        }
+                .ForEach(_ => _application.NotifyMessage(descriptor.Log[_].Message))
+                .Map(_ => descriptor)
+                             .Map(desc => new Descriptor
+                             {
+                                 CurrentTerm = desc.CurrentTerm,
+                                 VotedFor = desc.VotedFor,
+                                 Log = desc.Log,
+                                 CommitLenght = ready,
+                                 CurrentRole = desc.CurrentRole,
+                                 CurrentLeader = desc.CurrentLeader,
+                                 VotesReceived = desc.VotesReceived,
+                                 SentLength = desc.SentLength,
+                                 AckedLength = desc.AckedLength
+                             })
+                .Tee(desc => _descriptor = desc);                
     }
 }
