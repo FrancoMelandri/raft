@@ -2,6 +2,7 @@
 using RaftCore.Models;
 using TinyFp.Extensions;
 using static RaftCore.Node.LogRequestChecks;
+using static RaftCore.Node.Checks;
 using static RaftCore.Utils;
 
 namespace RaftCore.Node
@@ -95,9 +96,7 @@ namespace RaftCore.Node
                         .Map(_ => _.Max())
                         .OnNone(0);
 
-            if (ready > 0 &&
-                ready > descriptor.CommitLenght &&
-                descriptor.Log[ready - 1].Term == descriptor.CurrentTerm)
+            if (IsApplicationToBeNotified(descriptor, ready).IsRight)
             {
                 Enumerable
                     .Range(descriptor.CommitLenght, ready - descriptor.CommitLenght)

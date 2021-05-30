@@ -157,3 +157,4 @@ When the log response report an unsuccess flag means that the log is inconsisten
 ![raft-code-1](./imgs/raft-code-9.png)
 
 the function **acks** give us the set of node that has acknowledge the log to the **length** point or later.
+
