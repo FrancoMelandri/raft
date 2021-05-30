@@ -96,15 +96,17 @@ namespace RaftCore.Node
                         .Map(_ => _.Max())
                         .OnNone(0);
 
-            if (IsApplicationToBeNotified(descriptor, ready).IsRight)
-            {
-                Enumerable
-                    .Range(descriptor.CommitLenght, ready - descriptor.CommitLenght)
-                    .ForEach(_ => _application.NotifyMessage(descriptor.Log[_].Message));
+            return IsApplicationToBeNotified(descriptor, ready)
+                    .Match(_ =>
+                            {
+                                Enumerable
+                                    .Range(descriptor.CommitLenght, ready - descriptor.CommitLenght)
+                                    .ForEach(_ => _application.NotifyMessage(descriptor.Log[_].Message));
 
-                descriptor.CommitLenght = ready;
-            }
-            return descriptor;
+                                descriptor.CommitLenght = ready;
+                                return descriptor;
+                            },
+                           _ => descriptor);
         }
     }
 }
