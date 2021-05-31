@@ -14,7 +14,7 @@ namespace RaftCore.Node
                 .Bind(descriptor => IsLengthOk(message, descriptor))
                 .Bind(descriptor => IsTermOk(message, descriptor))
                 .Bind(descriptor => IsCurrentTermOk(message, descriptor))
-                .Match(_ => HandleReceivedLogRequestOk(message, _), 
+                .Match(_ => HandleReceivedLogRequestOk(message, _),
                        _ => HandleReceivedLogRequestKo(message, _descriptor));
 
         private Status UpdateDescriptorDueTerm(LogRequestMessage message, Status descriptor)

@@ -5,6 +5,16 @@ namespace RaftApplication.Services.Application
 {
     public class ExampleApplication : IExampleApplication
     {
+        private readonly ClusterConfiguration _clusterConfiguration;
+        private readonly NodeConfiguration _nodeConfiguration;
+
+        public ExampleApplication(ClusterConfiguration clusterConfiguration,
+                                  NodeConfiguration nodeConfiguration)
+        {
+            _clusterConfiguration = clusterConfiguration;
+            _nodeConfiguration = nodeConfiguration;
+        }
+
         public Unit Deinitialise()
             => Unit.Default;
 

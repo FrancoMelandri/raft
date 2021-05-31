@@ -1,7 +1,10 @@
-﻿namespace RaftCore.Models
+﻿using System.Collections.Generic;
+
+namespace RaftCore.Models
 {
-    public struct NodeConfiguration
+    public record NodeConfiguration
     {
         public int Id { get; set; }
+        public Dictionary<string, string> Properties { get; set; }
     }
 }
