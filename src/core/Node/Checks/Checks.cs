@@ -1,5 +1,6 @@
 ﻿using TinyFp;
 using TinyFp.Extensions;
+using static TinyFp.Prelude;
 
 namespace RaftCore.Node
 {
@@ -12,8 +13,7 @@ namespace RaftCore.Node
             => ready > 0 &&
                 ready > descriptor.CommitLenght &&
                 descriptor.Log[ready - 1].Term == descriptor.CurrentTerm ?
-                Either<string, Descriptor>.Right(descriptor) :
-                Either<string, Descriptor>.Left("");
-
+                Right<string, Descriptor>(descriptor) :
+                Left<string, Descriptor>("");
     }
 }

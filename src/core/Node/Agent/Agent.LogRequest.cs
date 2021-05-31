@@ -48,14 +48,14 @@ namespace RaftCore.Node
             .Tee(desc => _descriptor = desc)
             .Tee(desc => AppendEntries(message, desc))
             .Tee(desc => _cluster.SendMessage(message.LeaderId,
-                                                        new LogResponseMessage
-                                                        {
-                                                            Type = MessageType.LogResponse,
-                                                            NodeId = _configuration.Id,
-                                                            Term = desc.CurrentTerm,
-                                                            Ack = message.LogLength + message.Entries.Length,
-                                                            Success = OK_ACK
-                                                        }));
+                                              new LogResponseMessage
+                                              {
+                                                  Type = MessageType.LogResponse,
+                                                  NodeId = _configuration.Id,
+                                                  Term = desc.CurrentTerm,
+                                                  Ack = message.LogLength + message.Entries.Length,
+                                                  Success = OK_ACK
+                                              }));
 
         private Descriptor HandleReceivedLogRequestKo(LogRequestMessage message, Descriptor descriptor)
             => descriptor.Tee(_ => _cluster.SendMessage(message.LeaderId,

@@ -1,5 +1,6 @@
 ﻿using RaftCore.Models;
 using TinyFp;
+using static TinyFp.Prelude;
 
 namespace RaftCore.Node
 {
@@ -7,22 +8,22 @@ namespace RaftCore.Node
     {
         public static Either<string, Descriptor> IsTermGreater(LogResponseMessage message, Descriptor descriptor)
             => message.Term > descriptor.CurrentTerm ?
-                Either<string, Descriptor>.Right(descriptor) :
-                Either<string, Descriptor>.Left("");
+                Right<string, Descriptor>(descriptor) :
+                Left<string, Descriptor>("");
 
         public static Either<string, Descriptor> IsTermEqual(LogResponseMessage message, Descriptor descriptor)
             => message.Term == descriptor.CurrentTerm ?
-                Either<string, Descriptor>.Right(descriptor) :
-                Either<string, Descriptor>.Left("");
+                Right<string, Descriptor>(descriptor) :
+                Left<string, Descriptor>("");
 
         public static Either<string, Descriptor> IsSentLengthGreaterThanZero(LogResponseMessage message, Descriptor descriptor)
             => descriptor.SentLength[message.NodeId] > 0 ?
-                Either<string, Descriptor>.Right(descriptor) :
-                Either<string, Descriptor>.Left("");
+                Right<string, Descriptor>(descriptor) :
+                Left<string, Descriptor>("");
 
         public static Either<string, Descriptor> IsSuccessLogReponse(LogResponseMessage message, Descriptor descriptor)
             => message.Success ?
-                Either<string, Descriptor>.Right(descriptor) :
-                Either<string, Descriptor>.Left("");
+                Right<string, Descriptor>(descriptor) :
+                Left<string, Descriptor>("");
     }
 }

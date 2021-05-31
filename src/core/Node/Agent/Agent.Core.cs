@@ -18,34 +18,34 @@ namespace RaftCore.Node
             => IsEntriesLogLengthOk(message, descriptor)
                 .Bind(_ => IsEntriesTermhNotOk(message, _))
                 .Match(_ => _.Map(desc => new Descriptor
-                {
-                    CurrentTerm = desc.CurrentTerm,
-                    VotedFor = desc.VotedFor,
-                    Log = desc.Log.Take(message.LogLength).ToArray(),
-                    CommitLenght = desc.CommitLenght,
-                    CurrentRole = desc.CurrentRole,
-                    CurrentLeader = desc.CurrentLeader,
-                    VotesReceived = desc.VotesReceived,
-                    SentLength = desc.SentLength,
-                    AckedLength = desc.AckedLength
-                })
+                            {
+                                CurrentTerm = desc.CurrentTerm,
+                                VotedFor = desc.VotedFor,
+                                Log = desc.Log.Take(message.LogLength).ToArray(),
+                                CommitLenght = desc.CommitLenght,
+                                CurrentRole = desc.CurrentRole,
+                                CurrentLeader = desc.CurrentLeader,
+                                VotesReceived = desc.VotesReceived,
+                                SentLength = desc.SentLength,
+                                AckedLength = desc.AckedLength
+                            })
                             .Tee(desc => _descriptor = desc),
                        _ => descriptor);
 
         private Descriptor AppendNewEntries(LogRequestMessage message, Descriptor descriptor)
             => AreThereEntriesToAdd(message, descriptor)
                 .Match(_ => _.Map(desc => new Descriptor
-                {
-                    CurrentTerm = desc.CurrentTerm,
-                    VotedFor = desc.VotedFor,
-                    Log = desc.Log.Concat(message.Entries).ToArray(),
-                    CommitLenght = desc.CommitLenght,
-                    CurrentRole = desc.CurrentRole,
-                    CurrentLeader = desc.CurrentLeader,
-                    VotesReceived = desc.VotesReceived,
-                    SentLength = desc.SentLength,
-                    AckedLength = desc.AckedLength
-                })
+                            {
+                                CurrentTerm = desc.CurrentTerm,
+                                VotedFor = desc.VotedFor,
+                                Log = desc.Log.Concat(message.Entries).ToArray(),
+                                CommitLenght = desc.CommitLenght,
+                                CurrentRole = desc.CurrentRole,
+                                CurrentLeader = desc.CurrentLeader,
+                                VotesReceived = desc.VotesReceived,
+                                SentLength = desc.SentLength,
+                                AckedLength = desc.AckedLength
+                            })
                             .Tee(desc => _descriptor = desc),
                        _ => descriptor);
 
@@ -109,18 +109,18 @@ namespace RaftCore.Node
                 .Range(descriptor.CommitLenght, ready - descriptor.CommitLenght)
                 .ForEach(_ => _application.NotifyMessage(descriptor.Log[_].Message))
                 .Map(_ => descriptor)
-                             .Map(desc => new Descriptor
-                             {
-                                 CurrentTerm = desc.CurrentTerm,
-                                 VotedFor = desc.VotedFor,
-                                 Log = desc.Log,
-                                 CommitLenght = ready,
-                                 CurrentRole = desc.CurrentRole,
-                                 CurrentLeader = desc.CurrentLeader,
-                                 VotesReceived = desc.VotesReceived,
-                                 SentLength = desc.SentLength,
-                                 AckedLength = desc.AckedLength
-                             })
+                .Map(desc => new Descriptor
+                {
+                    CurrentTerm = desc.CurrentTerm,
+                    VotedFor = desc.VotedFor,
+                    Log = desc.Log,
+                    CommitLenght = ready,
+                    CurrentRole = desc.CurrentRole,
+                    CurrentLeader = desc.CurrentLeader,
+                    VotesReceived = desc.VotesReceived,
+                    SentLength = desc.SentLength,
+                    AckedLength = desc.AckedLength
+                })
                 .Tee(desc => _descriptor = desc);                
     }
 }
