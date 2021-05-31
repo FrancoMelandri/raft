@@ -1,9 +1,6 @@
 name: CI
 
-on:
-  push:
-    branches:
-      - main 
+on: push
 
 jobs:
 
@@ -30,10 +27,10 @@ jobs:
 
     - name: Test
       run: |
-        dotnet test --no-restore test/core/core-test.csproj /p:CollectCoverage=true /p:CoverletOutput=TestResults/ /p:CoverletOutputFormat=lcov
+        dotnet test --no-restore raft.sln /p:CollectCoverage=true /p:CoverletOutput=TestResults/ /p:CoverletOutputFormat=lcov
 
     - name: Publish results
       uses: coverallsapp/github-action@master   
       with:
         github-token: ${{github.token}} 
-        path-to-lcov: test/core/TestResults/coverage.info
+        path-to-lcov: TestResults/coverage.info

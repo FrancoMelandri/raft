@@ -1,15 +1,19 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
+<Project Sdk="Microsoft.NET.Sdk">
 
 	<PropertyGroup>
 		<TargetFramework>net5.0</TargetFramework>
-		<RootNamespace>RaftCore</RootNamespace>
+		<RootNamespace>Raft</RootNamespace>
 		<IsPackable>true</IsPackable>
-		<PackageDescription>RAFT Consensus Algorithm Core library</PackageDescription>
+		<PackageDescription>RAFT Consensus Algorithm</PackageDescription>
 		<RepositoryUrl>https://github.com/FrancoMelandri/raft.git</RepositoryUrl>
 	</PropertyGroup>
 
 	<ItemGroup>
 		<PackageReference Include="tiny-fp" Version="1.0.0" />
+	</ItemGroup>
+
+	<ItemGroup>
+	  <ProjectReference Include="..\core\raft-core.csproj" />
 	</ItemGroup>
 
 </Project>
