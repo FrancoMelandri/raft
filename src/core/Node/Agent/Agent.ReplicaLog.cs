@@ -6,15 +6,15 @@ namespace RaftCore.Node
     public partial class Agent
     {
         public Status OnReplicateLog()
-            => IsLeader(_descriptor)
-                .Match(_ => _descriptor.Tee(descriptor => ReplicateLogToFollowers(descriptor)),
-                       _ => _descriptor);
+            => IsLeader(_status)
+                .Match(_ => _status.Tee(s => ReplicateLogToFollowers(s)),
+                       _ => _status);
 
-        private Status ReplicateLogToFollowers(Status descriptor)
+        private Status ReplicateLogToFollowers(Status status)
             => _cluster
                 .Nodes
                 .Filter(_ => _.Id != _configuration.Id)
-                .ForEach(follower => ReplicateLog(descriptor, follower.Id))
-                .Map(_ => descriptor);
+                .ForEach(follower => ReplicateLog(status, follower.Id))
+                .Map(_ => status);
     }
 }

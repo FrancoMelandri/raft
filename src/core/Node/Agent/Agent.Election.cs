@@ -9,29 +9,29 @@ namespace RaftCore.Node
         public Status OnLeaderHasFailed()
             => new Status
             {
-                CurrentTerm = _descriptor.CurrentTerm + 1,
+                CurrentTerm = _status.CurrentTerm + 1,
                 VotedFor = _configuration.Id,
-                Log = _descriptor.Log,
-                CommitLenght = _descriptor.CommitLenght,
+                Log = _status.Log,
+                CommitLenght = _status.CommitLenght,
                 CurrentRole = States.Candidate,
-                CurrentLeader = _descriptor.CurrentLeader,
+                CurrentLeader = _status.CurrentLeader,
                 VotesReceived = new[] { _configuration.Id },
-                SentLength = _descriptor.SentLength,
-                AckedLength = _descriptor.AckedLength
+                SentLength = _status.SentLength,
+                AckedLength = _status.AckedLength
             }
-            .Tee(descriptor => _descriptor = descriptor)
-            .Tee(descriptor => LastEntryOrZero(descriptor.Log)
-                                .Map(lastTerm => new VoteRequestMessage
-                                {
-                                    Type = MessageType.VoteRequest,
-                                    NodeId = _configuration.Id,
-                                    CurrentTerm = _descriptor.CurrentTerm,
-                                    LogLength = _descriptor.Log.ToOption().Map(_ => _.Length).OnNone(0),
-                                    LastTerm = lastTerm
-                                })
-                                .Tee(_ => _cluster.SendBroadcastMessage(_))
-                                .Tee(_ => _election.Start()))
-            .Map(_ => _descriptor);
+            .Tee(s => _status = s)
+            .Tee(s => LastEntryOrZero(s.Log)
+                            .Map(lastTerm => new VoteRequestMessage
+                            {
+                                Type = MessageType.VoteRequest,
+                                NodeId = _configuration.Id,
+                                CurrentTerm = _status.CurrentTerm,
+                                LogLength = _status.Log.ToOption().Map(_ => _.Length).OnNone(0),
+                                LastTerm = lastTerm
+                            })
+                            .Tee(_ => _cluster.SendBroadcastMessage(_))
+                            .Tee(_ => _election.Start()))
+            .Map(_ => _status);
 
         public Status OnElectionTimeOut()
             => OnLeaderHasFailed();

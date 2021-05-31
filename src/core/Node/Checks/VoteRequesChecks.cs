@@ -8,13 +8,13 @@ namespace RaftCore.Node
 {
     public static class VoteRequesChecks
     {
-        public static Either<string, Status> ValidateLog(Status descriptor, VoteRequestMessage message)
-            => ValidateLogTerm(descriptor, message)
-                .Map(_ => _.Match(_ => _, _ => ValidateLogLength(descriptor, message)));
+        public static Either<string, Status> ValidateLog(Status status, VoteRequestMessage message)
+            => ValidateLogTerm(status, message)
+                .Map(_ => _.Match(_ => _, _ => ValidateLogLength(status, message)));
 
-        private static Either<string, Status> ValidateLogTerm(Status descriptor, VoteRequestMessage message)
-            => message.LastTerm > LastEntryOrZero(descriptor.Log) ?
-                Right<string, Status>(descriptor) :
+        private static Either<string, Status> ValidateLogTerm(Status status, VoteRequestMessage message)
+            => message.LastTerm > LastEntryOrZero(status.Log) ?
+                Right<string, Status>(status) :
                 Left<string, Status>("");
 
         private static Either<string, Status> ValidateLogLength(Status descriptor, VoteRequestMessage message)

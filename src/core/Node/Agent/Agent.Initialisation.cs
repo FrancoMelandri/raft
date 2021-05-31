@@ -9,7 +9,7 @@ namespace RaftCore.Node
         public Status OnInitialise(NodeConfiguration nodeConfiguration)
             => this
                 .Tee(_ => _configuration = nodeConfiguration)
-                .Tee(_ => _descriptor = new Status
+                .Tee(_ => _status = new Status
                 {
                     CurrentTerm = INIT_TERM,
                     VotedFor = INIT_VOTED_FOR,
@@ -21,23 +21,23 @@ namespace RaftCore.Node
                     SentLength = INIT_SENT_LENGTH,
                     AckedLength = INIT_ACKED_LENGTH
                 })
-                .Map(_ => _descriptor);
+                .Map(_ => _status);
 
-        public Status OnInitialise(NodeConfiguration nodeConfiguration, Status descriptor)
+        public Status OnInitialise(NodeConfiguration nodeConfiguration, Status status)
             => this
                 .Tee(_ => _configuration = nodeConfiguration)
-                .Tee(_ => _descriptor = new Status
+                .Tee(_ => _status = new Status
                 {
-                    CurrentTerm = descriptor.CurrentTerm,
-                    VotedFor = descriptor.VotedFor,
-                    Log = descriptor.Log,
-                    CommitLenght = descriptor.CommitLenght,
+                    CurrentTerm = status.CurrentTerm,
+                    VotedFor = status.VotedFor,
+                    Log = status.Log,
+                    CommitLenght = status.CommitLenght,
                     CurrentRole = INIT_STATE,
                     CurrentLeader = INIT_CURRENT_LEADER,
                     VotesReceived = INIT_VOTES_RECEIVED,
                     SentLength = INIT_SENT_LENGTH,
                     AckedLength = INIT_ACKED_LENGTH
                 })
-                .Map(_ => _descriptor);
+                .Map(_ => _status);
     }
 }

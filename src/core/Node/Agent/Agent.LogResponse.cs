@@ -9,71 +9,71 @@ namespace RaftCore.Node
     public partial class Agent
     {
         public Status OnReceivedLogResponse(LogResponseMessage message)
-            => IsTermGreater(message, _descriptor)
-                .Match(descriptor => HandleReceivedLogResponseKo(message, descriptor), 
-                       _ => HandleReceivedLogResponseOk(message, _descriptor));
+            => IsTermGreater(message, _status)
+                .Match(s => HandleReceivedLogResponseKo(message, s), 
+                       _ => HandleReceivedLogResponseOk(message, _status));
 
-        private Status HandleReceivedLogResponseKo(LogResponseMessage message, Status descriptor)
+        private Status HandleReceivedLogResponseKo(LogResponseMessage message, Status status)
             => new Status 
             {
                 CurrentTerm = message.Term,
                 VotedFor = INIT_VOTED_FOR,
-                Log = descriptor.Log,
-                CommitLenght = descriptor.CommitLenght,
+                Log = status.Log,
+                CommitLenght = status.CommitLenght,
                 CurrentRole = States.Follower,
-                CurrentLeader = descriptor.CurrentLeader,
-                VotesReceived = descriptor.VotesReceived,
-                SentLength = descriptor.SentLength,
-                AckedLength = descriptor.AckedLength
+                CurrentLeader = status.CurrentLeader,
+                VotesReceived = status.VotesReceived,
+                SentLength = status.SentLength,
+                AckedLength = status.AckedLength
             }
-            .Tee(desc => _descriptor = desc);
+            .Tee(s => _status = s);
 
-        private Status HandleReceivedLogResponseOk(LogResponseMessage message, Status descriptor)
-            => IsTermEqual(message, descriptor)
-                .Bind(desc => IsLeader(desc))
-                .Match(desc => IsSuccessLogReponse(message, descriptor)
-                                .Match(_ => HandleSuccessLogResponse(message, desc), 
-                                       _ => HandleUnSuccessLogResponse(message, desc)),
-                       _ => descriptor);
+        private Status HandleReceivedLogResponseOk(LogResponseMessage message, Status status)
+            => IsTermEqual(message, status)
+                .Bind(s => IsLeader(s))
+                .Match(s => IsSuccessLogReponse(message, status)
+                                .Match(_ => HandleSuccessLogResponse(message, s), 
+                                       _ => HandleUnSuccessLogResponse(message, s)),
+                       _ => status);
 
-        private Status HandleSuccessLogResponse(LogResponseMessage message, Status descriptor)
-            => descriptor
-                .Tee(desc => desc.SentLength[message.NodeId] = message.Ack)
-                .Tee(desc => desc.AckedLength[message.NodeId] = message.Ack)
-                .Map(desc => new Status
+        private Status HandleSuccessLogResponse(LogResponseMessage message, Status status)
+            => status
+                .Tee(s => s.SentLength[message.NodeId] = message.Ack)
+                .Tee(s => s.AckedLength[message.NodeId] = message.Ack)
+                .Map(s => new Status
                 {
-                    CurrentTerm = desc.CurrentTerm,
-                    VotedFor = desc.VotedFor,
-                    Log = desc.Log,
-                    CommitLenght = desc.CommitLenght,
-                    CurrentRole = desc.CurrentRole,
-                    CurrentLeader = desc.CurrentLeader,
-                    VotesReceived = desc.VotesReceived,
-                    SentLength = desc.SentLength,
-                    AckedLength = desc.AckedLength
+                    CurrentTerm = s.CurrentTerm,
+                    VotedFor = s.VotedFor,
+                    Log = s.Log,
+                    CommitLenght = s.CommitLenght,
+                    CurrentRole = s.CurrentRole,
+                    CurrentLeader = s.CurrentLeader,
+                    VotesReceived = s.VotesReceived,
+                    SentLength = s.SentLength,
+                    AckedLength = s.AckedLength
                 })
-                .Tee(desc => _descriptor = desc)
-                .Tee(desc => CommitLogEntries(desc));
+                .Tee(s => _status = s)
+                .Tee(s => CommitLogEntries(s));
 
-        private Status HandleUnSuccessLogResponse(LogResponseMessage message, Status descriptor)
-            => IsSentLengthGreaterThanZero(message, descriptor)
+        private Status HandleUnSuccessLogResponse(LogResponseMessage message, Status status)
+            => IsSentLengthGreaterThanZero(message, status)
                 .Match(_ => _
-                            .Tee(desc => desc.SentLength[message.NodeId] = desc.SentLength[message.NodeId] - 1)
-                            .Map(desc => new Status
+                            .Tee(s => s.SentLength[message.NodeId] = s.SentLength[message.NodeId] - 1)
+                            .Map(s => new Status
                             {
-                                CurrentTerm = desc.CurrentTerm,
-                                VotedFor = desc.VotedFor,
-                                Log = desc.Log,
-                                CommitLenght = desc.CommitLenght,
-                                CurrentRole = desc.CurrentRole,
-                                CurrentLeader = desc.CurrentLeader,
-                                VotesReceived = desc.VotesReceived,
-                                SentLength = desc.SentLength,
-                                AckedLength = desc.AckedLength
+                                CurrentTerm = s.CurrentTerm,
+                                VotedFor = s.VotedFor,
+                                Log = s.Log,
+                                CommitLenght = s.CommitLenght,
+                                CurrentRole = s.CurrentRole,
+                                CurrentLeader = s.CurrentLeader,
+                                VotesReceived = s.VotesReceived,
+                                SentLength = s.SentLength,
+                                AckedLength = s.AckedLength
                             })
-                            .Tee(desc => _descriptor = desc)
-                            .Tee(desc => ReplicateLog(desc, message.NodeId)), 
-                       _ => descriptor);
+                            .Tee(s => _status = s)
+                            .Tee(s => ReplicateLog(s, message.NodeId)), 
+                       _ => status);
 
     }
 }

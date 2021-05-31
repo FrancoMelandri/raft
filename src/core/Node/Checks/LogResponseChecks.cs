@@ -6,24 +6,24 @@ namespace RaftCore.Node
 {
     public static class LogResponseChecks
     {
-        public static Either<string, Status> IsTermGreater(LogResponseMessage message, Status descriptor)
-            => message.Term > descriptor.CurrentTerm ?
-                Right<string, Status>(descriptor) :
+        public static Either<string, Status> IsTermGreater(LogResponseMessage message, Status status)
+            => message.Term > status.CurrentTerm ?
+                Right<string, Status>(status) :
                 Left<string, Status>("");
 
-        public static Either<string, Status> IsTermEqual(LogResponseMessage message, Status descriptor)
-            => message.Term == descriptor.CurrentTerm ?
-                Right<string, Status>(descriptor) :
+        public static Either<string, Status> IsTermEqual(LogResponseMessage message, Status status)
+            => message.Term == status.CurrentTerm ?
+                Right<string, Status>(status) :
                 Left<string, Status>("");
 
-        public static Either<string, Status> IsSentLengthGreaterThanZero(LogResponseMessage message, Status descriptor)
-            => descriptor.SentLength[message.NodeId] > 0 ?
-                Right<string, Status>(descriptor) :
+        public static Either<string, Status> IsSentLengthGreaterThanZero(LogResponseMessage message, Status status)
+            => status.SentLength[message.NodeId] > 0 ?
+                Right<string, Status>(status) :
                 Left<string, Status>("");
 
-        public static Either<string, Status> IsSuccessLogReponse(LogResponseMessage message, Status descriptor)
+        public static Either<string, Status> IsSuccessLogReponse(LogResponseMessage message, Status status)
             => message.Success ?
-                Right<string, Status>(descriptor) :
+                Right<string, Status>(status) :
                 Left<string, Status>("");
     }
 }

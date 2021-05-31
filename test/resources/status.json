@@ -1,0 +1,13 @@
+{
+  "CurrentTerm": 1,
+  "VotedFor": 2,
+  "Log": [
+    {
+      "Term": 1,
+      "Message": {
+        "Type": 2
+      }
+    }
+  ],
+  "CommitLenght": 1
+}

@@ -7,7 +7,7 @@ namespace RaftCore.Node
     public partial class Agent : IAgent
     {
         private NodeConfiguration _configuration;
-        private Status _descriptor;
+        private Status _status;
         private readonly ICluster _cluster;
         private readonly IElection _election;
         private readonly IApplication _application;

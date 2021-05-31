@@ -6,14 +6,14 @@ namespace RaftCore.Node
 {
     public static class Checks
     {
-        public static Either<string, Status> IsLeader(Status descriptor)
-            => descriptor.CurrentRole.ToEither(_ => descriptor, _ => _ != States.Leader, "");
+        public static Either<string, Status> IsLeader(Status status)
+            => status.CurrentRole.ToEither(_ => status, _ => _ != States.Leader, "");
 
-        public static Either<string, Status> IsApplicationToBeNotified(Status descriptor, int ready)
+        public static Either<string, Status> IsApplicationToBeNotified(Status status, int ready)
             => ready > 0 &&
-                ready > descriptor.CommitLenght &&
-                descriptor.Log[ready - 1].Term == descriptor.CurrentTerm ?
-                Right<string, Status>(descriptor) :
+                ready > status.CommitLenght &&
+                status.Log[ready - 1].Term == status.CurrentTerm ?
+                Right<string, Status>(status) :
                 Left<string, Status>("");
     }
 }

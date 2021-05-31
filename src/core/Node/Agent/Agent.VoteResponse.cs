@@ -11,30 +11,30 @@ namespace RaftCore.Node
     public partial class Agent
     {
         public Status OnReceivedVoteResponse(VoteResponseMessage message)
-            => ValidateVoteGrant(_descriptor, message)
+            => ValidateVoteGrant(_status, message)
                 .Match(_ => ReceivedVoteResponseGranted(message),
-                       _ => ValidateTerm(_descriptor, message)
+                       _ => ValidateTerm(_status, message)
                                 .Match(_ => ReceivedVoteResponseNoGrantedUpdateDescriptor(message),
                                         _ => Unit.Default))
-                .Map(_ => _descriptor);
+                .Map(_ => _status);
 
         private Unit ReceivedVoteResponseGranted(VoteResponseMessage message)
             => new Status
                 {
-                    CurrentTerm = _descriptor.CurrentTerm,
-                    VotedFor = _descriptor.VotedFor,
-                    Log = _descriptor.Log,
-                    CommitLenght = _descriptor.CommitLenght,
-                    CurrentRole = _descriptor.CurrentRole,
-                    CurrentLeader = _descriptor.CurrentLeader,
-                    VotesReceived = _descriptor.VotesReceived.Concat(new int[] { message.NodeId }).Distinct().ToArray(),
-                    SentLength = _descriptor.SentLength,
-                    AckedLength = _descriptor.AckedLength
+                    CurrentTerm = _status.CurrentTerm,
+                    VotedFor = _status.VotedFor,
+                    Log = _status.Log,
+                    CommitLenght = _status.CommitLenght,
+                    CurrentRole = _status.CurrentRole,
+                    CurrentLeader = _status.CurrentLeader,
+                    VotesReceived = _status.VotesReceived.Concat(new int[] { message.NodeId }).Distinct().ToArray(),
+                    SentLength = _status.SentLength,
+                    AckedLength = _status.AckedLength
                 }
-                .Map(descriptor => ValidateVotesQuorum(descriptor, _cluster)
-                                    .Match(_ => ReceivedVoteResponseGrantedPromoteAsLeader(descriptor),
-                                           _ => descriptor))
-                .Tee(descriptor => _descriptor = descriptor)
+                .Map(s => ValidateVotesQuorum(s, _cluster)
+                            .Match(_ => ReceivedVoteResponseGrantedPromoteAsLeader(s),
+                                    _ => s))
+                .Tee(s => _status = s)
                 .Map(_ => Unit.Default);
 
         private Unit ReceivedVoteResponseNoGrantedUpdateDescriptor(VoteResponseMessage message)
@@ -42,54 +42,54 @@ namespace RaftCore.Node
                 {
                     CurrentTerm = message.CurrentTerm,
                     VotedFor = INIT_VOTED_FOR,
-                    Log = _descriptor.Log,
-                    CommitLenght = _descriptor.CommitLenght,
+                    Log = _status.Log,
+                    CommitLenght = _status.CommitLenght,
                     CurrentRole = States.Follower,
-                    CurrentLeader = _descriptor.CurrentLeader,
-                    VotesReceived = _descriptor.VotesReceived,
-                    SentLength = _descriptor.SentLength,
-                    AckedLength = _descriptor.AckedLength
+                    CurrentLeader = _status.CurrentLeader,
+                    VotesReceived = _status.VotesReceived,
+                    SentLength = _status.SentLength,
+                    AckedLength = _status.AckedLength
                 }
-                .Tee(descriptor => _descriptor = descriptor)
+                .Tee(s => _status = s)
                 .Map(_ => _election.Cancel());
 
-        private Status ReceivedVoteResponseGrantedPromoteAsLeader(Status descriptor)
+        private Status ReceivedVoteResponseGrantedPromoteAsLeader(Status status)
             => new Status
                 {
-                    CurrentTerm = descriptor.CurrentTerm,
-                    VotedFor = descriptor.VotedFor,
-                    Log = descriptor.Log,
-                    CommitLenght = descriptor.CommitLenght,
+                    CurrentTerm = status.CurrentTerm,
+                    VotedFor = status.VotedFor,
+                    Log = status.Log,
+                    CommitLenght = status.CommitLenght,
                     CurrentRole = States.Leader,
                     CurrentLeader = _configuration.Id,
-                    VotesReceived = descriptor.VotesReceived,
-                    SentLength = descriptor.SentLength,
-                    AckedLength = descriptor.AckedLength
+                    VotesReceived = status.VotesReceived,
+                    SentLength = status.SentLength,
+                    AckedLength = status.AckedLength
                 }
                 .Tee(_ => _election.Cancel())
-                .Tee(desc => ReceivedVoteResponseGrantedUpdateFollowers(desc));
+                .Tee(ReceivedVoteResponseGrantedUpdateFollowers);
 
-        private Status ReceivedVoteResponseGrantedUpdateFollowers(Status descriptor)
+        private Status ReceivedVoteResponseGrantedUpdateFollowers(Status status)
             => _cluster.Nodes
                 .Filter(_ => _.Id != _configuration.Id)
-                .Map(_ => (_.Id, descriptor.Log.Length))
+                .Map(_ => (_.Id, status.Log.Length))
                 .Fold((SentLength: new Dictionary<int, int>(), AckedLength: new Dictionary<int, int>()),
                       (a, i) => a.Tee(_ => a.SentLength.Add(i.Id, i.Length))
                                  .Tee(_ => a.AckedLength.Add(i.Id, 0)))
-                .Map(_ => (Descriptor: new Status
+                .Map(_ => (Status: new Status
                                 {
-                                    CurrentTerm = descriptor.CurrentTerm,
-                                    VotedFor = descriptor.VotedFor,
-                                    Log = descriptor.Log,
-                                    CommitLenght = descriptor.CommitLenght,
-                                    CurrentRole = descriptor.CurrentRole,
-                                    CurrentLeader = descriptor.CurrentLeader,
-                                    VotesReceived = descriptor.VotesReceived,
+                                    CurrentTerm = status.CurrentTerm,
+                                    VotedFor = status.VotedFor,
+                                    Log = status.Log,
+                                    CommitLenght = status.CommitLenght,
+                                    CurrentRole = status.CurrentRole,
+                                    CurrentLeader = status.CurrentLeader,
+                                    VotesReceived = status.VotesReceived,
                                     SentLength = _.SentLength,
                                     AckedLength = _.AckedLength
                                 },
                            Followers: _.SentLength.Keys))
-                .Tee(_ => _.Followers.ForEach(follower => ReplicateLog(_.Descriptor, follower)))
-                .Map(_ => _.Descriptor);
+                .Tee(_ => _.Followers.ForEach(follower => ReplicateLog(_.Status, follower)))
+                .Map(_ => _.Status);
     }
 }

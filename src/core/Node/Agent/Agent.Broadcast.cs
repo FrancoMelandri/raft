@@ -8,23 +8,23 @@ namespace RaftCore.Node
     public partial class Agent
     {
         public Status OnBroadcastMessage(Message message)
-            => IsLeader(_descriptor)
+            => IsLeader(_status)
                 .Match(_ => HandleBroadcastMessageAsLeader(message),
-                       _ => _descriptor.Tee(descriptor => _cluster.SendMessage(descriptor.CurrentLeader, message)));
+                       _ => _status.Tee(status => _cluster.SendMessage(status.CurrentLeader, message)));
 
         private Status HandleBroadcastMessageAsLeader(Message message)
-            => (Log: _descriptor.Log.Concat(new LogEntry[] { new LogEntry { Message = message, Term = _descriptor.CurrentTerm } }).ToArray(),
-                AckedLength: _descriptor.AckedLength.Tee(_ => _[_configuration.Id] = _descriptor.Log.Length + 1))
+            => (Log: _status.Log.Concat(new LogEntry[] { new LogEntry { Message = message, Term = _status.CurrentTerm } }).ToArray(),
+                AckedLength: _status.AckedLength.Tee(_ => _[_configuration.Id] = _status.Log.Length + 1))
                 .Map(_ => new Status
                 {
-                    CurrentTerm = _descriptor.CurrentTerm,
-                    VotedFor = _descriptor.VotedFor,
+                    CurrentTerm = _status.CurrentTerm,
+                    VotedFor = _status.VotedFor,
                     Log = _.Log,
-                    CommitLenght = _descriptor.CommitLenght,
-                    CurrentRole = _descriptor.CurrentRole,
-                    CurrentLeader = _descriptor.CurrentLeader,
-                    VotesReceived = _descriptor.VotesReceived,
-                    SentLength = _descriptor.SentLength,
+                    CommitLenght = _status.CommitLenght,
+                    CurrentRole = _status.CurrentRole,
+                    CurrentLeader = _status.CurrentLeader,
+                    VotesReceived = _status.VotesReceived,
+                    SentLength = _status.SentLength,
                     AckedLength = _.AckedLength
                 })
                 .Tee(_ => ReplicateLogToFollowers(_));

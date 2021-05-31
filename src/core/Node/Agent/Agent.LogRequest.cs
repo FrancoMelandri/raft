@@ -9,31 +9,31 @@ namespace RaftCore.Node
     public partial class Agent
     {
         public Status OnReceivedLogRequest(LogRequestMessage message)
-            => IsTermGreater(message, _descriptor)
-                .Map(descriptor => UpdateDescriptorDueTerm(message, descriptor))
-                .Bind(descriptor => IsLengthOk(message, descriptor))
-                .Bind(descriptor => IsTermOk(message, descriptor))
-                .Bind(descriptor => IsCurrentTermOk(message, descriptor))
+            => IsTermGreater(message, _status)
+                .Map(s => UpdateDescriptorDueTerm(message, s))
+                .Bind(s => IsLengthOk(message, s))
+                .Bind(s => IsTermOk(message, s))
+                .Bind(s => IsCurrentTermOk(message, s))
                 .Match(_ => HandleReceivedLogRequestOk(message, _),
-                       _ => HandleReceivedLogRequestKo(message, _descriptor));
+                       _ => HandleReceivedLogRequestKo(message, _status));
 
-        private Status UpdateDescriptorDueTerm(LogRequestMessage message, Status descriptor)
+        private Status UpdateDescriptorDueTerm(LogRequestMessage message, Status status)
             => new Status
             {
                 CurrentTerm = message.Term,
                 VotedFor = INIT_VOTED_FOR,
-                Log = descriptor.Log,
-                CommitLenght = descriptor.CommitLenght,
-                CurrentRole = descriptor.CurrentRole,
-                CurrentLeader = descriptor.CurrentLeader,
-                VotesReceived = descriptor.VotesReceived,
-                SentLength = descriptor.SentLength,
-                AckedLength = descriptor.AckedLength
+                Log = status.Log,
+                CommitLenght = status.CommitLenght,
+                CurrentRole = status.CurrentRole,
+                CurrentLeader = status.CurrentLeader,
+                VotesReceived = status.VotesReceived,
+                SentLength = status.SentLength,
+                AckedLength = status.AckedLength
             }
-            .Tee(desc => _descriptor = desc);
+            .Tee(s => _status = s);
 
-        private Status HandleReceivedLogRequestOk(LogRequestMessage message, Status descriptor)
-            => descriptor.Map(desc => new Status
+        private Status HandleReceivedLogRequestOk(LogRequestMessage message, Status status)
+            => status.Map(desc => new Status
             {
                 CurrentTerm = desc.CurrentTerm,
                 VotedFor = desc.VotedFor,
@@ -45,20 +45,20 @@ namespace RaftCore.Node
                 SentLength = desc.SentLength,
                 AckedLength = desc.AckedLength
             })
-            .Tee(desc => _descriptor = desc)
-            .Tee(desc => AppendEntries(message, desc))
-            .Tee(desc => _cluster.SendMessage(message.LeaderId,
+            .Tee(s => _status = s)
+            .Tee(s => AppendEntries(message, s))
+            .Tee(s => _cluster.SendMessage(message.LeaderId,
                                               new LogResponseMessage
                                               {
                                                   Type = MessageType.LogResponse,
                                                   NodeId = _configuration.Id,
-                                                  Term = desc.CurrentTerm,
+                                                  Term = s.CurrentTerm,
                                                   Ack = message.LogLength + message.Entries.Length,
                                                   Success = OK_ACK
                                               }));
 
-        private Status HandleReceivedLogRequestKo(LogRequestMessage message, Status descriptor)
-            => descriptor.Tee(_ => _cluster.SendMessage(message.LeaderId,
+        private Status HandleReceivedLogRequestKo(LogRequestMessage message, Status status)
+            => status.Tee(_ => _cluster.SendMessage(message.LeaderId,
                                                         new LogResponseMessage
                                                         {
                                                             Type = MessageType.LogResponse,

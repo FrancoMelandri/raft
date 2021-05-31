@@ -10,31 +10,31 @@ namespace RaftCore.Node
     public partial class Agent
     {
         public Status OnReceivedVoteRequest(VoteRequestMessage message)
-            => ValidateLog(_descriptor, message)
-                .Bind(_ => ValidateTerm(_descriptor, message))
+            => ValidateLog(_status, message)
+                .Bind(_ => ValidateTerm(_status, message))
                 .Match(_ => ReceivedVoteRequestGrantResponse(message),
                        _ => ReceivedVoteRequestDontGrantResponse(message))
-                .Map(_ => _descriptor);
+                .Map(_ => _status);
 
         private Unit ReceivedVoteRequestGrantResponse(VoteRequestMessage message)
             => new Status
                 {
                     CurrentTerm = message.CurrentTerm,
                     VotedFor = message.NodeId,
-                    Log = _descriptor.Log,
-                    CommitLenght = _descriptor.CommitLenght,
+                    Log = _status.Log,
+                    CommitLenght = _status.CommitLenght,
                     CurrentRole = States.Follower,
-                    CurrentLeader = _descriptor.CurrentLeader,
-                    VotesReceived = _descriptor.VotesReceived,
-                    SentLength = _descriptor.SentLength,
-                    AckedLength = _descriptor.AckedLength
+                    CurrentLeader = _status.CurrentLeader,
+                    VotesReceived = _status.VotesReceived,
+                    SentLength = _status.SentLength,
+                    AckedLength = _status.AckedLength
                 }
-                .Tee(descriptor => _descriptor = descriptor)
-                .Map(descriptor => _cluster.SendMessage(message.NodeId, new VoteResponseMessage
+                .Tee(s => _status = s)
+                .Map(s => _cluster.SendMessage(message.NodeId, new VoteResponseMessage
                 {
                     Type = MessageType.VoteResponse,
                     NodeId = _configuration.Id,
-                    CurrentTerm = _descriptor.CurrentTerm,
+                    CurrentTerm = _status.CurrentTerm,
                     Granted = GRANT
                 }));
 
@@ -43,7 +43,7 @@ namespace RaftCore.Node
             {
                 Type = MessageType.VoteResponse,
                 NodeId = _configuration.Id,
-                CurrentTerm = _descriptor.CurrentTerm,
+                CurrentTerm = _status.CurrentTerm,
                 Granted = NO_GRANT
             });
     }

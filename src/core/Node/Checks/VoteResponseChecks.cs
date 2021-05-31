@@ -9,20 +9,20 @@ namespace RaftCore.Node
 {
     public static class VoteResponseChecks
     {
-        public static Either<string, int> ValidateVoteGrant(Status descriptor, VoteResponseMessage message)
-            => descriptor.CurrentRole == States.Candidate && 
-               descriptor.CurrentTerm == message.CurrentTerm &&
+        public static Either<string, int> ValidateVoteGrant(Status status, VoteResponseMessage message)
+            => status.CurrentRole == States.Candidate && 
+               status.CurrentTerm == message.CurrentTerm &&
                message.Granted ?
                 Right<string, int>(0) :
                 Left<string, int>("");
 
-        public static Either<string, int> ValidateTerm(Status descriptor, VoteResponseMessage message)
-            => message.CurrentTerm > descriptor.CurrentTerm ?
+        public static Either<string, int> ValidateTerm(Status status, VoteResponseMessage message)
+            => message.CurrentTerm > status.CurrentTerm ?
                 Right<string, int>(0) :
                 Left<string, int>("");
 
-        public static Either<string, int> ValidateVotesQuorum(Status descriptor, ICluster cluster)
-            => descriptor.VotesReceived.ToOption(_ => _.Length, _ => _.Length == 0).OnNone(0) > GetQuorum(cluster) ?
+        public static Either<string, int> ValidateVotesQuorum(Status status, ICluster cluster)
+            => status.VotesReceived.ToOption(_ => _.Length, _ => _.Length == 0).OnNone(0) > GetQuorum(cluster) ?
                 Right<string, int>(0) :
                 Left<string, int>("");
     }

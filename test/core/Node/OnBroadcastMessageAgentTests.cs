@@ -15,7 +15,7 @@ namespace RaftTest.Core
         {
             var nodeConfig = new NodeConfiguration
             {
-                Id = 42
+                Id = 42,
             };
 
             var descriptor = new Status
