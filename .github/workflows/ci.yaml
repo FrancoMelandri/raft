@@ -25,12 +25,12 @@ jobs:
       run: |
         dotnet build
 
-    - name: Test CORE
+    - name: Test
       run: |
-        dotnet test --no-restore test/raft/raft-tests.csproj /p:CollectCoverage=true /p:CoverletOutput=TestResults/ /p:CoverletOutputFormat=lcov
+        dotnet test --no-restore test/raft-tests.csproj /p:CollectCoverage=true /p:CoverletOutput=TestResults/ /p:CoverletOutputFormat=lcov
 
-    - name: Publish results CORE
+    - name: Publish results
       uses: coverallsapp/github-action@master   
       with:
         github-token: ${{github.token}} 
-        path-to-lcov: test/raft/TestResults/coverage.info
+        path-to-lcov: test/TestResults/coverage.info
