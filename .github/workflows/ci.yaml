@@ -27,10 +27,16 @@ jobs:
 
     - name: Test
       run: |
-        dotnet test --no-restore raft.sln /p:CollectCoverage=true /p:CoverletOutput=TestResults/ /p:CoverletOutputFormat=lcov
+        dotnet test --no-restore test/core/core-test.csproj /p:CollectCoverage=true /p:CoverletOutput=TestResults/ /p:CoverletOutputFormat=lcov
+        dotnet test --no-restore test/raft/raft-test.csproj /p:CollectCoverage=true /p:CoverletOutput=TestResults/ /p:CoverletOutputFormat=lcov
 
-    - name: Publish results
+    - name: Publish results CORE
       uses: coverallsapp/github-action@master   
       with:
         github-token: ${{github.token}} 
-        path-to-lcov: TestResults/coverage.info
+
+    - name: Publish results RAFT
+      uses: coverallsapp/github-action@master   
+      with:
+        github-token: ${{github.token}} 
+        path-to-lcov: test/raft/TestResults/coverage.info
