@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using RaftApplication.Services;
 using System.Diagnostics.CodeAnalysis;
 using TinyFp.Extensions;
 using static TinyFp.Extensions.Functional;
@@ -20,7 +21,8 @@ namespace RaftApplication
 
         public virtual void ConfigureServices(IServiceCollection services)
             => services
-                .Tee(_ => _.AddControllers());
+                .Tee(_ => _.AddControllers())
+                .Tee(_ => _.AddHostedService<RaftService>());
 
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
             => app
