@@ -8,7 +8,7 @@ namespace RaftCore.Node
 {
     public partial class Agent
     {
-        public Descriptor OnReceivedLogRequest(LogRequestMessage message)
+        public Status OnReceivedLogRequest(LogRequestMessage message)
             => IsTermGreater(message, _descriptor)
                 .Map(descriptor => UpdateDescriptorDueTerm(message, descriptor))
                 .Bind(descriptor => IsLengthOk(message, descriptor))
@@ -17,8 +17,8 @@ namespace RaftCore.Node
                 .Match(_ => HandleReceivedLogRequestOk(message, _), 
                        _ => HandleReceivedLogRequestKo(message, _descriptor));
 
-        private Descriptor UpdateDescriptorDueTerm(LogRequestMessage message, Descriptor descriptor)
-            => new Descriptor
+        private Status UpdateDescriptorDueTerm(LogRequestMessage message, Status descriptor)
+            => new Status
             {
                 CurrentTerm = message.Term,
                 VotedFor = INIT_VOTED_FOR,
@@ -32,8 +32,8 @@ namespace RaftCore.Node
             }
             .Tee(desc => _descriptor = desc);
 
-        private Descriptor HandleReceivedLogRequestOk(LogRequestMessage message, Descriptor descriptor)
-            => descriptor.Map(desc => new Descriptor
+        private Status HandleReceivedLogRequestOk(LogRequestMessage message, Status descriptor)
+            => descriptor.Map(desc => new Status
             {
                 CurrentTerm = desc.CurrentTerm,
                 VotedFor = desc.VotedFor,
@@ -57,7 +57,7 @@ namespace RaftCore.Node
                                                   Success = OK_ACK
                                               }));
 
-        private Descriptor HandleReceivedLogRequestKo(LogRequestMessage message, Descriptor descriptor)
+        private Status HandleReceivedLogRequestKo(LogRequestMessage message, Status descriptor)
             => descriptor.Tee(_ => _cluster.SendMessage(message.LeaderId,
                                                         new LogResponseMessage
                                                         {

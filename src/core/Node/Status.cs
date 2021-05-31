@@ -3,7 +3,7 @@ using System.Collections.Generic;
 
 namespace RaftCore.Node
 {
-    public struct Descriptor
+    public struct Status
     {
         public int CurrentTerm { get; set; }
         public int VotedFor { get; set; }

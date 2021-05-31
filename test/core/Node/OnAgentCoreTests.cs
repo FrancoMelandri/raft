@@ -20,7 +20,7 @@ namespace RaftCoreTest.Node
         [Test]
         public void CommitLogEntries_WhenReadyIsEmpty_DoNothing()
         {
-            var descriptor = new Descriptor
+            var descriptor = new Status
             {
                 Log = new LogEntry[] {
                         new LogEntry { Message = new Message(), Term = 0 }, // 0
@@ -56,7 +56,7 @@ namespace RaftCoreTest.Node
         [Test]
         public void CommitLogEntries_WhenReadyIsWrong_DueNoOneNodeHaveSussificentAcks_DoNothing()
         {
-            var descriptor = new Descriptor
+            var descriptor = new Status
             {
                 Log = new LogEntry[] {
                         new LogEntry { Message = new Message(), Term = 0 }, // 0
@@ -92,7 +92,7 @@ namespace RaftCoreTest.Node
         [Test]
         public void CommitLogEntries_WhenReadyIsWrong_WhenAtOneNode_ReachedAcks_DoNothing()
         {
-            var descriptor = new Descriptor
+            var descriptor = new Status
             {
                 Log = new LogEntry[] {
                         new LogEntry { Message = new Message(), Term = 0 }, // 0
@@ -127,7 +127,7 @@ namespace RaftCoreTest.Node
         [Test]
         public void CommitLogEntries_WhenAtLeastOneNode_ReachedAcks_NotifyApplication()
         {
-            var descriptor = new Descriptor
+            var descriptor = new Status
             {
                 Log = new LogEntry[] {
                         new LogEntry { Message = new Message(), Term = 0 }, // 0
@@ -162,7 +162,7 @@ namespace RaftCoreTest.Node
         [Test]
         public void CommitLogEntries_WhenMoreNodes_ReachedAcks_NotifyApplication()
         {
-            var descriptor = new Descriptor
+            var descriptor = new Status
             {
                 Log = new LogEntry[] {
                         new LogEntry { Message = new Message(), Term = 0 }, // 0
@@ -197,7 +197,7 @@ namespace RaftCoreTest.Node
         [Test]
         public void CommitLogEntries_WhenAllNodes_ReachedAcks_NotifyApplication()
         {
-            var descriptor = new Descriptor
+            var descriptor = new Status
             {
                 Log = new LogEntry[] {
                         new LogEntry { Message = new Message(), Term = 0 }, // 0
@@ -232,7 +232,7 @@ namespace RaftCoreTest.Node
         [Test]
         public void CommitLogEntries_WhenMoreNodes_ReachedAcks_ButWrongCommitLength_DoNothign()
         {
-            var descriptor = new Descriptor
+            var descriptor = new Status
             {
                 Log = new LogEntry[] {
                         new LogEntry { Message = new Message(), Term = 0 }, // 0
@@ -267,7 +267,7 @@ namespace RaftCoreTest.Node
         [Test]
         public void CommitLogEntries_WhenAllNodes_ReachedAcks_ButTermIsWrong_DoNothing()
         {
-            var descriptor = new Descriptor
+            var descriptor = new Status
             {
                 Log = new LogEntry[] {
                         new LogEntry { Message = new Message(), Term = 0 }, // 0

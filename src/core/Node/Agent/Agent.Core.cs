@@ -9,15 +9,15 @@ namespace RaftCore.Node
 {
     public partial class Agent
     {
-        public Descriptor AppendEntries(LogRequestMessage message, Descriptor descriptor)
+        public Status AppendEntries(LogRequestMessage message, Status descriptor)
             => TruncateLog(message, descriptor)
                 .Map(desc => AppendNewEntries(message, desc))
                 .Map(desc => NotifyApplication(message, desc));
 
-        private Descriptor TruncateLog(LogRequestMessage message, Descriptor descriptor)
+        private Status TruncateLog(LogRequestMessage message, Status descriptor)
             => IsEntriesLogLengthOk(message, descriptor)
                 .Bind(_ => IsEntriesTermhNotOk(message, _))
-                .Match(_ => _.Map(desc => new Descriptor
+                .Match(_ => _.Map(desc => new Status
                             {
                                 CurrentTerm = desc.CurrentTerm,
                                 VotedFor = desc.VotedFor,
@@ -32,9 +32,9 @@ namespace RaftCore.Node
                             .Tee(desc => _descriptor = desc),
                        _ => descriptor);
 
-        private Descriptor AppendNewEntries(LogRequestMessage message, Descriptor descriptor)
+        private Status AppendNewEntries(LogRequestMessage message, Status descriptor)
             => AreThereEntriesToAdd(message, descriptor)
-                .Match(_ => _.Map(desc => new Descriptor
+                .Match(_ => _.Map(desc => new Status
                             {
                                 CurrentTerm = desc.CurrentTerm,
                                 VotedFor = desc.VotedFor,
@@ -49,12 +49,12 @@ namespace RaftCore.Node
                             .Tee(desc => _descriptor = desc),
                        _ => descriptor);
 
-        private Descriptor NotifyApplication(LogRequestMessage message, Descriptor descriptor)
+        private Status NotifyApplication(LogRequestMessage message, Status descriptor)
             => AreThereUncommitedMessages(message, descriptor)
                 .Match(_ => _.Tee(desc => desc.Log
                                             .TakeLast(message.CommitLength - descriptor.CommitLenght)
                                             .ForEach(log => _application.NotifyMessage(log.Message)))
-                             .Map(desc => new Descriptor
+                             .Map(desc => new Status
                              {
                                  CurrentTerm = desc.CurrentTerm,
                                  VotedFor = desc.VotedFor,
@@ -69,7 +69,7 @@ namespace RaftCore.Node
                               .Tee(desc => _descriptor = desc),
                        _ => descriptor);
 
-        public Descriptor ReplicateLog(Descriptor descriptor, int follower)
+        public Status ReplicateLog(Status descriptor, int follower)
             => descriptor.SentLength[follower]
                 .Map(length => (Length: length, PrevLogTerm: length > 0 ? descriptor.Log[length - 1].Term : 0))
                 .Tee(_ => _cluster.SendMessage(follower, new LogRequestMessage
@@ -84,7 +84,7 @@ namespace RaftCore.Node
                 }))
                 .Map(_ => descriptor);
 
-        public Descriptor CommitLogEntries(Descriptor descriptor)
+        public Status CommitLogEntries(Status descriptor)
             => Enumerable
                 .Range(1, descriptor.Log.Length)
                 .Filter(index => HasQuorum(descriptor, index))
@@ -98,18 +98,18 @@ namespace RaftCore.Node
                     () => descriptor
                 );
 
-        private bool HasQuorum(Descriptor descriptor, int index)
+        private bool HasQuorum(Status descriptor, int index)
             => descriptor
                 .AckedLength
                 .Filter(ack => ack.Value >= index)
                 .Count() >= GetQuorum(_cluster);
 
-        private Descriptor NotifyToApplication(Descriptor descriptor, int ready)
+        private Status NotifyToApplication(Status descriptor, int ready)
             => Enumerable
                 .Range(descriptor.CommitLenght, ready - descriptor.CommitLenght)
                 .ForEach(_ => _application.NotifyMessage(descriptor.Log[_].Message))
                 .Map(_ => descriptor)
-                .Map(desc => new Descriptor
+                .Map(desc => new Status
                 {
                     CurrentTerm = desc.CurrentTerm,
                     VotedFor = desc.VotedFor,

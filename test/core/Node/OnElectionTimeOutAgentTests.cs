@@ -18,7 +18,7 @@ namespace RaftCoreTest.Node
                 Id = 42
             };
 
-            var descriptor = new Descriptor
+            var descriptor = new Status
             {
                 CurrentTerm = 42,
                 VotedFor = 42,
@@ -53,7 +53,7 @@ namespace RaftCoreTest.Node
                 Id = 42
             };
 
-            var descriptor = new Descriptor
+            var descriptor = new Status
             {
                 CurrentTerm = 42,
                 VotedFor = 42,

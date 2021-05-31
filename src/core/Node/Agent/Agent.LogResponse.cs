@@ -8,13 +8,13 @@ namespace RaftCore.Node
 {
     public partial class Agent
     {
-        public Descriptor OnReceivedLogResponse(LogResponseMessage message)
+        public Status OnReceivedLogResponse(LogResponseMessage message)
             => IsTermGreater(message, _descriptor)
                 .Match(descriptor => HandleReceivedLogResponseKo(message, descriptor), 
                        _ => HandleReceivedLogResponseOk(message, _descriptor));
 
-        private Descriptor HandleReceivedLogResponseKo(LogResponseMessage message, Descriptor descriptor)
-            => new Descriptor 
+        private Status HandleReceivedLogResponseKo(LogResponseMessage message, Status descriptor)
+            => new Status 
             {
                 CurrentTerm = message.Term,
                 VotedFor = INIT_VOTED_FOR,
@@ -28,7 +28,7 @@ namespace RaftCore.Node
             }
             .Tee(desc => _descriptor = desc);
 
-        private Descriptor HandleReceivedLogResponseOk(LogResponseMessage message, Descriptor descriptor)
+        private Status HandleReceivedLogResponseOk(LogResponseMessage message, Status descriptor)
             => IsTermEqual(message, descriptor)
                 .Bind(desc => IsLeader(desc))
                 .Match(desc => IsSuccessLogReponse(message, descriptor)
@@ -36,11 +36,11 @@ namespace RaftCore.Node
                                        _ => HandleUnSuccessLogResponse(message, desc)),
                        _ => descriptor);
 
-        private Descriptor HandleSuccessLogResponse(LogResponseMessage message, Descriptor descriptor)
+        private Status HandleSuccessLogResponse(LogResponseMessage message, Status descriptor)
             => descriptor
                 .Tee(desc => desc.SentLength[message.NodeId] = message.Ack)
                 .Tee(desc => desc.AckedLength[message.NodeId] = message.Ack)
-                .Map(desc => new Descriptor
+                .Map(desc => new Status
                 {
                     CurrentTerm = desc.CurrentTerm,
                     VotedFor = desc.VotedFor,
@@ -55,11 +55,11 @@ namespace RaftCore.Node
                 .Tee(desc => _descriptor = desc)
                 .Tee(desc => CommitLogEntries(desc));
 
-        private Descriptor HandleUnSuccessLogResponse(LogResponseMessage message, Descriptor descriptor)
+        private Status HandleUnSuccessLogResponse(LogResponseMessage message, Status descriptor)
             => IsSentLengthGreaterThanZero(message, descriptor)
                 .Match(_ => _
                             .Tee(desc => desc.SentLength[message.NodeId] = desc.SentLength[message.NodeId] - 1)
-                            .Map(desc => new Descriptor
+                            .Map(desc => new Status
                             {
                                 CurrentTerm = desc.CurrentTerm,
                                 VotedFor = desc.VotedFor,

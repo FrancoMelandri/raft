@@ -9,7 +9,7 @@ namespace RaftCore.Node
 {
     public partial class Agent
     {
-        public Descriptor OnReceivedVoteRequest(VoteRequestMessage message)
+        public Status OnReceivedVoteRequest(VoteRequestMessage message)
             => ValidateLog(_descriptor, message)
                 .Bind(_ => ValidateTerm(_descriptor, message))
                 .Match(_ => ReceivedVoteRequestGrantResponse(message),
@@ -17,7 +17,7 @@ namespace RaftCore.Node
                 .Map(_ => _descriptor);
 
         private Unit ReceivedVoteRequestGrantResponse(VoteRequestMessage message)
-            => new Descriptor
+            => new Status
                 {
                     CurrentTerm = message.CurrentTerm,
                     VotedFor = message.NodeId,

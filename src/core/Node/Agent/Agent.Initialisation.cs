@@ -6,10 +6,10 @@ namespace RaftCore.Node
 {
     public partial class Agent
     {
-        public Descriptor OnInitialise(NodeConfiguration nodeConfiguration)
+        public Status OnInitialise(NodeConfiguration nodeConfiguration)
             => this
                 .Tee(_ => _configuration = nodeConfiguration)
-                .Tee(_ => _descriptor = new Descriptor
+                .Tee(_ => _descriptor = new Status
                 {
                     CurrentTerm = INIT_TERM,
                     VotedFor = INIT_VOTED_FOR,
@@ -23,10 +23,10 @@ namespace RaftCore.Node
                 })
                 .Map(_ => _descriptor);
 
-        public Descriptor OnInitialise(NodeConfiguration nodeConfiguration, Descriptor descriptor)
+        public Status OnInitialise(NodeConfiguration nodeConfiguration, Status descriptor)
             => this
                 .Tee(_ => _configuration = nodeConfiguration)
-                .Tee(_ => _descriptor = new Descriptor
+                .Tee(_ => _descriptor = new Status
                 {
                     CurrentTerm = descriptor.CurrentTerm,
                     VotedFor = descriptor.VotedFor,

@@ -47,7 +47,7 @@ namespace RaftCoreTest.Node
                 .Returns(new INode[] { _node1.Object, _node2.Object, _node3.Object });
         }
 
-        protected Descriptor UseNodeAsLeader()
+        protected Status UseNodeAsLeader()
         {
 
             var nodeConfig = new NodeConfiguration
@@ -55,7 +55,7 @@ namespace RaftCoreTest.Node
                 Id = 42
             };
 
-            var descriptor = new Descriptor
+            var descriptor = new Status
             {
                 CurrentTerm = 10,
                 VotedFor = 1,
@@ -105,7 +105,7 @@ namespace RaftCoreTest.Node
             return _sut.OnReceivedVoteResponse(message);
         }
 
-        protected Descriptor UseNodeAsFollower()
+        protected Status UseNodeAsFollower()
         {
             var node1 = new Mock<INode>();
             node1.Setup(m => m.Id).Returns(1);
@@ -123,7 +123,7 @@ namespace RaftCoreTest.Node
                 Id = 42
             };
 
-            var descriptor = new Descriptor
+            var descriptor = new Status
             {
                 CurrentTerm = 10,
                 VotedFor = 1,

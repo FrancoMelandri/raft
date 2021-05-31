@@ -19,7 +19,7 @@ namespace RaftCoreTest.Node
                 Id = 42
             };
 
-            var descriptor = new Descriptor
+            var descriptor = new Status
             {
                 CurrentTerm = 11,
                 VotedFor = 1,
@@ -60,7 +60,7 @@ namespace RaftCoreTest.Node
                 Id = 42
             };
 
-            var descriptor = new Descriptor
+            var descriptor = new Status
             {
                 CurrentTerm = 11,
                 VotedFor = 1,
@@ -101,7 +101,7 @@ namespace RaftCoreTest.Node
                 Id = 42
             };
 
-            var descriptor = new Descriptor
+            var descriptor = new Status
             {
                 CurrentTerm = 10,
                 VotedFor = 1,
@@ -143,7 +143,7 @@ namespace RaftCoreTest.Node
                 Id = 42
             };
 
-            var descriptor = new Descriptor
+            var descriptor = new Status
             {
                 CurrentTerm = 11,
                 VotedFor = 1,
@@ -188,7 +188,7 @@ namespace RaftCoreTest.Node
                 Id = 42
             };
 
-            var descriptor = new Descriptor
+            var descriptor = new Status
             {
                 CurrentTerm = 10,
                 VotedFor = 1,

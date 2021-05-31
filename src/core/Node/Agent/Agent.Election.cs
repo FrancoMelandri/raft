@@ -6,8 +6,8 @@ namespace RaftCore.Node
 {
     public partial class Agent
     {
-        public Descriptor OnLeaderHasFailed()
-            => new Descriptor
+        public Status OnLeaderHasFailed()
+            => new Status
             {
                 CurrentTerm = _descriptor.CurrentTerm + 1,
                 VotedFor = _configuration.Id,
@@ -33,7 +33,7 @@ namespace RaftCore.Node
                                 .Tee(_ => _election.Start()))
             .Map(_ => _descriptor);
 
-        public Descriptor OnElectionTimeOut()
+        public Status OnElectionTimeOut()
             => OnLeaderHasFailed();
     }   
 }

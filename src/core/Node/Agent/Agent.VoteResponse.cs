@@ -10,7 +10,7 @@ namespace RaftCore.Node
 {
     public partial class Agent
     {
-        public Descriptor OnReceivedVoteResponse(VoteResponseMessage message)
+        public Status OnReceivedVoteResponse(VoteResponseMessage message)
             => ValidateVoteGrant(_descriptor, message)
                 .Match(_ => ReceivedVoteResponseGranted(message),
                        _ => ValidateTerm(_descriptor, message)
@@ -19,7 +19,7 @@ namespace RaftCore.Node
                 .Map(_ => _descriptor);
 
         private Unit ReceivedVoteResponseGranted(VoteResponseMessage message)
-            => new Descriptor
+            => new Status
                 {
                     CurrentTerm = _descriptor.CurrentTerm,
                     VotedFor = _descriptor.VotedFor,
@@ -38,7 +38,7 @@ namespace RaftCore.Node
                 .Map(_ => Unit.Default);
 
         private Unit ReceivedVoteResponseNoGrantedUpdateDescriptor(VoteResponseMessage message)
-            => new Descriptor
+            => new Status
                 {
                     CurrentTerm = message.CurrentTerm,
                     VotedFor = INIT_VOTED_FOR,
@@ -53,8 +53,8 @@ namespace RaftCore.Node
                 .Tee(descriptor => _descriptor = descriptor)
                 .Map(_ => _election.Cancel());
 
-        private Descriptor ReceivedVoteResponseGrantedPromoteAsLeader(Descriptor descriptor)
-            => new Descriptor
+        private Status ReceivedVoteResponseGrantedPromoteAsLeader(Status descriptor)
+            => new Status
                 {
                     CurrentTerm = descriptor.CurrentTerm,
                     VotedFor = descriptor.VotedFor,
@@ -69,14 +69,14 @@ namespace RaftCore.Node
                 .Tee(_ => _election.Cancel())
                 .Tee(desc => ReceivedVoteResponseGrantedUpdateFollowers(desc));
 
-        private Descriptor ReceivedVoteResponseGrantedUpdateFollowers(Descriptor descriptor)
+        private Status ReceivedVoteResponseGrantedUpdateFollowers(Status descriptor)
             => _cluster.Nodes
                 .Filter(_ => _.Id != _configuration.Id)
                 .Map(_ => (_.Id, descriptor.Log.Length))
                 .Fold((SentLength: new Dictionary<int, int>(), AckedLength: new Dictionary<int, int>()),
                       (a, i) => a.Tee(_ => a.SentLength.Add(i.Id, i.Length))
                                  .Tee(_ => a.AckedLength.Add(i.Id, 0)))
-                .Map(_ => (Descriptor: new Descriptor
+                .Map(_ => (Descriptor: new Status
                                 {
                                     CurrentTerm = descriptor.CurrentTerm,
                                     VotedFor = descriptor.VotedFor,

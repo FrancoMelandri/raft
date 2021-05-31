@@ -4,15 +4,15 @@ namespace RaftCore.Node
 {
     public interface IAgent
     {
-        Descriptor OnInitialise(NodeConfiguration nodeConfiguration);
-        Descriptor OnInitialise(NodeConfiguration nodeConfiguration, Descriptor descriptor);
-        Descriptor OnLeaderHasFailed();
-        Descriptor OnElectionTimeOut();
-        Descriptor OnReceivedVoteRequest(VoteRequestMessage message);
-        Descriptor OnReceivedVoteResponse(VoteResponseMessage message);
-        Descriptor OnBroadcastMessage(Message message);
-        Descriptor OnReplicateLog();
-        Descriptor OnReceivedLogRequest(LogRequestMessage message);
-        Descriptor OnReceivedLogResponse(LogResponseMessage message);
+        Status OnInitialise(NodeConfiguration nodeConfiguration);
+        Status OnInitialise(NodeConfiguration nodeConfiguration, Status descriptor);
+        Status OnLeaderHasFailed();
+        Status OnElectionTimeOut();
+        Status OnReceivedVoteRequest(VoteRequestMessage message);
+        Status OnReceivedVoteResponse(VoteResponseMessage message);
+        Status OnBroadcastMessage(Message message);
+        Status OnReplicateLog();
+        Status OnReceivedLogRequest(LogRequestMessage message);
+        Status OnReceivedLogResponse(LogResponseMessage message);
     }
 }
