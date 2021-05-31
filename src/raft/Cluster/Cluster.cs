@@ -14,9 +14,9 @@ namespace Raft.Cluster
         }
 
         public Unit SendBroadcastMessage(Message message)
-            => throw new System.NotImplementedException();        
+            => Unit.Default;        
 
         public Unit SendMessage(int nodeId, Message message)
-            => throw new System.NotImplementedException();        
+            => Unit.Default;
     }
 }

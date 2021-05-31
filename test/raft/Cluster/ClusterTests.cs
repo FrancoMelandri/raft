@@ -3,6 +3,8 @@ using Moq;
 using NUnit.Framework;
 using Raft.Cluster;
 using RaftCore.Cluster;
+using RaftCore.Models;
+using TinyFp;
 
 namespace RaftTest.Raft
 {
@@ -29,5 +31,15 @@ namespace RaftTest.Raft
         [Test]
         public void Cluster_HasCorrectNodes()
             => _sut.Nodes.Should().HaveCount(3);
+
+        [Test]
+        public void SendBroadcastMessage_DoNothing()
+            => _sut.SendBroadcastMessage(new Message())
+                .Should().Be(Unit.Default);
+
+        [Test]
+        public void SendMessage_DoNothing()
+            => _sut.SendMessage(1, new Message())
+                .Should().Be(Unit.Default);
     }
 }
