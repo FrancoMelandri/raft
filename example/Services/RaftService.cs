@@ -1,5 +1,5 @@
 ﻿using Microsoft.Extensions.Hosting;
-using RaftApplication.Services.Application;
+using RaftCore.Adapters;
 using System;
 using System.Threading;
 using System.Threading.Tasks;
@@ -10,9 +10,9 @@ namespace RaftApplication.Services
     public class RaftService : IHostedService,
                                IDisposable
     {
-        private readonly IExampleApplication _exampleApplication;
+        private readonly IApplication _exampleApplication;
 
-        public RaftService(IExampleApplication exampleApplication)
+        public RaftService(IApplication exampleApplication)
         {
             _exampleApplication = exampleApplication;
         }

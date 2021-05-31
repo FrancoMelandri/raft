@@ -9,15 +9,15 @@ using static System.IO.File;
 
 namespace Raft.Node
 {
-    public class ClusterNode : INode
+    public class LocalNode : ILocalNode
     {
-        private readonly NodeConfiguration _nodeConfiguration;
+        private readonly LocalNodeConfiguration _nodeConfiguration;
         private readonly IAgent _agent;
 
         public int Id => _nodeConfiguration.Id;
 
-        public ClusterNode(NodeConfiguration nodeConfiguration,
-                           IAgent agent)
+        public LocalNode(LocalNodeConfiguration nodeConfiguration,
+                         IAgent agent)
         {
             _nodeConfiguration = nodeConfiguration;
             _agent = agent;

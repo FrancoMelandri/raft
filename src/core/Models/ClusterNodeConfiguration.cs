@@ -3,8 +3,7 @@
 namespace RaftCore.Models
 {
     [ExcludeFromCodeCoverage]
-    public record ClusterConfiguration
+    public record ClusterNodeConfiguration : NodeConfiguration
     {
-        public ClusterNodeConfiguration[] Nodes { get; set; }
     }
 }

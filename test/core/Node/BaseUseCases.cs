@@ -14,20 +14,20 @@ namespace RaftTest.Core
         protected Mock<ICluster> _cluster;
         protected Mock<IElection> _election;
         protected Mock<IApplication> _application;
-        protected Mock<INode> _node1;
-        protected Mock<INode> _node2;
-        protected Mock<INode> _node3;
+        protected Mock<IClusterNode> _node1;
+        protected Mock<IClusterNode> _node2;
+        protected Mock<IClusterNode> _node3;
 
         [SetUp]
         public void SetUp()
         {
-            _node1 = new Mock<INode>();
+            _node1 = new Mock<IClusterNode>();
             _node1.Setup(m => m.Id).Returns(1);
 
-            _node2 = new Mock<INode>();
+            _node2 = new Mock<IClusterNode>();
             _node2.Setup(m => m.Id).Returns(2);
             
-            _node3 = new Mock<INode>();
+            _node3 = new Mock<IClusterNode>();
             _node3.Setup(m => m.Id).Returns(3);
 
             _cluster = new Mock<ICluster>();
@@ -44,13 +44,13 @@ namespace RaftTest.Core
             _cluster.Reset();
             _cluster
                 .Setup(m => m.Nodes)
-                .Returns(new INode[] { _node1.Object, _node2.Object, _node3.Object });
+                .Returns(new IClusterNode[] { _node1.Object, _node2.Object, _node3.Object });
         }
 
         protected Status UseNodeAsLeader()
         {
 
-            var nodeConfig = new NodeConfiguration
+            var nodeConfig = new LocalNodeConfiguration
             {
                 Id = 42
             };
@@ -107,18 +107,18 @@ namespace RaftTest.Core
 
         protected Status UseNodeAsFollower()
         {
-            var node1 = new Mock<INode>();
+            var node1 = new Mock<IClusterNode>();
             node1.Setup(m => m.Id).Returns(1);
-            var node2 = new Mock<INode>();
+            var node2 = new Mock<IClusterNode>();
             node2.Setup(m => m.Id).Returns(2);
-            var node3 = new Mock<INode>();
+            var node3 = new Mock<IClusterNode>();
             node3.Setup(m => m.Id).Returns(99);
 
             _cluster
                 .Setup(m => m.Nodes)
-                .Returns(new INode[] { node1.Object, node2.Object, node3.Object });
+                .Returns(new IClusterNode[] { node1.Object, node2.Object, node3.Object });
 
-            var nodeConfig = new NodeConfiguration
+            var nodeConfig = new LocalNodeConfiguration
             {
                 Id = 42
             };

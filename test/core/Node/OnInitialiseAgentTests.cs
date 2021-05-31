@@ -12,7 +12,7 @@ namespace RaftTest.Core
         [Test]
         public void WhenNoDescriptor_FirstInitialisation_SetTheRightValues()
         {
-            var nodeConfig = new NodeConfiguration
+            var nodeConfig = new LocalNodeConfiguration
             {
                 Id = 42
             };
@@ -33,7 +33,7 @@ namespace RaftTest.Core
         [Test]
         public void WhenDescriptor_RecoverFromCrash_SetTheRightValues()
         {
-            var nodeConfig = new NodeConfiguration
+            var nodeConfig = new LocalNodeConfiguration
             {
                 Id = 42
             };

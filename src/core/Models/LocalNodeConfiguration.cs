@@ -2,9 +2,10 @@
 
 namespace RaftCore.Models
 {
+
     [ExcludeFromCodeCoverage]
-    public record ClusterConfiguration
+    public record LocalNodeConfiguration : NodeConfiguration
     {
-        public ClusterNodeConfiguration[] Nodes { get; set; }
+        public string StatusFileName { get; set; }
     }
 }

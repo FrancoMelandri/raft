@@ -13,7 +13,7 @@ namespace RaftTest.Core
         [Test]
         public void WhenNodeIsNotLeader_ForwardToLeader()
         {
-            var nodeConfig = new NodeConfiguration
+            var nodeConfig = new LocalNodeConfiguration
             {
                 Id = 42,
             };

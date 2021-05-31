@@ -12,16 +12,16 @@ namespace RaftTest.Raft
     public class ClusterTests
     {
         private Cluster _sut;
-        private Mock<INode> _node1;
-        private Mock<INode> _node2;
-        private Mock<INode> _node3;
+        private Mock<IClusterNode> _node1;
+        private Mock<IClusterNode> _node2;
+        private Mock<IClusterNode> _node3;
 
         [SetUp]
         public void SetUp()
         {
-            _node1 = new Mock<INode>();
-            _node2 = new Mock<INode>();
-            _node3 = new Mock<INode>();
+            _node1 = new Mock<IClusterNode>();
+            _node2 = new Mock<IClusterNode>();
+            _node3 = new Mock<IClusterNode>();
 
             _sut = new Cluster(new[] { _node1.Object,
                                        _node2.Object,

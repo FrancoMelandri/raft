@@ -2,11 +2,16 @@
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Logging;
+using Raft.Cluster;
+using Raft.Node;
 using RaftApplication.Services;
 using RaftApplication.Services.Application;
+using RaftCore.Adapters;
+using RaftCore.Cluster;
 using RaftCore.Models;
+using RaftCore.Node;
 using System.Diagnostics.CodeAnalysis;
+using System.Linq;
 using TinyFp.Extensions;
 using static TinyFp.Extensions.Functional;
 
@@ -26,6 +31,7 @@ namespace RaftApplication
             => services
                 .Tee(InitializeControllers)
                 .Tee(InitializeHostedService)
+                .Tee(InitializeRaftCore)
                 .Tee(InitializeApplication)
                 .Tee(InitializeNodeConfiguration)
                 .Tee(InitializeClosterConfiguration);
@@ -44,16 +50,26 @@ namespace RaftApplication
                 .Tee(_ => _.AddSingleton<RaftService>())
                 .Tee(_ => _.AddHostedService<RaftService>());
 
+        private void InitializeRaftCore(IServiceCollection services)
+            => services
+                .Tee(_ => _.AddSingleton<ICluster>(_ =>
+                {
+                    var config = _.GetService<ClusterConfiguration>();
+                    var nodes = config.Nodes.Map(_ => new ClusterNode(_)).ToArray();
+                    return new Cluster(nodes);
+                }))
+                .Tee(_ => _.AddSingleton<IElection, Election>())
+                .Tee(_ => _.AddSingleton<IAgent, Agent>())
+                .Tee(_ => _.AddSingleton<ILocalNode, LocalNode>());
+
         private void InitializeApplication(IServiceCollection services)
             => services
-                .Tee(_ => _.AddSingleton<ExampleApplication>())
-                .Tee(_ => _.AddSingleton<IExampleApplication>(_ =>
-                                new LoggedApplication(_.GetRequiredService<ExampleApplication>(),
-                                                      _.GetRequiredService<ILogger<LoggedApplication>>())));
+                .Tee(_ => _.AddSingleton<IApplication, ExampleApplication>());
+
         private void InitializeNodeConfiguration(IServiceCollection services)
             => Configuration
-                .GetSection(typeof(NodeConfiguration).Name)
-                .Get<NodeConfiguration>()
+                .GetSection(typeof(LocalNodeConfiguration).Name)
+                .Get<LocalNodeConfiguration>()
                 .Map(services.AddSingleton);
 
         private void InitializeClosterConfiguration(IServiceCollection services)

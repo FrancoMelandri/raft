@@ -5,7 +5,7 @@ namespace RaftCore.Cluster
 {
     public interface ICluster
     {
-        INode[] Nodes { get; }
+        IClusterNode[] Nodes { get; }
         Unit SendBroadcastMessage(Message message);
         Unit SendMessage(int nodeId, Message message);
     }

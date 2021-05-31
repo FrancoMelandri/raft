@@ -6,9 +6,9 @@ namespace Raft.Cluster
 {
     public class Cluster : ICluster
     {
-        public INode[] Nodes { get; private set; }
+        public IClusterNode[] Nodes { get; private set; }
 
-        public Cluster(INode[] nodes)
+        public Cluster(IClusterNode[] nodes)
         {
             Nodes = nodes;
         }

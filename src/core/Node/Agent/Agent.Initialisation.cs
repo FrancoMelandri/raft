@@ -6,7 +6,7 @@ namespace RaftCore.Node
 {
     public partial class Agent
     {
-        public Status OnInitialise(NodeConfiguration nodeConfiguration)
+        public Status OnInitialise(LocalNodeConfiguration nodeConfiguration)
             => this
                 .Tee(_ => _configuration = nodeConfiguration)
                 .Tee(_ => _status = new Status
@@ -23,7 +23,7 @@ namespace RaftCore.Node
                 })
                 .Map(_ => _status);
 
-        public Status OnInitialise(NodeConfiguration nodeConfiguration, Status status)
+        public Status OnInitialise(LocalNodeConfiguration nodeConfiguration, Status status)
             => this
                 .Tee(_ => _configuration = nodeConfiguration)
                 .Tee(_ => _status = new Status

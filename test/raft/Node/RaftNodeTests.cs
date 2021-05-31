@@ -11,19 +11,19 @@ namespace RaftTest.Raft
     [TestFixture]
     public class RaftNodeTests
     {
-        private ClusterNode _sut;
-        private NodeConfiguration _nodeConfiguration;
+        private LocalNode _sut;
+        private LocalNodeConfiguration _nodeConfiguration;
         private Mock<IAgent> _agent;
 
         [SetUp]
         public void SetUp()
         {
-            _nodeConfiguration = new NodeConfiguration
+            _nodeConfiguration = new LocalNodeConfiguration
             {
                 Id = 1,
             };
             _agent = new Mock<IAgent>();
-            _sut = new ClusterNode(_nodeConfiguration,
+            _sut = new LocalNode(_nodeConfiguration,
                                    _agent.Object);
         }
 
