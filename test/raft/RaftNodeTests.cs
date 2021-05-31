@@ -3,13 +3,13 @@ using NUnit.Framework;
 using Raft.Node;
 using RaftCore.Models;
 
-namespace RaftCoreTest
+namespace RaftTest
 {
     [TestFixture]
-    public class NodeTests
+    public class RaftNodeTests
     {
-        private Node _sut;
-        private NodeConfiguration  _nodeConfiguration;
+        private ClusterNode _sut;
+        private NodeConfiguration _nodeConfiguration;
 
         [SetUp]
         public void SetUp()
@@ -18,11 +18,11 @@ namespace RaftCoreTest
             {
                 Id = 1
             };
-            _sut = new Node(_nodeConfiguration);
+            _sut = new ClusterNode(_nodeConfiguration);
         }
 
         [Test]
-        public void Node_HaCorrectId()
+        public void ClusterNode_HasCorrectId()
             => _sut.Id.Should().Be(1);
     }
 }

@@ -3,11 +3,11 @@ using RaftCore.Models;
 
 namespace Raft.Node
 {
-    public class Node : INode
+    public class ClusterNode : INode
     {
         public int Id { get; private set; }
 
-        public Node(NodeConfiguration nodeConfiguration)
+        public ClusterNode(NodeConfiguration nodeConfiguration)
         {
             Id = nodeConfiguration.Id;
         }

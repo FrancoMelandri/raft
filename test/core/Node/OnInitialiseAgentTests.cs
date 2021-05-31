@@ -4,7 +4,7 @@ using RaftCore.Models;
 using RaftCore.Node;
 using System.Collections.Generic;
 
-namespace RaftCoreTest.Node
+namespace RaftTest.Core
 {
     [TestFixture]
     public class OnInitialiseAgentTests : BaseUseCases

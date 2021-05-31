@@ -4,7 +4,7 @@ using NUnit.Framework;
 using RaftCore.Models;
 using RaftCore.Node;
 
-namespace RaftCoreTest.Node
+namespace RaftTest.Core
 {
     [TestFixture]
     public class OnReceivedLogResponseAgentTests : BaseUseCases

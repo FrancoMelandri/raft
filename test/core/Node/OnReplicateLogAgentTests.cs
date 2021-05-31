@@ -2,7 +2,7 @@
 using NUnit.Framework;
 using RaftCore.Models;
 
-namespace RaftCoreTest.Node
+namespace RaftTest.Core
 {
     [TestFixture]
     public class OnReplicateLogAgentTests : BaseUseCases
