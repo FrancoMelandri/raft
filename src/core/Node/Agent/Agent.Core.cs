@@ -75,7 +75,7 @@ namespace RaftCore.Node
                 .Tee(_ => _cluster.SendMessage(follower, new LogRequestMessage
                 {
                     Type = MessageType.LogRequest,
-                    LeaderId = _localNodeConfiguration.Id,
+                    LeaderId = _nodeConfiguration.Id,
                     Term = status.CurrentTerm,
                     LogLength = _.Length,
                     LogTerm = _.PrevLogTerm,

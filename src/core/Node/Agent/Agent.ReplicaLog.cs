@@ -13,7 +13,7 @@ namespace RaftCore.Node
         private Status ReplicateLogToFollowers(Status status)
             => _cluster
                 .Nodes
-                .Filter(_ => _.Id != _localNodeConfiguration.Id)
+                .Filter(_ => _.Id != _nodeConfiguration.Id)
                 .ForEach(follower => ReplicateLog(status, follower.Id))
                 .Map(_ => status);
     }

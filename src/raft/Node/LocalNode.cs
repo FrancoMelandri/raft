@@ -6,6 +6,7 @@ using TinyFp.Extensions;
 using System.Text.Json;
 using static TinyFp.Prelude;
 using static System.IO.File;
+using RaftCore.Adapters;
 
 namespace Raft.Node
 {
@@ -13,14 +14,17 @@ namespace Raft.Node
     {
         private readonly LocalNodeConfiguration _nodeConfiguration;
         private readonly IAgent _agent;
+        private readonly IStatusRepository _statusRepository;
 
         public int Id => _nodeConfiguration.Id;
 
         public LocalNode(LocalNodeConfiguration nodeConfiguration,
-                         IAgent agent)
+                         IAgent agent,
+                         IStatusRepository statusRepository)
         {
             _nodeConfiguration = nodeConfiguration;
             _agent = agent;
+            _statusRepository = statusRepository;
         }
 
         public Unit Initialise()

@@ -12,7 +12,7 @@ namespace RaftTest.Core
         [Test]
         public void WhenNoDescriptor_FirstInitialisation_SetTheRightValues()
         {
-            var nodeConfig = new LocalNodeConfiguration
+            var nodeConfig = new BaseNodeConfiguration
             {
                 Id = 42
             };
@@ -32,7 +32,7 @@ namespace RaftTest.Core
         [Test]
         public void CurrentStatus_IsCorrect()
         {
-            var nodeConfig = new LocalNodeConfiguration
+            var nodeConfig = new BaseNodeConfiguration
             {
                 Id = 42
             };
@@ -54,7 +54,7 @@ namespace RaftTest.Core
         [Test]
         public void WhenDescriptor_RecoverFromCrash_SetTheRightValues()
         {
-            var nodeConfig = new LocalNodeConfiguration
+            var nodeConfig = new BaseNodeConfiguration
             {
                 Id = 42
             };

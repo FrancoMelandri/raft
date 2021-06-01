@@ -2,6 +2,7 @@
 using Moq;
 using NUnit.Framework;
 using Raft.Node;
+using RaftCore.Adapters;
 using RaftCore.Models;
 using RaftCore.Node;
 using System.IO;
@@ -14,6 +15,7 @@ namespace RaftTest.Raft
         private LocalNode _sut;
         private LocalNodeConfiguration _nodeConfiguration;
         private Mock<IAgent> _agent;
+        private Mock<IStatusRepository> _statusRepository;
 
         [SetUp]
         public void SetUp()
@@ -23,8 +25,10 @@ namespace RaftTest.Raft
                 Id = 1,
             };
             _agent = new Mock<IAgent>();
+            _statusRepository = new Mock<IStatusRepository>();
             _sut = new LocalNode(_nodeConfiguration,
-                                   _agent.Object);
+                                  _agent.Object,
+                                  _statusRepository.Object);
         }
 
         [Test]

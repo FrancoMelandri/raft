@@ -13,7 +13,7 @@ namespace RaftTest.Core
         [Test]
         public void NodeLogTerm_GreaterThan_CandidateLog_RespondWithFalse()
         {
-            var nodeConfig = new LocalNodeConfiguration
+            var nodeConfig = new BaseNodeConfiguration
             {
                 Id = 42
             };
@@ -53,7 +53,7 @@ namespace RaftTest.Core
         [Test]
         public void NodeLogTerm_LessThan_CandidateLog_RespondWithTrue()
         {
-            var nodeConfig = new LocalNodeConfiguration
+            var nodeConfig = new BaseNodeConfiguration
             {
                 Id = 42
             };
@@ -95,7 +95,7 @@ namespace RaftTest.Core
         [Test]
         public void NodeLogTerm_Empty_RespondWithTrue()
         {
-            var nodeConfig = new LocalNodeConfiguration
+            var nodeConfig = new BaseNodeConfiguration
             {
                 Id = 42
             };
@@ -137,7 +137,7 @@ namespace RaftTest.Core
         [Test]
         public void NodeLogTerm_Equal_CandidateLog_LogLength_Greater_ThanCandidate_RespondWithFalse()
         {
-            var nodeConfig = new LocalNodeConfiguration
+            var nodeConfig = new BaseNodeConfiguration
             {
                 Id = 42
             };
@@ -178,7 +178,7 @@ namespace RaftTest.Core
         [Test]
         public void NodeLogTerm_Equal_CandidateLog_LogLebngth_Equal_ThanCandidate_RespondWithTrue()
         {
-            var nodeConfig = new LocalNodeConfiguration
+            var nodeConfig = new BaseNodeConfiguration
             {
                 Id = 42
             };
@@ -220,7 +220,7 @@ namespace RaftTest.Core
         [Test]
         public void CurrentTerm_Lessthan_CandidateTerm_RespondWithTrue()
         {
-            var nodeConfig = new LocalNodeConfiguration
+            var nodeConfig = new BaseNodeConfiguration
             {
                 Id = 42
             };
@@ -262,7 +262,7 @@ namespace RaftTest.Core
         [Test]
         public void CurrentTerm_Ok__And_Already_VotedFor_RespondWithFalse()
         {
-            var nodeConfig = new LocalNodeConfiguration
+            var nodeConfig = new BaseNodeConfiguration
             {
                 Id = 42
             };
@@ -305,7 +305,7 @@ namespace RaftTest.Core
         [TestCase(2)]
         public void CurrentTerm_Ok_And_Not_VotedFor_RespondWithTrue(int voteFor)
         {
-            var nodeConfig = new LocalNodeConfiguration
+            var nodeConfig = new BaseNodeConfiguration
             {
                 Id = 42
             };

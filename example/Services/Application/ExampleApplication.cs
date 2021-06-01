@@ -1,4 +1,5 @@
 ﻿using Microsoft.Extensions.Logging;
+using Raft.Node;
 using RaftCore.Adapters;
 using RaftCore.Cluster;
 using RaftCore.Models;

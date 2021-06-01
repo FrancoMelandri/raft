@@ -50,7 +50,7 @@ namespace RaftTest.Core
         protected Status UseNodeAsLeader()
         {
 
-            var nodeConfig = new LocalNodeConfiguration
+            var nodeConfig = new BaseNodeConfiguration
             {
                 Id = 42
             };
@@ -118,7 +118,7 @@ namespace RaftTest.Core
                 .Setup(m => m.Nodes)
                 .Returns(new IClusterNode[] { node1.Object, node2.Object, node3.Object });
 
-            var nodeConfig = new LocalNodeConfiguration
+            var nodeConfig = new BaseNodeConfiguration
             {
                 Id = 42
             };

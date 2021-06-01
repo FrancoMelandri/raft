@@ -14,7 +14,7 @@ namespace RaftTest.Core
         [Test]
         public void CurrentRole_Not_Candidate_And_Term_LessOrEqual_CurrentTerm_DoNothing()
         {
-            var nodeConfig = new LocalNodeConfiguration
+            var nodeConfig = new BaseNodeConfiguration
             {
                 Id = 42
             };
@@ -55,7 +55,7 @@ namespace RaftTest.Core
         [Test]
         public void CurrentRole_Not_Candidate_And_Term_GreaterThan_CurrentTerm_UpdateDesccriptor()
         {
-            var nodeConfig = new LocalNodeConfiguration
+            var nodeConfig = new BaseNodeConfiguration
             {
                 Id = 42
             };
@@ -96,7 +96,7 @@ namespace RaftTest.Core
         [Test]
         public void CurrentRole_Candidate_And_Term_Equals_CurrentTerm_And_Not_Granted_DoNothing()
         {
-            var nodeConfig = new LocalNodeConfiguration
+            var nodeConfig = new BaseNodeConfiguration
             {
                 Id = 42
             };
@@ -138,7 +138,7 @@ namespace RaftTest.Core
         [Test]
         public void CurrentRole_Candidate_And_Term_Different_CurrentTerm_And_Not_Granted_DoNothing()
         {
-            var nodeConfig = new LocalNodeConfiguration
+            var nodeConfig = new BaseNodeConfiguration
             {
                 Id = 42
             };
@@ -183,7 +183,7 @@ namespace RaftTest.Core
             _cluster
                 .Setup(m => m.Nodes)
                 .Returns(new IClusterNode[] { null, null, null, null, null });
-            var nodeConfig = new LocalNodeConfiguration
+            var nodeConfig = new BaseNodeConfiguration
             {
                 Id = 42
             };

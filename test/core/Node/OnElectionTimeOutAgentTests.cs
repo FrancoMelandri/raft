@@ -13,7 +13,7 @@ namespace RaftTest.Core
         [Test]
         public void WhenEmptyLog_SendMessage_VoteRequest_And_LastTermZero()
         {
-            var nodeConfig = new LocalNodeConfiguration
+            var nodeConfig = new BaseNodeConfiguration
             {
                 Id = 42
             };
@@ -48,7 +48,7 @@ namespace RaftTest.Core
         [Test]
         public void WhenLogNotEmpty_SendMessage_VoteRequest_And_LastTerm()
         {
-            var nodeConfig = new LocalNodeConfiguration
+            var nodeConfig = new BaseNodeConfiguration
             {
                 Id = 42
             };

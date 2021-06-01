@@ -11,7 +11,7 @@ namespace RaftCore.Node
         private readonly ICluster _cluster;
         private readonly IElection _election;
         private readonly IApplication _application;
-        private LocalNodeConfiguration _localNodeConfiguration;
+        private BaseNodeConfiguration _nodeConfiguration;
 
         public Agent(ICluster cluster, 
                      IElection election,

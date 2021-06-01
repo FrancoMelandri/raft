@@ -5,8 +5,8 @@ namespace RaftCore.Node
     public interface IAgent
     {
         Status CurrentStatus();
-        Status OnInitialise(LocalNodeConfiguration nodeConfiguration);
-        Status OnInitialise(LocalNodeConfiguration nodeConfiguration, Status status);
+        Status OnInitialise(BaseNodeConfiguration nodeConfiguration);
+        Status OnInitialise(BaseNodeConfiguration nodeConfiguration, Status status);
         Status OnLeaderHasFailed();
         Status OnElectionTimeOut();
         Status OnReceivedVoteRequest(VoteRequestMessage message);
