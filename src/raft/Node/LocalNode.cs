@@ -9,18 +9,21 @@ namespace Raft.Node
     public class LocalNode : ILocalNode
     {
         private readonly LocalNodeConfiguration _nodeConfiguration;
-        private readonly IAgent _agent;
         private readonly IStatusRepository _statusRepository;
+        private readonly IMessageListener _messageListener;
+        private readonly IAgent _agent;
 
         public int Id => _nodeConfiguration.Id;
 
         public LocalNode(LocalNodeConfiguration nodeConfiguration,
                          IAgent agent,
-                         IStatusRepository statusRepository)
+                         IStatusRepository statusRepository,
+                         IMessageListener messageListener)
         {
             _nodeConfiguration = nodeConfiguration;
             _agent = agent;
             _statusRepository = statusRepository;
+            _messageListener = messageListener;
         }
 
         public Unit Initialise()
