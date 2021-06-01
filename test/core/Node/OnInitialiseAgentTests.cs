@@ -16,19 +16,40 @@ namespace RaftTest.Core
             {
                 Id = 42
             };
-            var descriptor = _sut.OnInitialise(nodeConfig);
+            var status = _sut.OnInitialise(nodeConfig);
             
-            descriptor.CurrentTerm.Should().Be(0);
-            descriptor.VotedFor.Should().Be(-1);
-            descriptor.Log.Should().BeEquivalentTo(new LogEntry[] { });
-            descriptor.CommitLenght.Should().Be(0);
-            descriptor.CurrentRole.Should().Be(States.Follower);
-            descriptor.CurrentLeader.Should().Be(-1);
-            descriptor.VotesReceived.Should().NotBeNull();
-            descriptor.SentLength.Should().BeEquivalentTo(new object[] { });
-            descriptor.AckedLength.Should().BeEquivalentTo(new object[] { });
+            status.CurrentTerm.Should().Be(0);
+            status.VotedFor.Should().Be(-1);
+            status.Log.Should().BeEquivalentTo(new LogEntry[] { });
+            status.CommitLenght.Should().Be(0);
+            status.CurrentRole.Should().Be(States.Follower);
+            status.CurrentLeader.Should().Be(-1);
+            status.VotesReceived.Should().NotBeNull();
+            status.SentLength.Should().BeEquivalentTo(new object[] { });
+            status.AckedLength.Should().BeEquivalentTo(new object[] { });
         }
 
+        [Test]
+        public void CurrentStatus_IsCorrect()
+        {
+            var nodeConfig = new LocalNodeConfiguration
+            {
+                Id = 42
+            };
+            _ = _sut.OnInitialise(nodeConfig);
+            var status = _sut.CurrentStatus();
+
+            status.CurrentTerm.Should().Be(0);
+            status.VotedFor.Should().Be(-1);
+            status.Log.Should().BeEquivalentTo(new LogEntry[] { });
+            status.CommitLenght.Should().Be(0);
+            status.CurrentRole.Should().Be(States.Follower);
+            status.CurrentLeader.Should().Be(-1);
+            status.VotesReceived.Should().NotBeNull();
+            status.SentLength.Should().BeEquivalentTo(new object[] { });
+            status.AckedLength.Should().BeEquivalentTo(new object[] { });
+
+        }
 
         [Test]
         public void WhenDescriptor_RecoverFromCrash_SetTheRightValues()
@@ -38,7 +59,7 @@ namespace RaftTest.Core
                 Id = 42
             };
 
-            var descriptor = new Status
+            var status = new Status
             {
                 CurrentTerm = 42,
                 VotedFor = 42,
@@ -51,17 +72,17 @@ namespace RaftTest.Core
                 AckedLength = new Dictionary<int, int> { {1, 1} }
             };
 
-            descriptor = _sut.OnInitialise(nodeConfig, descriptor);
+            status = _sut.OnInitialise(nodeConfig, status);
             
-            descriptor.CurrentTerm.Should().Be(42);
-            descriptor.VotedFor.Should().Be(42);
-            descriptor.Log.Length.Should().Be(1);
-            descriptor.CommitLenght.Should().Be(42);
-            descriptor.CurrentRole.Should().Be(States.Follower);
-            descriptor.CurrentLeader.Should().Be(-1);
-            descriptor.VotesReceived.Should().NotBeNull();
-            descriptor.SentLength.Should().BeEquivalentTo(new Dictionary<int, int>());
-            descriptor.AckedLength.Should().BeEquivalentTo(new Dictionary<int, int>());
+            status.CurrentTerm.Should().Be(42);
+            status.VotedFor.Should().Be(42);
+            status.Log.Length.Should().Be(1);
+            status.CommitLenght.Should().Be(42);
+            status.CurrentRole.Should().Be(States.Follower);
+            status.CurrentLeader.Should().Be(-1);
+            status.VotesReceived.Should().NotBeNull();
+            status.SentLength.Should().BeEquivalentTo(new Dictionary<int, int>());
+            status.AckedLength.Should().BeEquivalentTo(new Dictionary<int, int>());
         }
     }
 }

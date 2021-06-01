@@ -8,7 +8,7 @@ namespace RaftCore.Node
     {
         public Status OnInitialise(LocalNodeConfiguration nodeConfiguration)
             => this
-                .Tee(_ => _configuration = nodeConfiguration)
+                .Tee(_ => _localNodeConfiguration = nodeConfiguration)
                 .Tee(_ => _status = new Status
                 {
                     CurrentTerm = INIT_TERM,
@@ -25,7 +25,7 @@ namespace RaftCore.Node
 
         public Status OnInitialise(LocalNodeConfiguration nodeConfiguration, Status status)
             => this
-                .Tee(_ => _configuration = nodeConfiguration)
+                .Tee(_ => _localNodeConfiguration = nodeConfiguration)
                 .Tee(_ => _status = new Status
                 {
                     CurrentTerm = status.CurrentTerm,

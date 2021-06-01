@@ -64,5 +64,24 @@ namespace RaftTest.Raft
                                                 p.Log[0].Term == 1 &&
                                                 p.Log[0].Message.Type == MessageType.VoteResponse)), Times.Once);
         }
+
+        [Test]
+        public void Deinitialise_SaveStatusToFile()
+        {
+            _nodeConfiguration.StatusFileName = Path.Combine("resources", "status.json");
+
+            _ = _sut.Initialise();
+
+            _agent
+                .Verify(m => m.OnInitialise(_nodeConfiguration), Times.Never);
+            _agent
+                .Verify(m => m.OnInitialise(_nodeConfiguration, 
+                                            It.Is<Status>(p => 
+                                                p.CurrentTerm == 1 &&
+                                                p.VotedFor == 2 &&
+                                                p.CommitLenght == 1 &&
+                                                p.Log[0].Term == 1 &&
+                                                p.Log[0].Message.Type == MessageType.VoteResponse)), Times.Once);
+        }
     }
 }

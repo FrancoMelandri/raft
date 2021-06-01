@@ -33,7 +33,7 @@ namespace RaftCore.Node
                 .Map(s => _cluster.SendMessage(message.NodeId, new VoteResponseMessage
                 {
                     Type = MessageType.VoteResponse,
-                    NodeId = _configuration.Id,
+                    NodeId = _localNodeConfiguration.Id,
                     CurrentTerm = _status.CurrentTerm,
                     Granted = GRANT
                 }));
@@ -42,7 +42,7 @@ namespace RaftCore.Node
             => _cluster.SendMessage(message.NodeId, new VoteResponseMessage
             {
                 Type = MessageType.VoteResponse,
-                NodeId = _configuration.Id,
+                NodeId = _localNodeConfiguration.Id,
                 CurrentTerm = _status.CurrentTerm,
                 Granted = NO_GRANT
             });

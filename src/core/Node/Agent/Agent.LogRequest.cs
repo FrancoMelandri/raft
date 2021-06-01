@@ -51,7 +51,7 @@ namespace RaftCore.Node
                                               new LogResponseMessage
                                               {
                                                   Type = MessageType.LogResponse,
-                                                  NodeId = _configuration.Id,
+                                                  NodeId = _localNodeConfiguration.Id,
                                                   Term = s.CurrentTerm,
                                                   Ack = message.LogLength + message.Entries.Length,
                                                   Success = OK_ACK
@@ -62,7 +62,7 @@ namespace RaftCore.Node
                                                         new LogResponseMessage
                                                         {
                                                             Type = MessageType.LogResponse,
-                                                            NodeId = _configuration.Id,
+                                                            NodeId = _localNodeConfiguration.Id,
                                                             Term = _.CurrentTerm,
                                                             Ack = KO_LENGTH,
                                                             Success = KO_ACK

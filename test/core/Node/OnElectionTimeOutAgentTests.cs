@@ -18,7 +18,7 @@ namespace RaftTest.Core
                 Id = 42
             };
 
-            var descriptor = new Status
+            var status = new Status
             {
                 CurrentTerm = 42,
                 VotedFor = 42,
@@ -31,12 +31,12 @@ namespace RaftTest.Core
                 AckedLength = new Dictionary<int, int> { { 1, 1 } }
             };
 
-            descriptor = _sut.OnInitialise(nodeConfig, descriptor);
-            descriptor = _sut.OnElectionTimeOut();
+            status = _sut.OnInitialise(nodeConfig, status);
+            status = _sut.OnElectionTimeOut();
 
-            descriptor.CurrentTerm.Should().Be(43);
-            descriptor.CurrentRole.Should().Be(States.Candidate);
-            descriptor.VotedFor.Should().Be(42);
+            status.CurrentTerm.Should().Be(43);
+            status.CurrentRole.Should().Be(States.Candidate);
+            status.VotedFor.Should().Be(42);
             _cluster
                 .Verify(m => m.SendBroadcastMessage(It.Is<VoteRequestMessage>(
                                                     p => p.NodeId == 42 &&
@@ -53,7 +53,7 @@ namespace RaftTest.Core
                 Id = 42
             };
 
-            var descriptor = new Status
+            var status = new Status
             {
                 CurrentTerm = 42,
                 VotedFor = 42,
@@ -66,12 +66,12 @@ namespace RaftTest.Core
                 AckedLength = new Dictionary<int, int>()
             };
 
-            descriptor = _sut.OnInitialise(nodeConfig, descriptor);
-            descriptor = _sut.OnElectionTimeOut();
+            status = _sut.OnInitialise(nodeConfig, status);
+            status = _sut.OnElectionTimeOut();
 
-            descriptor.CurrentTerm.Should().Be(43);
-            descriptor.CurrentRole.Should().Be(States.Candidate);
-            descriptor.VotedFor.Should().Be(42);
+            status.CurrentTerm.Should().Be(43);
+            status.CurrentRole.Should().Be(States.Candidate);
+            status.VotedFor.Should().Be(42);
             _cluster
                 .Verify(m => m.SendBroadcastMessage(It.Is<VoteRequestMessage>(
                                                     p => p.NodeId == 42 &&

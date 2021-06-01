@@ -23,17 +23,17 @@ namespace RaftTest.Core
                 Success = false
             };
 
-            var descriptor = _sut.OnReceivedLogResponse(logResponse);
+            var status = _sut.OnReceivedLogResponse(logResponse);
 
-            descriptor.CurrentRole.Should().Be(States.Follower);
-            descriptor.VotedFor.Should().Be(-1);
-            descriptor.CurrentTerm.Should().Be(12);
+            status.CurrentRole.Should().Be(States.Follower);
+            status.VotedFor.Should().Be(-1);
+            status.CurrentTerm.Should().Be(12);
         }
 
         [Test]
         public void WhenTerm_EqualTo_CurrentTerm_AndNot_Leader_DiscardMessage()
         {
-            var descriptor = UseNodeAsFollower();
+            var status = UseNodeAsFollower();
 
             var logResponse = new LogResponseMessage
             {
@@ -46,7 +46,7 @@ namespace RaftTest.Core
 
             var descriptorResult = _sut.OnReceivedLogResponse(logResponse);
 
-            descriptorResult.Should().BeEquivalentTo(descriptor);
+            descriptorResult.Should().BeEquivalentTo(status);
         }
 
         [Test]
@@ -63,10 +63,10 @@ namespace RaftTest.Core
                 Success = true
             };
 
-            var descriptor = _sut.OnReceivedLogResponse(logResponse);
+            var status = _sut.OnReceivedLogResponse(logResponse);
 
-            descriptor.SentLength[1].Should().Be(3);
-            descriptor.AckedLength[1].Should().Be(3);
+            status.SentLength[1].Should().Be(3);
+            status.AckedLength[1].Should().Be(3);
         }
 
         [Test]
@@ -85,9 +85,9 @@ namespace RaftTest.Core
                 Success = false
             };
 
-            var descriptor = _sut.OnReceivedLogResponse(logResponse);
+            var status = _sut.OnReceivedLogResponse(logResponse);
 
-            descriptor.SentLength[1].Should().Be(5);
+            status.SentLength[1].Should().Be(5);
             _cluster
                 .Verify(m => m.SendMessage(1,
                                             It.Is<LogRequestMessage>(p =>

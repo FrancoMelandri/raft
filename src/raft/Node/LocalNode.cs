@@ -24,13 +24,23 @@ namespace Raft.Node
         }
 
         public Unit Initialise()
-            => GetFileContent(_nodeConfiguration.StatusFileName)
+            => LoadStatusFromFile(_nodeConfiguration.StatusFileName)
                 .Match(status => _agent.OnInitialise(_nodeConfiguration, status),
                        () => _agent.OnInitialise(_nodeConfiguration))
                 .Map(_ => Unit.Default);
 
-        private Option<Status> GetFileContent(string fileName)
+        public Unit Deinitialise()
+            => Unit.Default;
+
+        private static Option<Status> LoadStatusFromFile(string fileName)
             => Try(() => Exists(fileName)
+                            .Map(_ => ReadAllText(fileName))
+                            .Map(_ => JsonSerializer.Deserialize<Status>(_)))
+               .Match(_ => Option<Status>.Some(_),
+                      _ => Option<Status>.None());
+
+        private Option<Status> SaveStatusToFile(string fileName)
+            => Try(() => JsonSerializer.Serialize<Status>(_agent.CurrentStatus())
                             .Map(_ => ReadAllText(fileName))
                             .Map(_ => JsonSerializer.Deserialize<Status>(_)))
                .Match(_ => Option<Status>.Some(_),

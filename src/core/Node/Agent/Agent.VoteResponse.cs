@@ -61,7 +61,7 @@ namespace RaftCore.Node
                     Log = status.Log,
                     CommitLenght = status.CommitLenght,
                     CurrentRole = States.Leader,
-                    CurrentLeader = _configuration.Id,
+                    CurrentLeader = _localNodeConfiguration.Id,
                     VotesReceived = status.VotesReceived,
                     SentLength = status.SentLength,
                     AckedLength = status.AckedLength
@@ -71,7 +71,7 @@ namespace RaftCore.Node
 
         private Status ReceivedVoteResponseGrantedUpdateFollowers(Status status)
             => _cluster.Nodes
-                .Filter(_ => _.Id != _configuration.Id)
+                .Filter(_ => _.Id != _localNodeConfiguration.Id)
                 .Map(_ => (_.Id, status.Log.Length))
                 .Fold((SentLength: new Dictionary<int, int>(), AckedLength: new Dictionary<int, int>()),
                       (a, i) => a.Tee(_ => a.SentLength.Add(i.Id, i.Length))

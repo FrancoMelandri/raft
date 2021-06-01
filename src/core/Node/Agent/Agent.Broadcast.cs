@@ -14,7 +14,7 @@ namespace RaftCore.Node
 
         private Status HandleBroadcastMessageAsLeader(Message message)
             => (Log: _status.Log.Concat(new LogEntry[] { new LogEntry { Message = message, Term = _status.CurrentTerm } }).ToArray(),
-                AckedLength: _status.AckedLength.Tee(_ => _[_configuration.Id] = _status.Log.Length + 1))
+                AckedLength: _status.AckedLength.Tee(_ => _[_localNodeConfiguration.Id] = _status.Log.Length + 1))
                 .Map(_ => new Status
                 {
                     CurrentTerm = _status.CurrentTerm,

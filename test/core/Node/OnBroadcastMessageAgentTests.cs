@@ -18,7 +18,7 @@ namespace RaftTest.Core
                 Id = 42,
             };
 
-            var descriptor = new Status
+            var status = new Status
             {
                 CurrentTerm = 11,
                 VotedFor = 1,
@@ -31,7 +31,7 @@ namespace RaftTest.Core
                 AckedLength = new Dictionary<int, int>()
             };
 
-            descriptor = _sut.OnInitialise(nodeConfig, descriptor);
+            status = _sut.OnInitialise(nodeConfig, status);
             // TODO: how to set a leader
             var message = new VoteResponseMessage
             {
@@ -41,9 +41,9 @@ namespace RaftTest.Core
                 Granted = false
             };
 
-            var descriptorResult = _sut.OnBroadcastMessage(message);
+            var statusResult = _sut.OnBroadcastMessage(message);
 
-            descriptorResult.Should().BeEquivalentTo(descriptor);
+            statusResult.Should().BeEquivalentTo(status);
             //_cluster
             //    .Verify(m => m.SendMessage(2, message));
         }
@@ -63,13 +63,13 @@ namespace RaftTest.Core
 
             ResetCluster();
 
-            var descriptor = _sut.OnBroadcastMessage(message);
+            var status = _sut.OnBroadcastMessage(message);
 
-            descriptor.Log.Should().HaveCount(7);
-            descriptor.Log[6].Message.Should().Be(message);
-            descriptor.Log[6].Term.Should().Be(11);
+            status.Log.Should().HaveCount(7);
+            status.Log[6].Message.Should().Be(message);
+            status.Log[6].Term.Should().Be(11);
 
-            descriptor.AckedLength[42].Should().Be(7);
+            status.AckedLength[42].Should().Be(7);
             _cluster
                 .Verify(m => m.SendMessage(1,
                                             It.Is<LogRequestMessage>(p =>

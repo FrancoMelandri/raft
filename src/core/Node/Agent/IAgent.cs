@@ -4,6 +4,7 @@ namespace RaftCore.Node
 {
     public interface IAgent
     {
+        Status CurrentStatus();
         Status OnInitialise(LocalNodeConfiguration nodeConfiguration);
         Status OnInitialise(LocalNodeConfiguration nodeConfiguration, Status status);
         Status OnLeaderHasFailed();
