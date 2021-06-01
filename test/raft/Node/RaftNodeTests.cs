@@ -5,7 +5,7 @@ using Raft.Node;
 using RaftCore.Adapters;
 using RaftCore.Models;
 using RaftCore.Node;
-using System.IO;
+using TinyFp;
 
 namespace RaftTest.Raft
 {
@@ -35,12 +35,12 @@ namespace RaftTest.Raft
         public void ClusterNode_HasCorrectId()
             => _sut.Id.Should().Be(1);
 
-        [TestCase(null)]
-        [TestCase("")]
-        [TestCase("not-exists")]
-        public void Initialise_WhenFileDoesntExist_OnInitialize(string fileName)
+        [Test]
+        public void Initialise_WhenFileDoesntExist_OnInitialize()
         {
-            _nodeConfiguration.StatusFileName = fileName;
+            _statusRepository
+                .Setup(m => m.LoadStatus())
+                .Returns(Option<Status>.None());
 
             _ = _sut.Initialise();
 
@@ -53,7 +53,27 @@ namespace RaftTest.Raft
         [Test]
         public void Initialise_WhenFileExist_OnInitialize()
         {
-            _nodeConfiguration.StatusFileName = Path.Combine("resources", "status.json");
+            var status = new Status
+            {
+                CurrentTerm = 1,
+                VotedFor = 2,
+                CommitLenght = 1,
+                Log = new LogEntry[] 
+                {
+                    new LogEntry
+                    {
+                        Term = 1,
+                        Message = new VoteResponseMessage
+                        {
+                            Type = MessageType.VoteResponse
+                        }
+                    }
+                }
+            };
+
+            _statusRepository
+                .Setup(m => m.LoadStatus())
+                .Returns(Option<Status>.Some(status));
 
             _ = _sut.Initialise();
 
@@ -72,20 +92,17 @@ namespace RaftTest.Raft
         [Test]
         public void Deinitialise_SaveStatusToFile()
         {
-            _nodeConfiguration.StatusFileName = Path.Combine("resources", "status.json");
+            var status = new Status();
+            _agent
+                .Setup(m => m.CurrentStatus())
+                .Returns(status);
 
-            _ = _sut.Initialise();
+            _ = _sut.Deinitialise();
 
             _agent
-                .Verify(m => m.OnInitialise(_nodeConfiguration), Times.Never);
-            _agent
-                .Verify(m => m.OnInitialise(_nodeConfiguration, 
-                                            It.Is<Status>(p => 
-                                                p.CurrentTerm == 1 &&
-                                                p.VotedFor == 2 &&
-                                                p.CommitLenght == 1 &&
-                                                p.Log[0].Term == 1 &&
-                                                p.Log[0].Message.Type == MessageType.VoteResponse)), Times.Once);
+                .Verify(m => m.CurrentStatus(), Times.Once);
+            _statusRepository
+                .Verify(m => m.SaveStatus(status), Times.Once);
         }
     }
 }

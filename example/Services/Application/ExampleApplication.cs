@@ -29,7 +29,7 @@ namespace RaftApplication.Services.Application
 
         public Unit Deinitialise(ILocalNode localNode)
             => localNode
-                .Initialise()
+                .Deinitialise()
                 .Tee(_ => _logger.LogInformation(STOPPED));
 
         public Unit Initialise(ILocalNode localNode)

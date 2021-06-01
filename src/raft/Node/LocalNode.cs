@@ -1,11 +1,7 @@
 ﻿using RaftCore.Cluster;
-using RaftCore.Models;
 using RaftCore.Node;
 using TinyFp;
 using TinyFp.Extensions;
-using System.Text.Json;
-using static TinyFp.Prelude;
-using static System.IO.File;
 using RaftCore.Adapters;
 
 namespace Raft.Node
@@ -28,26 +24,15 @@ namespace Raft.Node
         }
 
         public Unit Initialise()
-            => LoadStatusFromFile(_nodeConfiguration.StatusFileName)
+            => _statusRepository
+                .LoadStatus()
                 .Match(status => _agent.OnInitialise(_nodeConfiguration, status),
                        () => _agent.OnInitialise(_nodeConfiguration))
                 .Map(_ => Unit.Default);
 
         public Unit Deinitialise()
-            => Unit.Default;
-
-        private static Option<Status> LoadStatusFromFile(string fileName)
-            => Try(() => Exists(fileName)
-                            .Map(_ => ReadAllText(fileName))
-                            .Map(_ => JsonSerializer.Deserialize<Status>(_)))
-               .Match(_ => Option<Status>.Some(_),
-                      _ => Option<Status>.None());
-
-        private Option<Status> SaveStatusToFile(string fileName)
-            => Try(() => JsonSerializer.Serialize<Status>(_agent.CurrentStatus())
-                            .Map(_ => ReadAllText(fileName))
-                            .Map(_ => JsonSerializer.Deserialize<Status>(_)))
-               .Match(_ => Option<Status>.Some(_),
-                      _ => Option<Status>.None());
+            => _statusRepository
+                .SaveStatus(_agent.CurrentStatus())
+                .OnNone(Unit.Default);
     }
 }
