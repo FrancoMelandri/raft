@@ -12,6 +12,7 @@ using static System.Threading.Tasks.Task;
 using static Raft.Constants.Messages;
 using static System.Text.Encoding;
 using static TinyFp.Prelude;
+using RaftCore.Cluster;
 
 namespace Raft.Node
 {
@@ -22,8 +23,8 @@ namespace Raft.Node
         private const string LOCAL_HOST = "127.0.0.1";
 
         private readonly LocalNodeConfiguration _localNodeConfiguration;
+        private IMessageObserver _messageObserver;
         private TcpListener _tcpListener;
-
         private Task _listener;
 
         public TcpMessageListener(LocalNodeConfiguration localNodeConfiguration)
@@ -31,8 +32,9 @@ namespace Raft.Node
             _localNodeConfiguration = localNodeConfiguration;
         }
 
-        public Unit Start()
+        public Unit Start(IMessageObserver messageObserver)
             => Unit.Default
+                .Tee(_ => _messageObserver = messageObserver)
                 .Tee(_ => StartListener());
 
         public Unit Stop()
@@ -61,8 +63,7 @@ namespace Raft.Node
                 .Bind(_ => GetMessage(_, client))
                 .Match(_ => _, () => new Message { Type = MessageType.None })
                 .Tee(_ => client.Close())
-                .Tee(_ => _)
-                .Map(_ => Unit.Default);
+                .Map(_ => _messageObserver.NotifyMessage(_));
 
         private static Option<int> GetHeader(TcpClient client)
             => Try(() => new byte[HEADER_SIZE]

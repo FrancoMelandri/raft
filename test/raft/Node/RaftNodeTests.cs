@@ -52,7 +52,7 @@ namespace RaftTest.Raft
             _agent
                 .Verify(m => m.OnInitialise(_nodeConfiguration, It.IsAny<Status>()), Times.Never);
             _messageListener
-                .Verify(m => m.Start(), Times.Once);
+                .Verify(m => m.Start(_sut), Times.Once);
         }
 
         [Test]
@@ -93,7 +93,7 @@ namespace RaftTest.Raft
                                                 p.Log[0].Term == 1 &&
                                                 p.Log[0].Message.Type == MessageType.VoteResponse)), Times.Once);
             _messageListener
-                .Verify(m => m.Start(), Times.Once);
+                .Verify(m => m.Start(_sut), Times.Once);
         }
 
         [Test]
@@ -112,6 +112,21 @@ namespace RaftTest.Raft
                 .Verify(m => m.SaveStatus(status), Times.Once);
             _messageListener
                 .Verify(m => m.Stop(), Times.Once);
+        }
+
+        [TestCase(MessageType.None)]
+        [TestCase(MessageType.LogRequest)]
+        [TestCase(MessageType.LogResponse)]
+        [TestCase(MessageType.VoteRequest)]
+        [TestCase(MessageType.VoteResponse)]
+        public void NotifyMessage_ReturnOk(MessageType type)
+        {
+            var message = new Message
+            {
+                Type = type
+            };
+            _sut.NotifyMessage(message)
+                .Should().Be(Unit.Default);
         }
     }
 }
