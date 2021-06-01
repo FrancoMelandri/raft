@@ -1,14 +1,17 @@
-﻿using RaftCore.Adapters;
+﻿using System.Text.Json;
+using RaftCore.Adapters;
 using System.Diagnostics.CodeAnalysis;
 using System.Net;
 using System.Net.Sockets;
 using System.Threading.Tasks;
 using TinyFp;
 using TinyFp.Extensions;
+using RaftCore.Models;
 using static System.Convert;
 using static System.Threading.Tasks.Task;
 using static Raft.Constants.Messages;
 using static System.Text.Encoding;
+using static TinyFp.Prelude;
 
 namespace Raft.Node
 {
@@ -55,14 +58,27 @@ namespace Raft.Node
 
         private Unit HandleIncomingMessage(TcpClient client)
             => GetHeader(client)
+                .Bind(_ => GetMessage(_, client))
+                .Match(_ => _, () => new Message { Type = MessageType.None })
                 .Tee(_ => client.Close())
+                .Tee(_ => _)
                 .Map(_ => Unit.Default);
 
-        private static int GetHeader(TcpClient client)
-            => new byte[HEADER_SIZE]
-                .Tee(_ => client.GetStream().Read(_, 0, HEADER_SIZE))
-                .Map(_ => UTF8.GetString(_))
-                .Map(_ => _.Replace(PADDING_CHAR, REPLACING_CHAR))
-                .Map(_ => ToInt32(_));
+        private static Option<int> GetHeader(TcpClient client)
+            => Try(() => new byte[HEADER_SIZE]
+                            .Tee(_ => client.GetStream().Read(_, 0, HEADER_SIZE))
+                            .Map(_ => UTF8.GetString(_))
+                            .Map(_ => _.Replace(PADDING_CHAR, REPLACING_CHAR))
+                            .Map(_ => ToInt32(_)))
+               .Match(_ => Option<int>.Some(_),
+                      _ => Option<int>.None());
+
+        private Option<Message> GetMessage(int size, TcpClient client)
+            => Try(() => new byte[size]
+                            .Tee(_ => client.GetStream().Read(_, 0, size))
+                            .Map(_ => UTF8.GetString(_))
+                            .Map(_ => JsonSerializer.Deserialize<Message>(_)))
+               .Match(_ => Option<Message>.Some(_),
+                      _ => Option<Message>.None());
     }
 }
