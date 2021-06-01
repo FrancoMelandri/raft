@@ -7,6 +7,8 @@ using TinyFp;
 using TinyFp.Extensions;
 using static System.Convert;
 using static System.Threading.Tasks.Task;
+using static Raft.Constants.Messages;
+using static System.Text.Encoding;
 
 namespace Raft.Node
 {
@@ -52,7 +54,15 @@ namespace Raft.Node
                 .Tee(_ => _listener = Task.Factory.StartNew(() => Listen()));
 
         private Unit HandleIncomingMessage(TcpClient client)
-            => Unit.Default
-                .Tee(_ => client.Close());
+            => GetHeader(client)
+                .Tee(_ => client.Close())
+                .Map(_ => Unit.Default);
+
+        private static int GetHeader(TcpClient client)
+            => new byte[HEADER_SIZE]
+                .Tee(_ => client.GetStream().Read(_, 0, HEADER_SIZE))
+                .Map(_ => UTF8.GetString(_))
+                .Map(_ => _.Replace(PADDING_CHAR, REPLACING_CHAR))
+                .Map(_ => ToInt32(_));
     }
 }
