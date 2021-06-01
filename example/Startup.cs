@@ -52,15 +52,15 @@ namespace RaftApplication
 
         private void InitializeRaftCore(IServiceCollection services)
             => services
-                .Tee(_ => _.AddSingleton<ICluster>(_ =>
-                {
-                    var config = _.GetService<ClusterConfiguration>();
-                    var nodes = config.Nodes.Map(_ => new ClusterNode(_)).ToArray();
-                    return new Cluster(nodes);
-                }))
+                .Tee(_ => _.AddSingleton<ICluster>(_ => 
+                                new Cluster(_.GetService<ClusterConfiguration>()
+                                                .Nodes
+                                                .Map(_ => new ClusterNode(_))
+                                                .ToArray())))
                 .Tee(_ => _.AddSingleton<IStatusRepository, FileStatusRepository>())
                 .Tee(_ => _.AddSingleton<IElection, Election>())
                 .Tee(_ => _.AddSingleton<IAgent, Agent>())
+                .Tee(_ => _.AddSingleton<IMessageListener, TcpMessageListener>())
                 .Tee(_ => _.AddSingleton<ILocalNode, LocalNode>());
 
         private void InitializeApplication(IServiceCollection services)

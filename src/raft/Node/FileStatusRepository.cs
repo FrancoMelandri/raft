@@ -2,10 +2,10 @@
 using RaftCore.Node;
 using System.Diagnostics.CodeAnalysis;
 using TinyFp;
-using static TinyFp.Prelude;
-using static System.IO.File;
 using TinyFp.Extensions;
 using System.Text.Json;
+using static TinyFp.Prelude;
+using static System.IO.File;
 
 namespace Raft.Node
 {
