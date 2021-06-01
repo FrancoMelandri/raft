@@ -16,6 +16,7 @@ namespace RaftTest.Raft
         private LocalNodeConfiguration _nodeConfiguration;
         private Mock<IAgent> _agent;
         private Mock<IStatusRepository> _statusRepository;
+        private Mock<IMessageListener> _messageListener;
 
         [SetUp]
         public void SetUp()
@@ -26,9 +27,11 @@ namespace RaftTest.Raft
             };
             _agent = new Mock<IAgent>();
             _statusRepository = new Mock<IStatusRepository>();
+            _messageListener = new Mock<IMessageListener>();
             _sut = new LocalNode(_nodeConfiguration,
                                   _agent.Object,
-                                  _statusRepository.Object);
+                                  _statusRepository.Object,
+                                  _messageListener.Object);
         }
 
         [Test]
@@ -48,6 +51,8 @@ namespace RaftTest.Raft
                 .Verify(m => m.OnInitialise(_nodeConfiguration), Times.Once);
             _agent
                 .Verify(m => m.OnInitialise(_nodeConfiguration, It.IsAny<Status>()), Times.Never);
+            _messageListener
+                .Verify(m => m.Start(), Times.Once);
         }
 
         [Test]
@@ -87,6 +92,8 @@ namespace RaftTest.Raft
                                                 p.CommitLenght == 1 &&
                                                 p.Log[0].Term == 1 &&
                                                 p.Log[0].Message.Type == MessageType.VoteResponse)), Times.Once);
+            _messageListener
+                .Verify(m => m.Start(), Times.Once);
         }
 
         [Test]
@@ -103,6 +110,8 @@ namespace RaftTest.Raft
                 .Verify(m => m.CurrentStatus(), Times.Once);
             _statusRepository
                 .Verify(m => m.SaveStatus(status), Times.Once);
+            _messageListener
+                .Verify(m => m.Stop(), Times.Once);
         }
     }
 }

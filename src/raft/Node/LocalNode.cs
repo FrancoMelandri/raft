@@ -31,11 +31,13 @@ namespace Raft.Node
                 .LoadStatus()
                 .Match(status => _agent.OnInitialise(_nodeConfiguration, status),
                        () => _agent.OnInitialise(_nodeConfiguration))
+                .Tee(_ => _messageListener.Start())
                 .Map(_ => Unit.Default);
 
         public Unit Deinitialise()
             => _statusRepository
                 .SaveStatus(_agent.CurrentStatus())
-                .OnNone(Unit.Default);
+                .OnNone(Unit.Default)
+                .Tee(_ => _messageListener.Stop());
     }
 }
