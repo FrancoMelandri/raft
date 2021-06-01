@@ -10,12 +10,12 @@ namespace RaftCore.Node
             => new Status
             {
                 CurrentTerm = _status.CurrentTerm + 1,
-                VotedFor = _configuration.Id,
+                VotedFor = _nodeConfiguration.Id,
                 Log = _status.Log,
                 CommitLenght = _status.CommitLenght,
                 CurrentRole = States.Candidate,
                 CurrentLeader = _status.CurrentLeader,
-                VotesReceived = new[] { _configuration.Id },
+                VotesReceived = new[] { _nodeConfiguration.Id },
                 SentLength = _status.SentLength,
                 AckedLength = _status.AckedLength
             }
@@ -24,7 +24,7 @@ namespace RaftCore.Node
                             .Map(lastTerm => new VoteRequestMessage
                             {
                                 Type = MessageType.VoteRequest,
-                                NodeId = _configuration.Id,
+                                NodeId = _nodeConfiguration.Id,
                                 CurrentTerm = _status.CurrentTerm,
                                 LogLength = _status.Log.ToOption().Map(_ => _.Length).OnNone(0),
                                 LastTerm = lastTerm

@@ -1,11 +1,8 @@
 ﻿using RaftCore.Cluster;
-using RaftCore.Models;
 using RaftCore.Node;
 using TinyFp;
 using TinyFp.Extensions;
-using System.Text.Json;
-using static TinyFp.Prelude;
-using static System.IO.File;
+using RaftCore.Adapters;
 
 namespace Raft.Node
 {
@@ -13,27 +10,29 @@ namespace Raft.Node
     {
         private readonly LocalNodeConfiguration _nodeConfiguration;
         private readonly IAgent _agent;
+        private readonly IStatusRepository _statusRepository;
 
         public int Id => _nodeConfiguration.Id;
 
         public LocalNode(LocalNodeConfiguration nodeConfiguration,
-                         IAgent agent)
+                         IAgent agent,
+                         IStatusRepository statusRepository)
         {
             _nodeConfiguration = nodeConfiguration;
             _agent = agent;
+            _statusRepository = statusRepository;
         }
 
         public Unit Initialise()
-            => GetFileContent(_nodeConfiguration.StatusFileName)
+            => _statusRepository
+                .LoadStatus()
                 .Match(status => _agent.OnInitialise(_nodeConfiguration, status),
                        () => _agent.OnInitialise(_nodeConfiguration))
                 .Map(_ => Unit.Default);
 
-        private Option<Status> GetFileContent(string fileName)
-            => Try(() => Exists(fileName)
-                            .Map(_ => ReadAllText(fileName))
-                            .Map(_ => JsonSerializer.Deserialize<Status>(_)))
-               .Match(_ => Option<Status>.Some(_),
-                      _ => Option<Status>.None());
+        public Unit Deinitialise()
+            => _statusRepository
+                .SaveStatus(_agent.CurrentStatus())
+                .OnNone(Unit.Default);
     }
 }

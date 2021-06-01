@@ -1,16 +1,17 @@
 ﻿using RaftCore.Adapters;
 using RaftCore.Cluster;
 using RaftCore.Models;
+using TinyFp.Extensions;
 
 namespace RaftCore.Node
 {
     public partial class Agent : IAgent
     {
-        private LocalNodeConfiguration _configuration;
         private Status _status;
         private readonly ICluster _cluster;
         private readonly IElection _election;
         private readonly IApplication _application;
+        private BaseNodeConfiguration _nodeConfiguration;
 
         public Agent(ICluster cluster, 
                      IElection election,
@@ -25,5 +26,9 @@ namespace RaftCore.Node
                                    IElection election,
                                    IApplication application)
             => new(cluster, election, application);
+
+        public Status CurrentStatus()
+            => new Status()
+                .Tee(status => status = _status);
     }
 }

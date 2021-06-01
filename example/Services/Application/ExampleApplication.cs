@@ -1,5 +1,7 @@
 ﻿using Microsoft.Extensions.Logging;
+using Raft.Node;
 using RaftCore.Adapters;
+using RaftCore.Cluster;
 using RaftCore.Models;
 using TinyFp;
 using TinyFp.Extensions;
@@ -25,12 +27,14 @@ namespace RaftApplication.Services.Application
             _logger = logger;
         }
 
-        public Unit Deinitialise()
-            => Unit.Default
+        public Unit Deinitialise(ILocalNode localNode)
+            => localNode
+                .Deinitialise()
                 .Tee(_ => _logger.LogInformation(STOPPED));
 
-        public Unit Initialise()
-            => Unit.Default
+        public Unit Initialise(ILocalNode localNode)
+            => localNode
+                .Initialise()
                 .Tee(_ => _logger.LogInformation(STARTED));
 
         public Unit NotifyMessage(Message message)

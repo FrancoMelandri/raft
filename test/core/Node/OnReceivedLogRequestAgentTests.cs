@@ -24,10 +24,10 @@ namespace RaftTest.Core
                 Entries = new LogEntry[] { },
                 CommitLength = 5
             };
-            var descritpor = _sut.OnReceivedLogRequest(logRequestMerssage);
+            var status = _sut.OnReceivedLogRequest(logRequestMerssage);
 
-            descritpor.CurrentTerm.Should().Be(15);
-            descritpor.VotedFor.Should().Be(-1);
+            status.CurrentTerm.Should().Be(15);
+            status.VotedFor.Should().Be(-1);
         }
 
         [Test]
@@ -45,10 +45,10 @@ namespace RaftTest.Core
                 Entries = new LogEntry[] { },
                 CommitLength = 5
             };
-            var descritpor = _sut.OnReceivedLogRequest(logRequestMerssage);
+            var status = _sut.OnReceivedLogRequest(logRequestMerssage);
 
-            descritpor.CurrentTerm.Should().Be(10);
-            descritpor.VotedFor.Should().Be(1);
+            status.CurrentTerm.Should().Be(10);
+            status.VotedFor.Should().Be(1);
         }
 
         [Test]
@@ -66,10 +66,10 @@ namespace RaftTest.Core
                 Entries = new LogEntry[] { },
                 CommitLength = 2
             };
-            var descritpor = _sut.OnReceivedLogRequest(logRequestMerssage);
+            var status = _sut.OnReceivedLogRequest(logRequestMerssage);
 
-            descritpor.CurrentTerm.Should().Be(15);
-            descritpor.VotedFor.Should().Be(-1);
+            status.CurrentTerm.Should().Be(15);
+            status.VotedFor.Should().Be(-1);
             _cluster
                 .Verify(m => m.SendMessage(1, It.Is<LogResponseMessage>(p =>
                                                     p.Term == 15 &&
@@ -93,10 +93,10 @@ namespace RaftTest.Core
                 Entries = new LogEntry[] { },
                 CommitLength = 2
             };
-            var descritpor = _sut.OnReceivedLogRequest(logRequestMerssage);
+            var status = _sut.OnReceivedLogRequest(logRequestMerssage);
 
-            descritpor.CurrentTerm.Should().Be(15);
-            descritpor.VotedFor.Should().Be(-1);
+            status.CurrentTerm.Should().Be(15);
+            status.VotedFor.Should().Be(-1);
             _cluster
                 .Verify(m => m.SendMessage(1, It.Is<LogResponseMessage>(p =>
                                                     p.Term == 15 &&
@@ -125,12 +125,12 @@ namespace RaftTest.Core
                         },
                 CommitLength = 2
             };
-            var descritpor = _sut.OnReceivedLogRequest(logRequestMerssage);
+            var status = _sut.OnReceivedLogRequest(logRequestMerssage);
 
-            descritpor.CurrentTerm.Should().Be(15);
-            descritpor.VotedFor.Should().Be(-1);
-            descritpor.CurrentRole.Should().Be(States.Follower);
-            descritpor.CurrentLeader.Should().Be(1);
+            status.CurrentTerm.Should().Be(15);
+            status.VotedFor.Should().Be(-1);
+            status.CurrentRole.Should().Be(States.Follower);
+            status.CurrentLeader.Should().Be(1);
             _cluster
                 .Verify(m => m.SendMessage(1, It.Is<LogResponseMessage>(p =>
                                                     p.Term == 15 &&
@@ -166,13 +166,13 @@ namespace RaftTest.Core
                         },
                 CommitLength = 2
             };
-            var descritpor = _sut.OnReceivedLogRequest(logRequestMerssage);
+            var status = _sut.OnReceivedLogRequest(logRequestMerssage);
 
-            descritpor.CurrentTerm.Should().Be(15);
-            descritpor.VotedFor.Should().Be(-1);
-            descritpor.CurrentRole.Should().Be(States.Follower);
-            descritpor.CurrentLeader.Should().Be(1);
-            descritpor.Log.Should().BeEquivalentTo(new LogEntry[] {
+            status.CurrentTerm.Should().Be(15);
+            status.VotedFor.Should().Be(-1);
+            status.CurrentRole.Should().Be(States.Follower);
+            status.CurrentLeader.Should().Be(1);
+            status.Log.Should().BeEquivalentTo(new LogEntry[] {
                         new LogEntry { Term = 6 },
                         new LogEntry { Term = 7 },
                         new LogEntry { Term = 8 },
@@ -214,13 +214,13 @@ namespace RaftTest.Core
                         },
                 CommitLength = 2
             };
-            var descritpor = _sut.OnReceivedLogRequest(logRequestMerssage);
+            var status = _sut.OnReceivedLogRequest(logRequestMerssage);
 
-            descritpor.CurrentTerm.Should().Be(15);
-            descritpor.VotedFor.Should().Be(-1);
-            descritpor.CurrentRole.Should().Be(States.Follower);
-            descritpor.CurrentLeader.Should().Be(1);
-            descritpor.Log.Should().BeEquivalentTo(new LogEntry[] {
+            status.CurrentTerm.Should().Be(15);
+            status.VotedFor.Should().Be(-1);
+            status.CurrentRole.Should().Be(States.Follower);
+            status.CurrentLeader.Should().Be(1);
+            status.Log.Should().BeEquivalentTo(new LogEntry[] {
                         new LogEntry { Term = 6 },
                         new LogEntry { Term = 7 },
                         new LogEntry { Term = 8 },
@@ -265,13 +265,13 @@ namespace RaftTest.Core
                         },
                 CommitLength = 9
             };
-            var descritpor = _sut.OnReceivedLogRequest(logRequestMerssage);
+            var status = _sut.OnReceivedLogRequest(logRequestMerssage);
 
-            descritpor.CurrentTerm.Should().Be(15);
-            descritpor.VotedFor.Should().Be(-1);
-            descritpor.CurrentRole.Should().Be(States.Follower);
-            descritpor.CurrentLeader.Should().Be(1);
-            descritpor.Log.Should().BeEquivalentTo(new LogEntry[] {
+            status.CurrentTerm.Should().Be(15);
+            status.VotedFor.Should().Be(-1);
+            status.CurrentRole.Should().Be(States.Follower);
+            status.CurrentLeader.Should().Be(1);
+            status.Log.Should().BeEquivalentTo(new LogEntry[] {
                         new LogEntry { Term = 6 },
                         new LogEntry { Term = 7 },
                         new LogEntry { Term = 8 },
@@ -281,7 +281,7 @@ namespace RaftTest.Core
                         new LogEntry { Message = new Message{ Type = MessageType.None }, Term = 12 },
                         new LogEntry { Message = new Message{ Type = MessageType.None }, Term = 13 },
                         new LogEntry { Message = new Message{ Type = MessageType.None }, Term = 14 }});
-            descritpor.CommitLenght.Should().Be(9);
+            status.CommitLenght.Should().Be(9);
             _cluster
                 .Verify(m => m.SendMessage(1, It.Is<LogResponseMessage>(p =>
                                                     p.Term == 15 &&

@@ -20,7 +20,7 @@ namespace RaftTest.Core
         [Test]
         public void CommitLogEntries_WhenReadyIsEmpty_DoNothing()
         {
-            var descriptor = new Status
+            var status = new Status
             {
                 Log = new LogEntry[] {
                         new LogEntry { Message = new Message(), Term = 0 }, // 0
@@ -46,9 +46,9 @@ namespace RaftTest.Core
                 }
             };
 
-            descriptor = _sut.CommitLogEntries(descriptor);
+            status = _sut.CommitLogEntries(status);
 
-            descriptor.CommitLenght.Should().Be(6);
+            status.CommitLenght.Should().Be(6);
             _application
                 .Verify(m => m.NotifyMessage(It.IsAny<Message>()), Times.Never);
         }
@@ -56,7 +56,7 @@ namespace RaftTest.Core
         [Test]
         public void CommitLogEntries_WhenReadyIsWrong_DueNoOneNodeHaveSussificentAcks_DoNothing()
         {
-            var descriptor = new Status
+            var status = new Status
             {
                 Log = new LogEntry[] {
                         new LogEntry { Message = new Message(), Term = 0 }, // 0
@@ -82,9 +82,9 @@ namespace RaftTest.Core
                 }
             };
 
-            descriptor = _sut.CommitLogEntries(descriptor);
+            status = _sut.CommitLogEntries(status);
 
-            descriptor.CommitLenght.Should().Be(6);
+            status.CommitLenght.Should().Be(6);
             _application
                 .Verify(m => m.NotifyMessage(It.IsAny<Message>()), Times.Never);
         }
@@ -92,7 +92,7 @@ namespace RaftTest.Core
         [Test]
         public void CommitLogEntries_WhenReadyIsWrong_WhenAtOneNode_ReachedAcks_DoNothing()
         {
-            var descriptor = new Status
+            var status = new Status
             {
                 Log = new LogEntry[] {
                         new LogEntry { Message = new Message(), Term = 0 }, // 0
@@ -117,9 +117,9 @@ namespace RaftTest.Core
                 }
             };
 
-            descriptor = _sut.CommitLogEntries(descriptor);
+            status = _sut.CommitLogEntries(status);
 
-            descriptor.CommitLenght.Should().Be(5);
+            status.CommitLenght.Should().Be(5);
             _application
                 .Verify(m => m.NotifyMessage(It.IsAny<Message>()), Times.Never);
         }
@@ -127,7 +127,7 @@ namespace RaftTest.Core
         [Test]
         public void CommitLogEntries_WhenAtLeastOneNode_ReachedAcks_NotifyApplication()
         {
-            var descriptor = new Status
+            var status = new Status
             {
                 Log = new LogEntry[] {
                         new LogEntry { Message = new Message(), Term = 0 }, // 0
@@ -152,9 +152,9 @@ namespace RaftTest.Core
                 }
             };
 
-            descriptor = _sut.CommitLogEntries(descriptor);
+            status = _sut.CommitLogEntries(status);
 
-            descriptor.CommitLenght.Should().Be(6);
+            status.CommitLenght.Should().Be(6);
             _application
                 .Verify(m => m.NotifyMessage(It.IsAny<Message>()), Times.Once);
         }        
@@ -162,7 +162,7 @@ namespace RaftTest.Core
         [Test]
         public void CommitLogEntries_WhenMoreNodes_ReachedAcks_NotifyApplication()
         {
-            var descriptor = new Status
+            var status = new Status
             {
                 Log = new LogEntry[] {
                         new LogEntry { Message = new Message(), Term = 0 }, // 0
@@ -187,9 +187,9 @@ namespace RaftTest.Core
                 }
             };
 
-            descriptor = _sut.CommitLogEntries(descriptor);
+            status = _sut.CommitLogEntries(status);
 
-            descriptor.CommitLenght.Should().Be(7);
+            status.CommitLenght.Should().Be(7);
             _application
                 .Verify(m => m.NotifyMessage(It.IsAny<Message>()), Times.Exactly(2));
         }
@@ -197,7 +197,7 @@ namespace RaftTest.Core
         [Test]
         public void CommitLogEntries_WhenAllNodes_ReachedAcks_NotifyApplication()
         {
-            var descriptor = new Status
+            var status = new Status
             {
                 Log = new LogEntry[] {
                         new LogEntry { Message = new Message(), Term = 0 }, // 0
@@ -222,9 +222,9 @@ namespace RaftTest.Core
                 }
             };
 
-            descriptor = _sut.CommitLogEntries(descriptor);
+            status = _sut.CommitLogEntries(status);
 
-            descriptor.CommitLenght.Should().Be(7);
+            status.CommitLenght.Should().Be(7);
             _application
                 .Verify(m => m.NotifyMessage(It.IsAny<Message>()), Times.Exactly(2));
         }
@@ -232,7 +232,7 @@ namespace RaftTest.Core
         [Test]
         public void CommitLogEntries_WhenMoreNodes_ReachedAcks_ButWrongCommitLength_DoNothign()
         {
-            var descriptor = new Status
+            var status = new Status
             {
                 Log = new LogEntry[] {
                         new LogEntry { Message = new Message(), Term = 0 }, // 0
@@ -257,9 +257,9 @@ namespace RaftTest.Core
                 }
             };
 
-            descriptor = _sut.CommitLogEntries(descriptor);
+            status = _sut.CommitLogEntries(status);
 
-            descriptor.CommitLenght.Should().Be(7);
+            status.CommitLenght.Should().Be(7);
             _application
                 .Verify(m => m.NotifyMessage(It.IsAny<Message>()), Times.Never);
         }
@@ -267,7 +267,7 @@ namespace RaftTest.Core
         [Test]
         public void CommitLogEntries_WhenAllNodes_ReachedAcks_ButTermIsWrong_DoNothing()
         {
-            var descriptor = new Status
+            var status = new Status
             {
                 Log = new LogEntry[] {
                         new LogEntry { Message = new Message(), Term = 0 }, // 0
@@ -292,9 +292,9 @@ namespace RaftTest.Core
                 }
             };
 
-            descriptor = _sut.CommitLogEntries(descriptor);
+            status = _sut.CommitLogEntries(status);
 
-            descriptor.CommitLenght.Should().Be(5);
+            status.CommitLenght.Should().Be(5);
             _application
                 .Verify(m => m.NotifyMessage(It.IsAny<Message>()), Times.Never);
         }

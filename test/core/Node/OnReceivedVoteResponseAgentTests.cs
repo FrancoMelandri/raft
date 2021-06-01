@@ -14,12 +14,12 @@ namespace RaftTest.Core
         [Test]
         public void CurrentRole_Not_Candidate_And_Term_LessOrEqual_CurrentTerm_DoNothing()
         {
-            var nodeConfig = new LocalNodeConfiguration
+            var nodeConfig = new BaseNodeConfiguration
             {
                 Id = 42
             };
 
-            var descriptor = new Status
+            var status = new Status
             {
                 CurrentTerm = 11,
                 VotedFor = 1,
@@ -32,7 +32,7 @@ namespace RaftTest.Core
                 AckedLength = new Dictionary<int, int>()
             };
 
-            _ = _sut.OnInitialise(nodeConfig, descriptor);
+            _ = _sut.OnInitialise(nodeConfig, status);
             var message = new VoteResponseMessage
             {
                 Type = MessageType.VoteResponse,
@@ -40,14 +40,14 @@ namespace RaftTest.Core
                 CurrentTerm = 10,
                 Granted = false
             };
-            descriptor = _sut.OnReceivedVoteResponse(message);
+            status = _sut.OnReceivedVoteResponse(message);
 
-            descriptor.CurrentTerm.Should().Be(11);
-            descriptor.CurrentRole.Should().Be(States.Follower);
-            descriptor.VotedFor.Should().Be(1);
-            descriptor.SentLength.Should().BeEmpty();
-            descriptor.AckedLength.Should().BeEmpty();
-            descriptor.VotesReceived.Should().BeEmpty();
+            status.CurrentTerm.Should().Be(11);
+            status.CurrentRole.Should().Be(States.Follower);
+            status.VotedFor.Should().Be(1);
+            status.SentLength.Should().BeEmpty();
+            status.AckedLength.Should().BeEmpty();
+            status.VotesReceived.Should().BeEmpty();
             _election
                 .Verify(m => m.Cancel(), Times.Never);
         }
@@ -55,12 +55,12 @@ namespace RaftTest.Core
         [Test]
         public void CurrentRole_Not_Candidate_And_Term_GreaterThan_CurrentTerm_UpdateDesccriptor()
         {
-            var nodeConfig = new LocalNodeConfiguration
+            var nodeConfig = new BaseNodeConfiguration
             {
                 Id = 42
             };
 
-            var descriptor = new Status
+            var status = new Status
             {
                 CurrentTerm = 11,
                 VotedFor = 1,
@@ -73,7 +73,7 @@ namespace RaftTest.Core
                 AckedLength = new Dictionary<int, int>()
             };
 
-            _ = _sut.OnInitialise(nodeConfig, descriptor);
+            _ = _sut.OnInitialise(nodeConfig, status);
             var message = new VoteResponseMessage
             {
                 Type = MessageType.VoteResponse,
@@ -81,14 +81,14 @@ namespace RaftTest.Core
                 CurrentTerm = 12,
                 Granted = false
             };
-            descriptor = _sut.OnReceivedVoteResponse(message);
+            status = _sut.OnReceivedVoteResponse(message);
 
-            descriptor.CurrentTerm.Should().Be(12);
-            descriptor.CurrentRole.Should().Be(States.Follower);
-            descriptor.VotedFor.Should().Be(-1);
-            descriptor.SentLength.Should().BeEmpty();
-            descriptor.AckedLength.Should().BeEmpty();
-            descriptor.VotesReceived.Should().BeEmpty();
+            status.CurrentTerm.Should().Be(12);
+            status.CurrentRole.Should().Be(States.Follower);
+            status.VotedFor.Should().Be(-1);
+            status.SentLength.Should().BeEmpty();
+            status.AckedLength.Should().BeEmpty();
+            status.VotesReceived.Should().BeEmpty();
             _election
                 .Verify(m => m.Cancel(), Times.Once);
         }
@@ -96,12 +96,12 @@ namespace RaftTest.Core
         [Test]
         public void CurrentRole_Candidate_And_Term_Equals_CurrentTerm_And_Not_Granted_DoNothing()
         {
-            var nodeConfig = new LocalNodeConfiguration
+            var nodeConfig = new BaseNodeConfiguration
             {
                 Id = 42
             };
 
-            var descriptor = new Status
+            var status = new Status
             {
                 CurrentTerm = 10,
                 VotedFor = 1,
@@ -114,8 +114,8 @@ namespace RaftTest.Core
                 AckedLength = new Dictionary<int, int>()
             };
 
-            _ = _sut.OnInitialise(nodeConfig, descriptor);
-            descriptor = _sut.OnLeaderHasFailed();
+            _ = _sut.OnInitialise(nodeConfig, status);
+            status = _sut.OnLeaderHasFailed();
             var message = new VoteResponseMessage
             {
                 Type = MessageType.VoteResponse,
@@ -123,14 +123,14 @@ namespace RaftTest.Core
                 CurrentTerm = 11,
                 Granted = false
             };
-            descriptor = _sut.OnReceivedVoteResponse(message);
+            status = _sut.OnReceivedVoteResponse(message);
 
-            descriptor.CurrentTerm.Should().Be(11);
-            descriptor.CurrentRole.Should().Be(States.Candidate);
-            descriptor.VotedFor.Should().Be(42);
-            descriptor.SentLength.Should().BeEmpty();
-            descriptor.AckedLength.Should().BeEmpty();
-            descriptor.VotesReceived.Should().HaveCount(1);
+            status.CurrentTerm.Should().Be(11);
+            status.CurrentRole.Should().Be(States.Candidate);
+            status.VotedFor.Should().Be(42);
+            status.SentLength.Should().BeEmpty();
+            status.AckedLength.Should().BeEmpty();
+            status.VotesReceived.Should().HaveCount(1);
             _election
                 .Verify(m => m.Cancel(), Times.Never);
         }
@@ -138,12 +138,12 @@ namespace RaftTest.Core
         [Test]
         public void CurrentRole_Candidate_And_Term_Different_CurrentTerm_And_Not_Granted_DoNothing()
         {
-            var nodeConfig = new LocalNodeConfiguration
+            var nodeConfig = new BaseNodeConfiguration
             {
                 Id = 42
             };
 
-            var descriptor = new Status
+            var status = new Status
             {
                 CurrentTerm = 11,
                 VotedFor = 1,
@@ -156,8 +156,8 @@ namespace RaftTest.Core
                 AckedLength = new Dictionary<int, int>()
             };
 
-            _ = _sut.OnInitialise(nodeConfig, descriptor);
-            descriptor = _sut.OnLeaderHasFailed();
+            _ = _sut.OnInitialise(nodeConfig, status);
+            status = _sut.OnLeaderHasFailed();
             var message = new VoteResponseMessage
             {
                 Type = MessageType.VoteResponse,
@@ -165,14 +165,14 @@ namespace RaftTest.Core
                 CurrentTerm = 11,
                 Granted = false
             };
-            descriptor = _sut.OnReceivedVoteResponse(message);
+            status = _sut.OnReceivedVoteResponse(message);
 
-            descriptor.CurrentTerm.Should().Be(12);
-            descriptor.CurrentRole.Should().Be(States.Candidate);
-            descriptor.VotedFor.Should().Be(42);
-            descriptor.SentLength.Should().BeEmpty();
-            descriptor.AckedLength.Should().BeEmpty();
-            descriptor.VotesReceived.Should().HaveCount(1);
+            status.CurrentTerm.Should().Be(12);
+            status.CurrentRole.Should().Be(States.Candidate);
+            status.VotedFor.Should().Be(42);
+            status.SentLength.Should().BeEmpty();
+            status.AckedLength.Should().BeEmpty();
+            status.VotesReceived.Should().HaveCount(1);
             _election
                 .Verify(m => m.Cancel(), Times.Never);
         }
@@ -183,12 +183,12 @@ namespace RaftTest.Core
             _cluster
                 .Setup(m => m.Nodes)
                 .Returns(new IClusterNode[] { null, null, null, null, null });
-            var nodeConfig = new LocalNodeConfiguration
+            var nodeConfig = new BaseNodeConfiguration
             {
                 Id = 42
             };
 
-            var descriptor = new Status
+            var status = new Status
             {
                 CurrentTerm = 10,
                 VotedFor = 1,
@@ -201,8 +201,8 @@ namespace RaftTest.Core
                 AckedLength = new Dictionary<int, int>()
             };
 
-            _ = _sut.OnInitialise(nodeConfig, descriptor);
-            descriptor = _sut.OnLeaderHasFailed();
+            _ = _sut.OnInitialise(nodeConfig, status);
+            status = _sut.OnLeaderHasFailed();
             var message = new VoteResponseMessage
             {
                 Type = MessageType.VoteResponse,
@@ -210,14 +210,14 @@ namespace RaftTest.Core
                 CurrentTerm = 11,
                 Granted = true
             };
-            descriptor = _sut.OnReceivedVoteResponse(message);
+            status = _sut.OnReceivedVoteResponse(message);
 
-            descriptor.CurrentTerm.Should().Be(11);
-            descriptor.CurrentRole.Should().Be(States.Candidate);
-            descriptor.VotedFor.Should().Be(42);
-            descriptor.SentLength.Should().BeEmpty();
-            descriptor.AckedLength.Should().BeEmpty();
-            descriptor.VotesReceived.Should().Contain(42).And.Contain(99);
+            status.CurrentTerm.Should().Be(11);
+            status.CurrentRole.Should().Be(States.Candidate);
+            status.VotedFor.Should().Be(42);
+            status.SentLength.Should().BeEmpty();
+            status.AckedLength.Should().BeEmpty();
+            status.VotesReceived.Should().Contain(42).And.Contain(99);
             _election
                 .Verify(m => m.Cancel(), Times.Never);
         }
@@ -225,17 +225,17 @@ namespace RaftTest.Core
         [Test]
         public void CurrentRole_Candidate_And_Term_Equals_CurrentTerm_And_Granted_WithQuorum_PromoteAsLeader()
         {
-            var descriptor = UseNodeAsLeader();
+            var status = UseNodeAsLeader();
 
-            descriptor.CurrentTerm.Should().Be(11);
-            descriptor.CurrentRole.Should().Be(States.Leader);
-            descriptor.CurrentLeader.Should().Be(42);
-            descriptor.VotedFor.Should().Be(42);
-            descriptor.SentLength[1].Should().Be(6);
-            descriptor.SentLength[2].Should().Be(6);
-            descriptor.AckedLength[1].Should().Be(0);
-            descriptor.AckedLength[2].Should().Be(0);
-            descriptor.VotesReceived.Should().Contain(42)
+            status.CurrentTerm.Should().Be(11);
+            status.CurrentRole.Should().Be(States.Leader);
+            status.CurrentLeader.Should().Be(42);
+            status.VotedFor.Should().Be(42);
+            status.SentLength[1].Should().Be(6);
+            status.SentLength[2].Should().Be(6);
+            status.AckedLength[1].Should().Be(0);
+            status.AckedLength[2].Should().Be(0);
+            status.VotesReceived.Should().Contain(42)
                                               .And.Contain(1)
                                               .And.Contain(2);
 

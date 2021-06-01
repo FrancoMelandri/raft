@@ -50,12 +50,12 @@ namespace RaftTest.Core
         protected Status UseNodeAsLeader()
         {
 
-            var nodeConfig = new LocalNodeConfiguration
+            var nodeConfig = new BaseNodeConfiguration
             {
                 Id = 42
             };
 
-            var descriptor = new Status
+            var status = new Status
             {
                 CurrentTerm = 10,
                 VotedFor = 1,
@@ -74,7 +74,7 @@ namespace RaftTest.Core
                 AckedLength = new Dictionary<int, int>()
             };
 
-            _ = _sut.OnInitialise(nodeConfig, descriptor);
+            _ = _sut.OnInitialise(nodeConfig, status);
             _ = _sut.OnLeaderHasFailed();
 
             var message = new VoteResponseMessage
@@ -118,12 +118,12 @@ namespace RaftTest.Core
                 .Setup(m => m.Nodes)
                 .Returns(new IClusterNode[] { node1.Object, node2.Object, node3.Object });
 
-            var nodeConfig = new LocalNodeConfiguration
+            var nodeConfig = new BaseNodeConfiguration
             {
                 Id = 42
             };
 
-            var descriptor = new Status
+            var status = new Status
             {
                 CurrentTerm = 10,
                 VotedFor = 1,
@@ -136,7 +136,7 @@ namespace RaftTest.Core
                 AckedLength = new Dictionary<int, int>()
             };
 
-            return _sut.OnInitialise(nodeConfig, descriptor);
+            return _sut.OnInitialise(nodeConfig, status);
         }
     }
 }

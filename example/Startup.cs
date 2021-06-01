@@ -58,6 +58,7 @@ namespace RaftApplication
                     var nodes = config.Nodes.Map(_ => new ClusterNode(_)).ToArray();
                     return new Cluster(nodes);
                 }))
+                .Tee(_ => _.AddSingleton<IStatusRepository, FileStatusRepository>())
                 .Tee(_ => _.AddSingleton<IElection, Election>())
                 .Tee(_ => _.AddSingleton<IAgent, Agent>())
                 .Tee(_ => _.AddSingleton<ILocalNode, LocalNode>());
