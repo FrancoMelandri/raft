@@ -17,7 +17,8 @@ namespace RaftCore.Node
                 Left<string, Status>("");
 
         public static Either<string, Status> IsSentLengthGreaterThanZero(LogResponseMessage message, Status status)
-            => status.SentLength[message.NodeId] > 0 ?
+            => status.SentLength.ContainsKey(message.NodeId) && 
+               status.SentLength[message.NodeId] > 0 ?
                 Right<string, Status>(status) :
                 Left<string, Status>("");
 
