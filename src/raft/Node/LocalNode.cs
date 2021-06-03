@@ -43,7 +43,7 @@ namespace Raft.Node
 
         public Unit Initialise()
             => _statusRepository
-                .LoadStatus()
+                .Load()
                 .Match(status => _agent.OnInitialise(_nodeConfiguration, status),
                        () => _agent.OnInitialise(_nodeConfiguration))
                 .Tee(_ => _messageListener.Start(this))
@@ -51,7 +51,7 @@ namespace Raft.Node
 
         public Unit Deinitialise()
             => _statusRepository
-                .SaveStatus(_agent.CurrentStatus())
+                .Save(_agent.CurrentStatus())
                 .OnNone(Unit.Default)
                 .Tee(_ => _messageListener.Stop());
 

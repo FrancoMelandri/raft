@@ -19,7 +19,7 @@ namespace Raft.Node
             _localNodeConfiguration = localNodeConfiguration;
         }
 
-        public Option<Status> LoadStatus()
+        public Option<Status> Load()
             => Try(() => Exists(_localNodeConfiguration.StatusFileName)
                             .ToOption(_ => !_)
                             .Map(_ => ReadAllText(_localNodeConfiguration.StatusFileName))
@@ -27,7 +27,7 @@ namespace Raft.Node
                .Match(_ => _,
                       _ => Option<Status>.None());
 
-        public Option<Unit> SaveStatus(Status status)
+        public Option<Unit> Save(Status status)
             => Try(() => JsonSerializer.Serialize(status)
                             .Tee(_ => WriteAllText(_localNodeConfiguration.StatusFileName, _)))
                .Match(_ => Option<Unit>.Some(Unit.Default),

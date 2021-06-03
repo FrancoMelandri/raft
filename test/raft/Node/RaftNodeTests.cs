@@ -42,7 +42,7 @@ namespace RaftTest.Raft
         public void Initialise_WhenFileDoesntExist_OnInitialize()
         {
             _statusRepository
-                .Setup(m => m.LoadStatus())
+                .Setup(m => m.Load())
                 .Returns(Option<Status>.None());
 
             _ = _sut.Initialise();
@@ -77,7 +77,7 @@ namespace RaftTest.Raft
             };
 
             _statusRepository
-                .Setup(m => m.LoadStatus())
+                .Setup(m => m.Load())
                 .Returns(Option<Status>.Some(status));
 
             _ = _sut.Initialise();
@@ -109,7 +109,7 @@ namespace RaftTest.Raft
             _agent
                 .Verify(m => m.CurrentStatus(), Times.Once);
             _statusRepository
-                .Verify(m => m.SaveStatus(status), Times.Once);
+                .Verify(m => m.Save(status), Times.Once);
             _messageListener
                 .Verify(m => m.Stop(), Times.Once);
         }

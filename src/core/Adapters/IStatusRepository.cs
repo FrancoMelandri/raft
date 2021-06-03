@@ -5,7 +5,7 @@ namespace RaftCore.Adapters
 {
     public interface IStatusRepository
     {
-        Option<Status> LoadStatus();
-        Option<Unit> SaveStatus(Status status);
+        Option<Status> Load();
+        Option<Unit> Save(Status status);
     }
 }
