@@ -62,6 +62,7 @@ namespace RaftApplication
                 .Tee(_ => _.AddSingleton<IAgent, Agent>())
                 .Tee(_ => _.AddSingleton<IMessageSerializer, ApplicationMessageSerializer>())
                 .Tee(_ => _.AddSingleton<IMessageListener, TcpMessageListener>())
+                .Tee(_ => _.AddSingleton<ILeaderFailureDetector, LeaderFailureDetector>())
                 .Tee(_ => _.AddSingleton<ILocalNode, LocalNode>());
 
         private void InitializeApplication(IServiceCollection services)
