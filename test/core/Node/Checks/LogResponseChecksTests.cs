@@ -6,6 +6,7 @@ using System.Collections.Generic;
 
 namespace RaftTest.Core.Checks
 {
+
     [TestFixture]
     public class LogResponseChecksTests
     {

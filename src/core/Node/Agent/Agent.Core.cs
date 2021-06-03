@@ -16,7 +16,7 @@ namespace RaftCore.Node
 
         private Status TruncateLog(LogRequestMessage message, Status status)
             => IsEntriesLogLengthOk(message, status)
-                .Bind(_ => IsEntriesTermhNotOk(message, _))
+                .Bind(_ => IsEntriesTermNotOk(message, _))
                 .Match(_ => _.Map(s => new Status
                             {
                                 CurrentTerm = s.CurrentTerm,

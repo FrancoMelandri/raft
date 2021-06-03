@@ -17,7 +17,7 @@ namespace RaftCore.Node
                 Left<string, Status>("");
 
         public static Either<string, Status> IsTermOk(LogRequestMessage message, Status status)
-             => message.LogTerm == status.Log[message.LogLength - 1].Term ?
+             => status.Log.Length >= message.LogLength && message.LogTerm == status.Log[message.LogLength - 1].Term ?
                 Right<string, Status>(status) :
                 Left<string, Status>("");
 
@@ -31,8 +31,10 @@ namespace RaftCore.Node
                 Right<string, Status>(status) :
                 Left<string, Status>("");
 
-        public static Either<string, Status> IsEntriesTermhNotOk(LogRequestMessage message, Status status)
-             => status.Log[message.LogLength].Term != message.Entries[0].Term ?
+        public static Either<string, Status> IsEntriesTermNotOk(LogRequestMessage message, Status status)
+             => message.Entries.Length > 0 &&
+                status.Log.Length > message.LogLength &&
+                status.Log[message.LogLength].Term != message.Entries[0].Term ?
                 Right<string, Status>(status) :
                 Left<string, Status>("");
 
