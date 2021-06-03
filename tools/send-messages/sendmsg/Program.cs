@@ -14,6 +14,9 @@ namespace sendmsg
 
             System.Threading.Thread.Sleep(5000);
             SendMessage(3, "{\"Type\":3}");
+
+            System.Threading.Thread.Sleep(5000);
+            SendMessage(5, "{\"Type\":5, \"CurrentStatus\": \"INIT\"}");
         }
 
         private static void SendMessage(int type, string message)
