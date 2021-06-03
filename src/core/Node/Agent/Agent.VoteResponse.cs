@@ -14,7 +14,7 @@ namespace RaftCore.Node
             => ValidateVoteGrant(_status, message)
                 .Match(_ => ReceivedVoteResponseGranted(message),
                        _ => ValidateTerm(_status, message)
-                                .Match(_ => ReceivedVoteResponseNoGrantedUpdateDescriptor(message),
+                                .Match(_ => ReceivedVoteResponseNoGrantedUpdateStatus(message),
                                         _ => Unit.Default))
                 .Map(_ => _status);
 
@@ -37,7 +37,7 @@ namespace RaftCore.Node
                 .Tee(s => _status = s)
                 .Map(_ => Unit.Default);
 
-        private Unit ReceivedVoteResponseNoGrantedUpdateDescriptor(VoteResponseMessage message)
+        private Unit ReceivedVoteResponseNoGrantedUpdateStatus(VoteResponseMessage message)
             => new Status
                 {
                     CurrentTerm = message.CurrentTerm,

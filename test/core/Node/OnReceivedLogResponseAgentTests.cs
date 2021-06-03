@@ -44,13 +44,13 @@ namespace RaftTest.Core
                 Success = false
             };
 
-            var descriptorResult = _sut.OnReceivedLogResponse(logResponse);
+            var statusResult = _sut.OnReceivedLogResponse(logResponse);
 
-            descriptorResult.Should().BeEquivalentTo(status);
+            statusResult.Should().BeEquivalentTo(status);
         }
 
         [Test]
-        public void WhenTerm_EqualTo_CurrentTerm_And_Leader_AndSuccess_UpdateDescriptorAndCommitEntries()
+        public void WhenTerm_EqualTo_CurrentTerm_And_Leader_AndSuccess_UpdateStatusAndCommitEntries()
         {
             _ = UseNodeAsLeader();
 

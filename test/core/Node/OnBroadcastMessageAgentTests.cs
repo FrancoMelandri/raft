@@ -49,7 +49,7 @@ namespace RaftTest.Core
         }
 
         [Test]
-        public void WhenNodeIsLeader_AppendMessageToLog_UpdateDescriptor_ReplicateLog()
+        public void WhenNodeIsLeader_AppendMessageToLog_UpdateStatus_ReplicateLog()
         {
             _ = UseNodeAsLeader();
 

@@ -10,14 +10,14 @@ namespace RaftCore.Node
     {
         public Status OnReceivedLogRequest(LogRequestMessage message)
             => IsTermGreater(message, _status)
-                .Map(s => UpdateDescriptorDueTerm(message, s))
+                .Map(s => UpdateStatusDueTerm(message, s))
                 .Bind(s => IsLengthOk(message, s))
                 .Bind(s => IsTermOk(message, s))
                 .Bind(s => IsCurrentTermOk(message, s))
                 .Match(_ => HandleReceivedLogRequestOk(message, _),
                        _ => HandleReceivedLogRequestKo(message, _status));
 
-        private Status UpdateDescriptorDueTerm(LogRequestMessage message, Status status)
+        private Status UpdateStatusDueTerm(LogRequestMessage message, Status status)
             => new Status
             {
                 CurrentTerm = message.Term,

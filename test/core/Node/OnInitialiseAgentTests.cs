@@ -10,7 +10,7 @@ namespace RaftTest.Core
     public class OnInitialiseAgentTests : BaseUseCases
     {
         [Test]
-        public void WhenNoDescriptor_FirstInitialisation_SetTheRightValues()
+        public void WhenNoStatus_FirstInitialisation_SetTheRightValues()
         {
             var nodeConfig = new BaseNodeConfiguration
             {
@@ -52,7 +52,7 @@ namespace RaftTest.Core
         }
 
         [Test]
-        public void WhenDescriptor_RecoverFromCrash_SetTheRightValues()
+        public void WhenStatus_RecoverFromCrash_SetTheRightValues()
         {
             var nodeConfig = new BaseNodeConfiguration
             {

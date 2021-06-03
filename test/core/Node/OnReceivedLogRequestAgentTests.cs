@@ -52,7 +52,7 @@ namespace RaftTest.Core
         }
 
         [Test]
-        public void WhenReceivingTerm_DescriptorLogLengthNotOk_UpdateTermAndVoteFor_AndNack()
+        public void WhenReceivingTerm_StatusLogLengthNotOk_UpdateTermAndVoteFor_AndNack()
         {
             _ = UseNodeAsLeader();
 
@@ -79,7 +79,7 @@ namespace RaftTest.Core
         }
 
         [Test]
-        public void WhenReceivingTerm_DescriptorLogLength_TermNotOk_UpdateTermAndVoteFor_AndNack()
+        public void WhenReceivingTerm_StatusLogLength_TermNotOk_UpdateTermAndVoteFor_AndNack()
         {
             _ = UseNodeAsLeader();
 
@@ -106,7 +106,7 @@ namespace RaftTest.Core
         }
 
         [Test]
-        public void WhenReceivingTerm_DescriptorLogLength_TermOk_UpdateTermAndVoteFor_AndAck()
+        public void WhenReceivingTerm_StatusLogLength_TermOk_UpdateTermAndVoteFor_AndAck()
         {
             _ = UseNodeAsLeader();
 
