@@ -17,6 +17,7 @@ namespace RaftTest.Raft
         private Mock<IAgent> _agent;
         private Mock<IStatusRepository> _statusRepository;
         private Mock<IMessageListener> _messageListener;
+        private Mock<ILeaderFailureDetector> _leaderFailure;
 
         [SetUp]
         public void SetUp()
@@ -28,10 +29,12 @@ namespace RaftTest.Raft
             _agent = new Mock<IAgent>();
             _statusRepository = new Mock<IStatusRepository>();
             _messageListener = new Mock<IMessageListener>();
+            _leaderFailure = new Mock<ILeaderFailureDetector>();
             _sut = new LocalNode(_nodeConfiguration,
                                   _agent.Object,
                                   _statusRepository.Object,
-                                  _messageListener.Object);
+                                  _messageListener.Object,
+                                  _leaderFailure.Object);
         }
 
         [Test]
@@ -52,6 +55,8 @@ namespace RaftTest.Raft
             _agent
                 .Verify(m => m.OnInitialise(_nodeConfiguration, It.IsAny<Status>()), Times.Never);
             _messageListener
+                .Verify(m => m.Start(_sut), Times.Once);
+            _leaderFailure
                 .Verify(m => m.Start(_sut), Times.Once);
         }
 
@@ -94,6 +99,8 @@ namespace RaftTest.Raft
                                                 p.Log[0].Message.Type == MessageType.VoteResponse)), Times.Once);
             _messageListener
                 .Verify(m => m.Start(_sut), Times.Once);
+            _leaderFailure
+                .Verify(m => m.Start(_sut), Times.Once);
         }
 
         [Test]
@@ -112,6 +119,8 @@ namespace RaftTest.Raft
                 .Verify(m => m.Save(status), Times.Once);
             _messageListener
                 .Verify(m => m.Stop(), Times.Once);
+            _leaderFailure
+                .Verify(m => m.Stop(), Times.Once);
         }
 
         [TestCase(MessageType.None)]
@@ -128,5 +137,10 @@ namespace RaftTest.Raft
             _sut.NotifyMessage(message)
                 .Should().Be(Unit.Default);
         }
+
+        [Test]
+        public void NotifyFailure_DoNothing()
+            => _sut.NotifyFailure()
+                .Should().Be(Unit.Default);
     }
 }

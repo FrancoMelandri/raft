@@ -58,7 +58,7 @@ namespace Raft.Node
             => _tcpListener
                 .AcceptTcpClient()
                 .Map(_ => HandleIncomingMessage(_))
-                .Tee(_ => _listener = Task.Factory.StartNew(() => Listen()));
+                .Tee(_ => _listener = Factory.StartNew(() => Listen()));
 
         private Unit HandleIncomingMessage(TcpClient client)
             => GetMessageSize(client)
