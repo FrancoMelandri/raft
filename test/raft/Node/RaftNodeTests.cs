@@ -124,7 +124,6 @@ namespace RaftTest.Raft
         }
 
         [TestCase(MessageType.None)]
-        [TestCase(MessageType.LogRequest)]
         [TestCase(MessageType.LogResponse)]
         [TestCase(MessageType.VoteRequest)]
         [TestCase(MessageType.VoteResponse)]
@@ -145,6 +144,38 @@ namespace RaftTest.Raft
 
             _agent
                 .Verify(m => m.OnLeaderHasFailed(), Times.Once);
-       }
+        }
+
+        [Test]
+        public void NotifyMessage_WhenLogRequest_CallAgentReceivedLogRequest_And_ResetLeaderDetector()
+        {
+            var message = new LogRequestMessage
+            {
+                Type = MessageType.LogRequest
+            };
+            _sut.NotifyMessage(message)
+                .Should().Be(Unit.Default);
+
+            _agent
+                .Verify(m => m.OnReceivedLogRequest(message), Times.Once);
+            _leaderFailure
+                .Verify(m => m.Reset(), Times.Once);
+        }
+
+        [Test]
+        public void NotifyMessage_WhenNotLogRequest_DontCallAgentReceivedLogRequest_And_DontResetLeaderDetector()
+        {
+            var message = new Message
+            {
+                Type = MessageType.LogRequest
+            };
+            _sut.NotifyMessage(message)
+                .Should().Be(Unit.Default);
+
+            _agent
+                .Verify(m => m.OnReceivedLogRequest(It.IsAny<LogRequestMessage>()), Times.Never);
+            _leaderFailure
+                .Verify(m => m.Reset(), Times.Never);
+        }
     }
 }
