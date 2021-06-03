@@ -17,6 +17,7 @@ namespace RaftTest.Raft
         private Mock<IAgent> _agent;
         private Mock<IStatusRepository> _statusRepository;
         private Mock<IMessageListener> _messageListener;
+        private Mock<ILeaderFailureDetector> _leaderFailure;
 
         [SetUp]
         public void SetUp()
@@ -28,10 +29,12 @@ namespace RaftTest.Raft
             _agent = new Mock<IAgent>();
             _statusRepository = new Mock<IStatusRepository>();
             _messageListener = new Mock<IMessageListener>();
+            _leaderFailure = new Mock<ILeaderFailureDetector>();
             _sut = new LocalNode(_nodeConfiguration,
                                   _agent.Object,
                                   _statusRepository.Object,
-                                  _messageListener.Object);
+                                  _messageListener.Object,
+                                  _leaderFailure.Object);
         }
 
         [Test]
@@ -52,6 +55,8 @@ namespace RaftTest.Raft
             _agent
                 .Verify(m => m.OnInitialise(_nodeConfiguration, It.IsAny<Status>()), Times.Never);
             _messageListener
+                .Verify(m => m.Start(_sut), Times.Once);
+            _leaderFailure
                 .Verify(m => m.Start(_sut), Times.Once);
         }
 
@@ -94,6 +99,8 @@ namespace RaftTest.Raft
                                                 p.Log[0].Message.Type == MessageType.VoteResponse)), Times.Once);
             _messageListener
                 .Verify(m => m.Start(_sut), Times.Once);
+            _leaderFailure
+                .Verify(m => m.Start(_sut), Times.Once);
         }
 
         [Test]
@@ -112,10 +119,11 @@ namespace RaftTest.Raft
                 .Verify(m => m.Save(status), Times.Once);
             _messageListener
                 .Verify(m => m.Stop(), Times.Once);
+            _leaderFailure
+                .Verify(m => m.Stop(), Times.Once);
         }
 
         [TestCase(MessageType.None)]
-        [TestCase(MessageType.LogRequest)]
         [TestCase(MessageType.LogResponse)]
         [TestCase(MessageType.VoteRequest)]
         [TestCase(MessageType.VoteResponse)]
@@ -127,6 +135,47 @@ namespace RaftTest.Raft
             };
             _sut.NotifyMessage(message)
                 .Should().Be(Unit.Default);
+        }
+
+        [Test]
+        public void NotifyFailure_CallAgentLeaderHasFailed()
+        {
+            _ = _sut.NotifyFailure();
+
+            _agent
+                .Verify(m => m.OnLeaderHasFailed(), Times.Once);
+        }
+
+        [Test]
+        public void NotifyMessage_WhenLogRequest_CallAgentReceivedLogRequest_And_ResetLeaderDetector()
+        {
+            var message = new LogRequestMessage
+            {
+                Type = MessageType.LogRequest
+            };
+            _sut.NotifyMessage(message)
+                .Should().Be(Unit.Default);
+
+            _agent
+                .Verify(m => m.OnReceivedLogRequest(message), Times.Once);
+            _leaderFailure
+                .Verify(m => m.Reset(), Times.Once);
+        }
+
+        [Test]
+        public void NotifyMessage_WhenNotLogRequest_DontCallAgentReceivedLogRequest_And_DontResetLeaderDetector()
+        {
+            var message = new Message
+            {
+                Type = MessageType.LogRequest
+            };
+            _sut.NotifyMessage(message)
+                .Should().Be(Unit.Default);
+
+            _agent
+                .Verify(m => m.OnReceivedLogRequest(It.IsAny<LogRequestMessage>()), Times.Never);
+            _leaderFailure
+                .Verify(m => m.Reset(), Times.Never);
         }
     }
 }

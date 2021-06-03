@@ -8,5 +8,6 @@ namespace Raft.Node
     public record LocalNodeConfiguration : NodeConfiguration
     {
         public string StatusFileName { get; set; }
+        public int LeaderFailureTimeout { get; set; }
     }
 }
