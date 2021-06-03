@@ -6,6 +6,7 @@
         VoteRequest,
         VoteResponse,
         LogRequest,
-        LogResponse
+        LogResponse,
+        Application
     }
 }
