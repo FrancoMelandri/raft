@@ -8,34 +8,34 @@ namespace RaftCore.Node
 {
     public static class VoteRequesChecks
     {
-        public static Either<string, Status> ValidateLog(Status status, VoteRequestMessage message)
-            => ValidateLogTerm(status, message)
-                .Map(_ => _.Match(_ => _, _ => ValidateLogLength(status, message)));
+        public static Either<string, Status> ValidateLog(VoteRequestMessage message, Status status)
+            => ValidateLogTerm(message, status)
+                .Map(_ => _.Match(_ => _, _ => ValidateLogLength(message, status)));
 
-        private static Either<string, Status> ValidateLogTerm(Status status, VoteRequestMessage message)
+        private static Either<string, Status> ValidateLogTerm(VoteRequestMessage message, Status status)
             => message.LastTerm > LastEntryOrZero(status.Log) ?
                 Right<string, Status>(status) :
                 Left<string, Status>("");
 
-        private static Either<string, Status> ValidateLogLength(Status descriptor, VoteRequestMessage message)
-            => message.LastTerm == LastEntryOrZero(descriptor.Log) &&
-               message.LogLength >= descriptor.Log.Length ?
-                Right<string, Status>(descriptor) :
+        private static Either<string, Status> ValidateLogLength(VoteRequestMessage message, Status status)
+            => message.LastTerm == LastEntryOrZero(status.Log) &&
+               message.LogLength >= status.Log.Length ?
+                Right<string, Status>(status) :
                 Left<string, Status>("");
 
-        public static Either<string, Status> ValidateTerm(Status descriptor, VoteRequestMessage message)
-            => ValidateCurrentTerm(descriptor, message)
-                .Map(_ => _.Match(_ => _, _ => ValidateVoteFor(descriptor, message)));
+        public static Either<string, Status> ValidateTerm(VoteRequestMessage message, Status status)
+            => ValidateCurrentTerm(message, status)
+                .Map(_ => _.Match(_ => _, _ => ValidateVoteFor(message, status)));
 
-        private static Either<string, Status> ValidateCurrentTerm(Status descriptor, VoteRequestMessage message)
-            => message.CurrentTerm > descriptor.CurrentTerm ?
-                Right<string, Status>(descriptor) :
+        private static Either<string, Status> ValidateCurrentTerm(VoteRequestMessage message, Status status)
+            => message.CurrentTerm > status.CurrentTerm ?
+                Right<string, Status>(status) :
                 Left<string, Status>("");
 
-        private static Either<string, Status> ValidateVoteFor(Status descriptor, VoteRequestMessage message)
-            => message.CurrentTerm == descriptor.CurrentTerm &&
-               descriptor.VotedFor != message.NodeId ?
-                Right<string, Status>(descriptor) :
+        private static Either<string, Status> ValidateVoteFor(VoteRequestMessage message, Status status)
+            => message.CurrentTerm == status.CurrentTerm &&
+               status.VotedFor != message.NodeId ?
+                Right<string, Status>(status) :
                 Left<string, Status>("");
     }
 }

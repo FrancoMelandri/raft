@@ -10,8 +10,8 @@ namespace RaftCore.Node
     public partial class Agent
     {
         public Status OnReceivedVoteRequest(VoteRequestMessage message)
-            => ValidateLog(_status, message)
-                .Bind(_ => ValidateTerm(_status, message))
+            => ValidateLog(message, _status)
+                .Bind(_ => ValidateTerm(message, _status))
                 .Match(_ => ReceivedVoteRequestGrantResponse(message),
                        _ => ReceivedVoteRequestDontGrantResponse(message))
                 .Map(_ => _status);

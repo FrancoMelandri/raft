@@ -5,6 +5,7 @@ using RaftCore.Node;
 
 namespace RaftTest.Core.Checks
 {
+
     [TestFixture]
     public class LogRequestChecksTests
     {
