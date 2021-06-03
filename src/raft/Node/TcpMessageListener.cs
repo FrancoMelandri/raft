@@ -1,5 +1,4 @@
-﻿using System.Text.Json;
-using RaftCore.Adapters;
+﻿using RaftCore.Adapters;
 using System.Diagnostics.CodeAnalysis;
 using System.Net;
 using System.Net.Sockets;
@@ -7,12 +6,12 @@ using System.Threading.Tasks;
 using TinyFp;
 using TinyFp.Extensions;
 using RaftCore.Models;
+using RaftCore.Cluster;
 using static System.Convert;
 using static System.Threading.Tasks.Task;
 using static Raft.Constants.Messages;
 using static System.Text.Encoding;
 using static TinyFp.Prelude;
-using RaftCore.Cluster;
 
 namespace Raft.Node
 {
@@ -23,13 +22,16 @@ namespace Raft.Node
         private const string LOCAL_HOST = "127.0.0.1";
 
         private readonly LocalNodeConfiguration _localNodeConfiguration;
+        private readonly IMessageSerializer _messageDeserializer;
         private IMessageObserver _messageObserver;
         private TcpListener _tcpListener;
         private Task _listener;
 
-        public TcpMessageListener(LocalNodeConfiguration localNodeConfiguration)
+        public TcpMessageListener(LocalNodeConfiguration localNodeConfiguration,
+                                  IMessageSerializer messageDeserializer)
         {
             _localNodeConfiguration = localNodeConfiguration;
+            _messageDeserializer = messageDeserializer;
         }
 
         public Unit Start(IMessageObserver messageObserver)
@@ -59,13 +61,14 @@ namespace Raft.Node
                 .Tee(_ => _listener = Task.Factory.StartNew(() => Listen()));
 
         private Unit HandleIncomingMessage(TcpClient client)
-            => GetHeader(client)
-                .Bind(_ => GetMessage(_, client))
+            => GetMessageSize(client)
+                .Map(_ => (Size: _, Type: GetMessageType(client).OnNone(0)))
+                .Bind(_ => GetMessage(_.Size, _.Type, client))
                 .Match(_ => _, () => new Message { Type = MessageType.None })
                 .Tee(_ => client.Close())
                 .Map(_ => _messageObserver.NotifyMessage(_));
 
-        private static Option<int> GetHeader(TcpClient client)
+        private static Option<int> GetMessageSize(TcpClient client)
             => Try(() => new byte[HEADER_SIZE]
                             .Tee(_ => client.GetStream().Read(_, 0, HEADER_SIZE))
                             .Map(_ => UTF8.GetString(_))
@@ -74,11 +77,19 @@ namespace Raft.Node
                .Match(_ => Option<int>.Some(_),
                       _ => Option<int>.None());
 
-        private Option<Message> GetMessage(int size, TcpClient client)
+        private static Option<int> GetMessageType(TcpClient client)
+            => Try(() => new byte[TYPE_SIZE]
+                            .Tee(_ => client.GetStream().Read(_, 0, TYPE_SIZE))
+                            .Map(_ => UTF8.GetString(_))
+                            .Map(_ => ToInt32(_)))
+               .Match(_ => Option<int>.Some(_),
+                      _ => Option<int>.None());
+
+        private Option<Message> GetMessage(int size, int type, TcpClient client)
             => Try(() => new byte[size]
                             .Tee(_ => client.GetStream().Read(_, 0, size))
                             .Map(_ => UTF8.GetString(_))
-                            .Map(_ => JsonSerializer.Deserialize<Message>(_)))
+                            .Map(_ => _messageDeserializer.Deserialize(type, _)))
                .Match(_ => Option<Message>.Some(_),
                       _ => Option<Message>.None());
     }

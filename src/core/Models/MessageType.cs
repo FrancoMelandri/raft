@@ -3,6 +3,7 @@
     public enum MessageType
     {
         None,
+        Application,
         VoteRequest,
         VoteResponse,
         LogRequest,
