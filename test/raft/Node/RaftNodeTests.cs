@@ -139,8 +139,12 @@ namespace RaftTest.Raft
         }
 
         [Test]
-        public void NotifyFailure_DoNothing()
-            => _sut.NotifyFailure()
-                .Should().Be(Unit.Default);
+        public void NotifyFailure_CallAgentLeaderHasFailed()
+        {
+            _ = _sut.NotifyFailure();
+
+            _agent
+                .Verify(m => m.OnLeaderHasFailed(), Times.Once);
+       }
     }
 }

@@ -67,6 +67,8 @@ namespace Raft.Node
                       () => Unit.Default);
 
         public Unit NotifyFailure()
-            => Unit.Default;
+            => _agent
+                .OnLeaderHasFailed()
+                .Map( _ => Unit.Default);
     }
 }
