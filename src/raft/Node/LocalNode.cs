@@ -38,8 +38,8 @@ namespace Raft.Node
             {
                 { MessageType.None, _ => Unit.Default },
                 { MessageType.VoteRequest, _ => Unit.Default },
-                { MessageType.VoteResponse, _ => Unit.Default },
-                { MessageType.LogRequest, _ => HandleLogRequest(_) },
+                { MessageType.VoteResponse, HandleVoteResponse },
+                { MessageType.LogRequest, HandleLogRequest },
                 { MessageType.LogResponse, _ => Unit.Default }
             };
         }
@@ -78,6 +78,15 @@ namespace Raft.Node
                 .Match(_ => _agent
                                 .OnReceivedLogRequest(_)
                                 .Tee(_ => _leaderFailure.Reset())
+                                .Map(_ => Unit.Default),
+                        () => Unit.Default);
+
+        private Unit HandleVoteResponse(Message message)
+            => message
+                .Map(_ => message as VoteResponseMessage)
+                .ToOption()
+                .Match(_ => _agent
+                                .OnReceivedVoteResponse(_)
                                 .Map(_ => Unit.Default),
                         () => Unit.Default);
     }

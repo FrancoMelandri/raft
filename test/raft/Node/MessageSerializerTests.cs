@@ -85,14 +85,13 @@ namespace RaftTest.Raft
         [Test]
         public void Deserialize_VoteResponse_VoteResponseMessage()
         {
-            var json = "{\"Type\":2, \"NodeId\": 1,\"CurrentTerm\": 2,\"Granted\": true}";
-
+            var json = "{\"Type\":2,\"NodeId\":2,\"CurrentTerm\":1,\"Granted\":true}";
             var result = _sut.Deserialize((int)MessageType.VoteResponse, json) as VoteResponseMessage;
 
             result.Should().NotBeNull();
             result.Type.Should().Be(MessageType.VoteResponse);
-            result.NodeId.Should().Be(1);
-            result.CurrentTerm.Should().Be(2);
+            result.NodeId.Should().Be(2);
+            result.CurrentTerm.Should().Be(1);
             result.Granted.Should().Be(true);
         }
 

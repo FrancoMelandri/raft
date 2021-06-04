@@ -177,5 +177,33 @@ namespace RaftTest.Raft
             _leaderFailure
                 .Verify(m => m.Reset(), Times.Never);
         }
+
+        [Test]
+        public void NotifyMessage_WhenVoteResponse_CallAgentReceivedVoteResponse()
+        {
+            var message = new VoteResponseMessage
+            {
+                Type = MessageType.VoteResponse
+            };
+            _sut.NotifyMessage(message)
+                .Should().Be(Unit.Default);
+
+            _agent
+                .Verify(m => m.OnReceivedVoteResponse(message), Times.Once);
+        }
+
+        [Test]
+        public void NotifyMessage_WhenNotVoteResponse_CallAgentReceivedVoteResponse()
+        {
+            var message = new Message
+            {
+                Type = MessageType.VoteResponse
+            };
+            _sut.NotifyMessage(message)
+                .Should().Be(Unit.Default);
+
+            _agent
+                .Verify(m => m.OnReceivedVoteResponse(It.IsAny<VoteResponseMessage>()), Times.Never);
+        }
     }
 }
