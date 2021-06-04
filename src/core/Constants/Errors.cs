@@ -11,5 +11,6 @@ namespace RaftCore.Constants
         public static readonly Error TermIsNotOk = new("LR-0003", "message-term-is-not-ok");
         public static readonly Error CurrentTermNotOk = new("LR-0004", "current-term-is-not-ok");
         public static readonly Error EntriesLogLengthNotOk = new("LR-0005", "entries-length-not-ok");
+        public static readonly Error EntrieTermIsNotOk = new("LR-0006", "entries-term-not-ok");
     }
 }

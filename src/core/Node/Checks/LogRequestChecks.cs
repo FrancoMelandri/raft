@@ -38,7 +38,7 @@ namespace RaftCore.Node
                 status.Log.Length > message.LogLength &&
                 status.Log[message.LogLength].Term != message.Entries[0].Term ?
                 Right<Error, Status>(status) :
-                Left<Error, Status>(Empty);
+                Left<Error, Status>(EntrieTermIsNotOk);
 
         public static Either<Error, Status> AreThereEntriesToAdd(LogRequestMessage message, Status status)
              => message.LogLength + message.Entries.Length > status.Log.Length ?
