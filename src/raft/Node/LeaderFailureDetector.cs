@@ -32,7 +32,7 @@ namespace Raft.Node
 
         public Unit Stop()
             => Unit.Default
-                .Tee(_ => _timer.Dispose());
+                .Tee(_ => _timer.Change(Timeout.Infinite, Timeout.Infinite));
 
         private void TimeoutCallback(object? state)
             => _leaderFailureObserver.NotifyFailure();

@@ -26,28 +26,30 @@ namespace mockfollower
             var client = _tcpListener.AcceptTcpClient();
             WriteLine($"Accepting client {client.Client.RemoteEndPoint}");
 
-
             _ = Factory.StartNew(() => Listen());
 
-            var buffer = new byte[16];
-            client.GetStream().Read(buffer, 0, 16);
-            
-            var size = ToInt32(UTF8.GetString(buffer).Replace(" ", ""));
+            while (client.Connected)
+            {
+                var buffer = new byte[16];
+                client.GetStream().Read(buffer, 0, 16);
 
-            buffer = new byte[1];
-            client.GetStream().Read(buffer, 0, 1);
-            var type = ToInt32( UTF8.GetString(buffer));
+                var size = ToInt32(UTF8.GetString(buffer).Replace(" ", ""));
+
+                buffer = new byte[1];
+                client.GetStream().Read(buffer, 0, 1);
+                var type = ToInt32(UTF8.GetString(buffer));
 
 
-            buffer = new byte[size];
-            client.GetStream().Read(buffer, 0, size);
-            var body = UTF8.GetString(buffer);
+                buffer = new byte[size];
+                client.GetStream().Read(buffer, 0, size);
+                var body = UTF8.GetString(buffer);
 
-            WriteLine($"Incoming message: {type}");
-            WriteLine($"With body: {body}");
+                WriteLine($"Incoming message: {type}");
+                WriteLine($"With body: {body}");
 
-            if (type == 1)
-                SendResponseToNode();
+                if (type == 1)
+                    SendResponseToNode();
+            }
         }
 
         private static void SendResponseToNode()

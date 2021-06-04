@@ -60,6 +60,7 @@ namespace RaftApplication
                                                 .ToArray())))
                 .Tee(_ => _.AddSingleton<IStatusRepository, FileStatusRepository>())
                 .Tee(_ => _.AddSingleton<IElection, Election>())
+                .Tee(_ => _.AddSingleton<ILeader, Leader>())
                 .Tee(_ => _.AddSingleton<IAgent, Agent>())
                 .Tee(_ => _.AddSingleton<IMessageSerializer, ApplicationMessageSerializer>())
                 .Tee(_ => _.AddSingleton<IMessageListener, TcpMessageListener>())

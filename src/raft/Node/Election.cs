@@ -5,7 +5,7 @@ namespace Raft.Node
 {
     public class Election : IElection
     {
-        public Unit Cancel()
+        public Unit Stop()
             => Unit.Default;
 
         public Unit Start()

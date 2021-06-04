@@ -9,5 +9,6 @@ namespace Raft.Node
     {
         public string StatusFileName { get; set; }
         public int LeaderFailureTimeout { get; set; }
+        public int LeaderReplicateLogInterval { get; set; }
     }
 }

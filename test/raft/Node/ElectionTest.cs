@@ -17,7 +17,7 @@ namespace RaftTest.Raft
         [Test]
         public void Cancel_DoNothing()
             => new Election()
-                .Cancel()
+                .Stop()
                 .Should().Be(Unit.Default);        
     }
 }

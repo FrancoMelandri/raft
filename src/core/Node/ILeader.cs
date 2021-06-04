@@ -2,9 +2,9 @@
 
 namespace RaftCore.Node
 {
-    public interface IElection
+    public interface ILeader
     {
-        Unit Start();
+        Unit Start(IAgent agent);
         Unit Stop();
     }
 }

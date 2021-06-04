@@ -49,7 +49,9 @@ namespace RaftTest.Core
             status.AckedLength.Should().BeEmpty();
             status.VotesReceived.Should().BeEmpty();
             _election
-                .Verify(m => m.Cancel(), Times.Never);
+                .Verify(m => m.Stop(), Times.Never);
+            _leader
+                .Verify(m => m.Stop(), Times.Never);
         }
 
         [Test]
@@ -90,7 +92,9 @@ namespace RaftTest.Core
             status.AckedLength.Should().BeEmpty();
             status.VotesReceived.Should().BeEmpty();
             _election
-                .Verify(m => m.Cancel(), Times.Once);
+                .Verify(m => m.Stop(), Times.Once);
+            _leader
+                .Verify(m => m.Stop(), Times.Once);
         }
 
         [Test]
@@ -132,7 +136,9 @@ namespace RaftTest.Core
             status.AckedLength.Should().BeEmpty();
             status.VotesReceived.Should().HaveCount(1);
             _election
-                .Verify(m => m.Cancel(), Times.Never);
+                .Verify(m => m.Stop(), Times.Never);
+            _leader
+                .Verify(m => m.Stop(), Times.Never);
         }
 
         [Test]
@@ -174,7 +180,9 @@ namespace RaftTest.Core
             status.AckedLength.Should().BeEmpty();
             status.VotesReceived.Should().HaveCount(1);
             _election
-                .Verify(m => m.Cancel(), Times.Never);
+                .Verify(m => m.Stop(), Times.Never);
+            _leader
+                .Verify(m => m.Stop(), Times.Never);
         }
 
         [Test]
@@ -219,7 +227,9 @@ namespace RaftTest.Core
             status.AckedLength.Should().BeEmpty();
             status.VotesReceived.Should().Contain(42).And.Contain(99);
             _election
-                .Verify(m => m.Cancel(), Times.Never);
+                .Verify(m => m.Stop(), Times.Never);
+            _leader
+                .Verify(m => m.Stop(), Times.Never);
         }
 
         [Test]
@@ -240,7 +250,9 @@ namespace RaftTest.Core
                                               .And.Contain(2);
 
             _election
-                .Verify(m => m.Cancel(), Times.Once);
+                .Verify(m => m.Stop(), Times.Once);
+            _leader
+                .Verify(m => m.Start(_sut), Times.Once);
             _cluster
                 .Verify(m => m.SendMessage(1,
                                             It.Is<LogRequestMessage>(p =>
