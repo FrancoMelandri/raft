@@ -35,14 +35,14 @@ namespace mockfollower
             
             var size = ToInt32(UTF8.GetString(header).Replace(" ", ""));
 
-            var tyoe = new byte[1];
-            client.GetStream().Read(tyoe, 0, 1);
+            var type = new byte[1];
+            client.GetStream().Read(type, 0, 1);
 
             var body = new byte[size];
             client.GetStream().Read(body, 0, size);
 
-            WriteLine($"Incoming message: {tyoe}");
-            WriteLine($"{body}");
+            WriteLine($"Incoming message: {UTF8.GetString(type)}");
+            WriteLine($"With body: {UTF8.GetString(body)}");
         }
     }
 }

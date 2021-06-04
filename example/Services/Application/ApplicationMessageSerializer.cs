@@ -9,5 +9,8 @@ namespace RaftApplication.Services.Application
     {
         protected override Message ApplicationMessageDeserialize(string message)
             => JsonSerializer.Deserialize<ApplicationMessage>(message);
+
+        protected override string ApplicationMessageSerialize(Message message)
+            => JsonSerializer.Serialize(message as ApplicationMessage);
     }
 }

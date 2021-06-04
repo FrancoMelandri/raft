@@ -113,5 +113,102 @@ namespace RaftCoreTest.raft.Node
             result.Should().BeOfType(typeof(Message));
             result.Type.Should().Be(MessageType.None);
         }
+
+        [TestCase(10)]
+        [TestCase(-1)]
+        public void Serialize_WhenWrongType_EmptyString(int type)
+            => _sut
+                .Serialize( new Message { Type = (MessageType)type })
+                .Should()
+                .Be(string.Empty);
+
+        [Test]
+        public void Serialize_LogRequest_LogRequestMessage()
+        {
+            var json = "{\"LeaderId\":1,\"Term\":2,\"LogLength\":3,\"LogTerm\":4,\"CommitLength\":5,\"Entries\":[{\"Message\":{\"Type\":3},\"Term\":6}],\"Type\":3}";
+
+            var logRequest = new LogRequestMessage
+            {
+                Type = MessageType.LogRequest,
+                LeaderId = 1,
+                Term = 2,
+                LogLength = 3,
+                LogTerm = 4,
+                CommitLength = 5,
+                Entries = new LogEntry[]
+                {
+                    new LogEntry{ Message = new Message{ Type = MessageType.LogRequest}, Term = 6 }
+                }
+            };
+            var result = _sut.Serialize(logRequest);
+
+            result.Should().Be(json);
+        }
+
+        [Test]
+        public void Serialize_LogResponse_LogResponseMessage()
+        {
+            var json = "{\"NodeId\":3,\"Term\":1,\"Ack\":2,\"Success\":true,\"Type\":4}";
+
+            var logResponse = new LogResponseMessage
+            {
+                Type = MessageType.LogResponse,
+                Term = 1,
+                Ack = 2,
+                NodeId = 3,
+                Success  = true
+            };
+            var result = _sut.Serialize(logResponse);
+
+            result.Should().Be(json);
+        }
+
+        [Test]
+        public void Serialize_VoteRequest_VoteRequestMessage()
+        {
+            var json = "{\"NodeId\":1,\"CurrentTerm\":2,\"LogLength\":4,\"LastTerm\":3,\"Type\":1}";
+
+            var voteRequest = new VoteRequestMessage
+            {
+                Type = MessageType.VoteRequest,
+                NodeId = 1,
+                CurrentTerm = 2,
+                LastTerm = 3,
+                LogLength = 4
+            };
+            var result = _sut.Serialize(voteRequest);
+
+            result.Should().Be(json);
+        }
+
+        [Test]
+        public void Serialize_VoteResponse_VoteResponseMessage()
+        {
+            var json = "{\"NodeId\":2,\"CurrentTerm\":1,\"Granted\":true,\"Type\":2}";
+
+            var voteResponse = new VoteResponseMessage
+            {
+                Type = MessageType.VoteResponse,
+                CurrentTerm = 1,
+                Granted = true,
+                NodeId = 2
+            };
+            var result = _sut.Serialize(voteResponse);
+
+            result.Should().Be(json);
+        }
+
+        [Test]
+        public void Serialize_Application_ApplicationMessage()
+        {
+            var json = "{\"Type\":5}";
+            var message = new Message
+            {
+                Type = MessageType.Application
+            };
+            var result = _sut.Serialize(message);
+
+            result.Should().Be(json);
+        }
     }
 }

@@ -5,6 +5,8 @@ namespace RaftCore.Adapters
 {
     public interface IMessageSender
     {
-        Unit SendMessage(int nodeId, Message message);
+        Unit Start(int nodeId);
+        Unit Stop();
+        Unit SendMessage(Message message);
     }
 }

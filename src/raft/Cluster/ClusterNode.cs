@@ -17,9 +17,11 @@ namespace Raft.Cluster
         {
             _clusterNodeConfiguration = clusterNodeConfiguration;
             _messageSender = messageSender;
+
+            _messageSender.Start(Id);
         }
 
         public Unit SendMessage(Message message)
-            => _messageSender.SendMessage(Id, message);
+            => _messageSender.SendMessage(message);
     }
 }

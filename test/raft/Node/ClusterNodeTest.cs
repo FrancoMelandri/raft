@@ -28,7 +28,11 @@ namespace RaftTest.Raft
 
         [Test]
         public void Ctor_SetRightId()
-            => _sut.Id.Should().Be(1);
+        {
+            _sut.Id.Should().Be(1);
+            _messageSender
+                .Verify(m => m.Start(1), Times.Once);
+        }
 
         [Test]
         public void SendMessage_CallMessageZSender()
@@ -38,7 +42,7 @@ namespace RaftTest.Raft
             _sut.SendMessage(message);
 
             _messageSender
-                .Verify(m => m.SendMessage(1, message), Times.Once);
+                .Verify(m => m.SendMessage(message), Times.Once);
         }
     }
 }
