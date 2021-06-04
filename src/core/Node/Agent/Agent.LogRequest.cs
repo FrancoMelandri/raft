@@ -15,7 +15,7 @@ namespace RaftCore.Node
                 .Bind(s => IsTermOk(message, s))
                 .Bind(s => IsCurrentTermOk(message, s))
                 .Match(_ => HandleReceivedLogRequestOk(message, _),
-                       _ => HandleReceivedLogRequestKo(message, _status));
+                       _ => LogError(_).Map(_ => HandleReceivedLogRequestKo(message, _status)));
 
         private Status UpdateStatusDueTerm(LogRequestMessage message, Status status)
             => new Status

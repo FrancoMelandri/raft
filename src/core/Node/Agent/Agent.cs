@@ -1,6 +1,7 @@
 ﻿using RaftCore.Adapters;
 using RaftCore.Cluster;
 using RaftCore.Models;
+using TinyFp;
 using TinyFp.Extensions;
 
 namespace RaftCore.Node
@@ -15,7 +16,7 @@ namespace RaftCore.Node
         private readonly ILogger _logger;
         private BaseNodeConfiguration _nodeConfiguration;
 
-        public Agent(ICluster cluster, 
+        public Agent(ICluster cluster,
                      IElection election,
                      ILeader leader,
                      IApplication application,
@@ -28,7 +29,7 @@ namespace RaftCore.Node
             _logger = logger;
         }
 
-        public static Agent Create(ICluster cluster, 
+        public static Agent Create(ICluster cluster,
                                    IElection election,
                                    ILeader leader,
                                    IApplication application,
@@ -38,5 +39,13 @@ namespace RaftCore.Node
         public Status CurrentStatus()
             => new Status()
                 .Tee(status => status = _status);
+
+        protected Unit LogError(Error error)
+            => Unit.Default
+                .Tee(_ => _logger.Error($"{error.Code}: {error.Description}"));
+
+        protected Unit LogInformation(string message)
+            => Unit.Default
+                .Tee(_ => _logger.Information(message));
     }
 }

@@ -1,6 +1,7 @@
 ﻿using RaftCore.Models;
 using TinyFp.Extensions;
 using static RaftCore.Constants.NodeConstants;
+using static RaftCore.Constants.Logs;
 
 namespace RaftCore.Node
 {
@@ -21,7 +22,8 @@ namespace RaftCore.Node
                     SentLength = INIT_SENT_LENGTH,
                     AckedLength = INIT_ACKED_LENGTH
                 })
-                .Map(_ => _status);
+                .Map(_ => _status)
+                .Tee(_ => _logger.Information(NODE_INITIALISE));
 
         public Status OnInitialise(BaseNodeConfiguration nodeConfiguration, Status status)
             => this
@@ -38,6 +40,7 @@ namespace RaftCore.Node
                     SentLength = INIT_SENT_LENGTH,
                     AckedLength = INIT_ACKED_LENGTH
                 })
-                .Map(_ => _status);
+                .Map(_ => _status)
+                .Tee(_ => _logger.Information(NODE_INITIALISE_WITH_STATUS));
     }
 }

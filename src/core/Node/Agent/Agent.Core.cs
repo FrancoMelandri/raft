@@ -4,6 +4,7 @@ using TinyFp.Extensions;
 using static RaftCore.Node.LogRequestChecks;
 using static RaftCore.Node.Checks;
 using static RaftCore.Utils;
+using static RaftCore.Constants.Logs;
 
 namespace RaftCore.Node
 {
@@ -29,7 +30,8 @@ namespace RaftCore.Node
                                 SentLength = s.SentLength,
                                 AckedLength = s.AckedLength
                             })
-                            .Tee(s => _status = s),
+                            .Tee(s => _status = s)
+                            .Tee(s => _logger.Information(LOG_TRUNCATED)),
                        _ => status);
 
         private Status AppendNewEntries(LogRequestMessage message, Status status)
@@ -46,7 +48,8 @@ namespace RaftCore.Node
                                 SentLength = s.SentLength,
                                 AckedLength = s.AckedLength
                             })
-                            .Tee(s => _status = s),
+                            .Tee(s => _status = s)
+                            .Tee(s => _logger.Information(LOG_APPEND_ENTRIES)),
                        _ => status);
 
         private Status NotifyApplication(LogRequestMessage message, Status status)
@@ -66,7 +69,8 @@ namespace RaftCore.Node
                                  SentLength = s.SentLength,
                                  AckedLength = s.AckedLength
                              })
-                              .Tee(s => _status = s),
+                             .Tee(s => _status = s)
+                             .Tee(s => _logger.Information(NOTIFY_TO_APPLICATION)),
                        _ => status);
 
         public Status ReplicateLog(Status status, int follower)

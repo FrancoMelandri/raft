@@ -28,6 +28,9 @@ namespace RaftTest.Core
 
             status.CurrentTerm.Should().Be(15);
             status.VotedFor.Should().Be(-1);
+
+            _logger
+                .Verify(m => m.Error("LR-0002: message-length-is-not-ok"));
         }
 
         [Test]
@@ -49,6 +52,9 @@ namespace RaftTest.Core
 
             status.CurrentTerm.Should().Be(10);
             status.VotedFor.Should().Be(1);
+
+            _logger
+                .Verify(m => m.Error("LR-0001: term-is-not-greater"));
         }
 
         [Test]
@@ -103,6 +109,8 @@ namespace RaftTest.Core
                                                     p.NodeId == 42 &&
                                                     p.Ack == 0 &&
                                                     p.Success == false)));
+            _logger
+                .Verify(m => m.Error("LR-0003: message-term-is-not-ok"));
         }
 
         [Test]
@@ -192,6 +200,9 @@ namespace RaftTest.Core
                                                     p.NodeId == 42 &&
                                                     p.Ack == 6 &&
                                                     p.Success == true)), Times.Once);
+
+            _logger
+                .Verify(m => m.Information("Log was trucated"));
         }
 
         [Test]
@@ -243,6 +254,8 @@ namespace RaftTest.Core
                                                     p.NodeId == 42 &&
                                                     p.Ack == 9 &&
                                                     p.Success == true)), Times.Once);
+            _logger
+                .Verify(m => m.Information("Append new entries to log"));
         }
 
         [Test]
@@ -297,6 +310,9 @@ namespace RaftTest.Core
                                                     p.Success == true)), Times.Once);
             _application
                 .Verify(m => m.NotifyMessage(It.Is<Message>(p => p.Type == MessageType.None)), Times.Exactly(3));
+
+            _logger
+                .Verify(m => m.Information("Notify to application"));
         }
     }
 }
