@@ -1,5 +1,8 @@
-﻿namespace Raft.Constants
+﻿using System.Diagnostics.CodeAnalysis;
+
+namespace Raft.Constants
 {
+    [ExcludeFromCodeCoverage]
     public static class Nodes
     {
         public static readonly string PORT = "Port";

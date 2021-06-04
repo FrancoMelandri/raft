@@ -210,5 +210,18 @@ namespace RaftCoreTest.raft.Node
 
             result.Should().Be(json);
         }
+
+        [Test]
+        public void Serialize_None_Message()
+        {
+            var json = "{\"Type\":0}";
+            var message = new Message
+            {
+                Type = MessageType.None
+            };
+            var result = _sut.Serialize(message);
+
+            result.Should().Be(json);
+        }
     }
 }
