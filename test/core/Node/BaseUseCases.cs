@@ -15,6 +15,7 @@ namespace RaftTest.Core
         protected Mock<IElection> _election;
         protected Mock<ILeader> _leader;
         protected Mock<IApplication> _application;
+        protected Mock<ILogger> _logger;
         protected Mock<IClusterNode> _node1;
         protected Mock<IClusterNode> _node2;
         protected Mock<IClusterNode> _node3;
@@ -35,10 +36,12 @@ namespace RaftTest.Core
             _election = new Mock<IElection>();
             _leader = new Mock<ILeader>();
             _application = new Mock<IApplication>();
+            _logger = new Mock<ILogger>();
             _sut = Agent.Create(_cluster.Object,
                                 _election.Object,
                                 _leader.Object,
-                                _application.Object);
+                                _application.Object,
+                                _logger.Object);
             ResetCluster();
         }
 

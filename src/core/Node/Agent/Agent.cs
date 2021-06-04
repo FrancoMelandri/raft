@@ -12,24 +12,28 @@ namespace RaftCore.Node
         private readonly IElection _election;
         private readonly ILeader _leader;
         private readonly IApplication _application;
+        private readonly ILogger _logger;
         private BaseNodeConfiguration _nodeConfiguration;
 
         public Agent(ICluster cluster, 
                      IElection election,
                      ILeader leader,
-                     IApplication application)
+                     IApplication application,
+                     ILogger logger)
         {
             _cluster = cluster;
             _election = election;
             _leader = leader;
             _application = application;
+            _logger = logger;
         }
 
         public static Agent Create(ICluster cluster, 
                                    IElection election,
                                    ILeader leader,
-                                   IApplication application)
-            => new(cluster, election, leader, application);
+                                   IApplication application,
+                                   ILogger logger)
+            => new(cluster, election, leader, application, logger);
 
         public Status CurrentStatus()
             => new Status()
