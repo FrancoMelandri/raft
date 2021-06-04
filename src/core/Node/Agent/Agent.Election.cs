@@ -1,6 +1,7 @@
 ﻿using RaftCore.Models;
 using TinyFp.Extensions;
 using static RaftCore.Utils;
+using static RaftCore.Constants.Logs;
 
 namespace RaftCore.Node
 {
@@ -31,9 +32,11 @@ namespace RaftCore.Node
                             })
                             .Tee(_ => _cluster.SendBroadcastMessage(_))
                             .Tee(_ => _election.Start()))
-            .Map(_ => _status);
+            .Map(_ => _status)
+            .Tee(_ => _logger.Information(LEADER_HAS_FAILED));
 
         public Status OnElectionTimeOut()
-            => OnLeaderHasFailed();
+            => OnLeaderHasFailed()
+                .Tee(_ => _logger.Information(ELECTION_TIMEOUT));
     }   
 }

@@ -49,6 +49,8 @@ namespace RaftTest.Core
             status.SentLength.Should().BeEquivalentTo(new object[] { });
             status.AckedLength.Should().BeEquivalentTo(new object[] { });
 
+            _logger
+                .Verify(m => m.Information("Node initialisation"));
         }
 
         [Test]
@@ -83,6 +85,9 @@ namespace RaftTest.Core
             status.VotesReceived.Should().NotBeNull();
             status.SentLength.Should().BeEquivalentTo(new Dictionary<int, int>());
             status.AckedLength.Should().BeEquivalentTo(new Dictionary<int, int>());
+
+            _logger
+                .Verify(m => m.Information("Node initialisation with status"));
         }
     }
 }

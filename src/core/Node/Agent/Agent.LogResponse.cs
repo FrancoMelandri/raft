@@ -11,7 +11,7 @@ namespace RaftCore.Node
         public Status OnReceivedLogResponse(LogResponseMessage message)
             => IsTermGreater(message, _status)
                 .Match(s => HandleReceivedLogResponseKo(message, s), 
-                       _ => HandleReceivedLogResponseOk(message, _status));
+                        _ => HandleReceivedLogResponseOk(message, _status));
 
         private Status HandleReceivedLogResponseKo(LogResponseMessage message, Status status)
             => new Status 

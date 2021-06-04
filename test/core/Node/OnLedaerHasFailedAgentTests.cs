@@ -46,6 +46,8 @@ namespace RaftTest.Core
                                                     p.CurrentTerm == 43)), Times.Once);
             _election
                 .Verify(m => m.Start(), Times.Once);
+            _logger
+                .Verify(m => m.Information("Leader has failed"), Times.Once);
         }
 
         [Test]
@@ -83,6 +85,8 @@ namespace RaftTest.Core
                                                     p.CurrentTerm == 43)), Times.Once);
             _election
                 .Verify(m => m.Start(), Times.Once);
+            _logger
+                .Verify(m => m.Information("Leader has failed"), Times.Once);
         }
     }
 }
