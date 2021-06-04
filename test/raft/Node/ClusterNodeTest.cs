@@ -2,22 +2,43 @@
 using NUnit.Framework;
 using RaftCore.Models;
 using Raft.Cluster;
+using Moq;
+using RaftCore.Adapters;
 
 namespace RaftTest.Raft
 {
     [TestFixture]
     public class ClusterNodeTest
     {
-        [Test]
-        public void Ctor_SetRightId()
+        private ClusterNode _sut;
+        private Mock<IMessageSender> _messageSender;
+        private ClusterNodeConfiguration _config;
+
+        [SetUp]
+        public void SetUp()
         {
-            var config = new ClusterNodeConfiguration
+            _config = new ClusterNodeConfiguration
             {
                 Id = 1
             };
+            _messageSender = new Mock<IMessageSender>();
+            _sut = new ClusterNode(_config,
+                                   _messageSender.Object);
+        }
 
-            new ClusterNode(config)
-                .Id.Should().Be(1);
+        [Test]
+        public void Ctor_SetRightId()
+            => _sut.Id.Should().Be(1);
+
+        [Test]
+        public void SendMessage_CallMessageZSender()
+        {
+            var message = new Message();
+
+            _sut.SendMessage(message);
+
+            _messageSender
+                .Verify(m => m.SendMessage(1, message), Times.Once);
         }
     }
 }
