@@ -4,7 +4,7 @@ using Raft.Node;
 using RaftCore.Cluster;
 using System.Threading.Tasks;
 
-namespace RaftCoreTest.raft.Node
+namespace RaftTest.Raft
 {
     [TestFixture]
     public class LeaderFailureDetectorTests

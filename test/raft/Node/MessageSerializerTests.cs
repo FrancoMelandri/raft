@@ -3,7 +3,7 @@ using NUnit.Framework;
 using Raft.Node;
 using RaftCore.Models;
 
-namespace RaftCoreTest.raft.Node
+namespace RaftTest.Raft
 {
     [TestFixture]
     public class MessageSerializerTests
