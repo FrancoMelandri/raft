@@ -12,26 +12,24 @@ using static System.Threading.Tasks.Task;
 using static Raft.Constants.Messages;
 using static System.Text.Encoding;
 using static TinyFp.Prelude;
+using static Raft.Constants.Nodes;
 
 namespace Raft.Node
 {
     [ExcludeFromCodeCoverage]
     public class TcpMessageListener : IMessageListener
     {
-        private const string LOCAL_PORT = "Port";
-        private const string LOCAL_HOST = "127.0.0.1";
-
         private readonly LocalNodeConfiguration _localNodeConfiguration;
-        private readonly IMessageSerializer _messageDeserializer;
+        private readonly IMessageSerializer _messageSerializer;
         private IMessageObserver _messageObserver;
         private TcpListener _tcpListener;
         private Task _listener;
 
         public TcpMessageListener(LocalNodeConfiguration localNodeConfiguration,
-                                  IMessageSerializer messageDeserializer)
+                                  IMessageSerializer messageSerializer)
         {
             _localNodeConfiguration = localNodeConfiguration;
-            _messageDeserializer = messageDeserializer;
+            _messageSerializer = messageSerializer;
         }
 
         public Unit Start(IMessageObserver messageObserver)
@@ -46,7 +44,7 @@ namespace Raft.Node
         private Unit StartListener()
             => Unit.Default
                 .Tee (_ =>
-                    (Address: IPAddress.Parse(LOCAL_HOST), Port: ToInt32(_localNodeConfiguration.Properties[LOCAL_PORT]))
+                    (Address: IPAddress.Parse(LOCAL_HOST), Port: ToInt32(_localNodeConfiguration.Properties[PORT]))
                     .Map(_ => _tcpListener = new TcpListener(_.Address, _.Port))
                     .Tee(_ => _tcpListener.Start())
                     .Tee(_ => _listener = Factory.StartNew(() => Listen())));
@@ -57,8 +55,8 @@ namespace Raft.Node
         private void Listen()
             => _tcpListener
                 .AcceptTcpClient()
-                .Map(_ => HandleIncomingMessage(_))
-                .Tee(_ => _listener = Factory.StartNew(() => Listen()));
+                .Tee(_ => _listener = Factory.StartNew(() => Listen()))
+                .Map(_ => HandleIncomingMessage(_));
 
         private Unit HandleIncomingMessage(TcpClient client)
             => GetMessageSize(client)
@@ -72,7 +70,7 @@ namespace Raft.Node
             => Try(() => new byte[HEADER_SIZE]
                             .Tee(_ => client.GetStream().Read(_, 0, HEADER_SIZE))
                             .Map(_ => UTF8.GetString(_))
-                            .Map(_ => _.Replace(PADDING_CHAR, REPLACING_CHAR))
+                            .Map(_ => _.Replace(PADDING_STRING, REPLACING_CHAR))
                             .Map(_ => ToInt32(_)))
                .Match(_ => Option<int>.Some(_),
                       _ => Option<int>.None());
@@ -89,7 +87,7 @@ namespace Raft.Node
             => Try(() => new byte[size]
                             .Tee(_ => client.GetStream().Read(_, 0, size))
                             .Map(_ => UTF8.GetString(_))
-                            .Map(_ => _messageDeserializer.Deserialize(type, _)))
+                            .Map(_ => _messageSerializer.Deserialize(type, _)))
                .Match(_ => Option<Message>.Some(_),
                       _ => Option<Message>.None());
     }

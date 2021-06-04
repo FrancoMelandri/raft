@@ -52,16 +52,18 @@ namespace RaftApplication
 
         private void InitializeRaftCore(IServiceCollection services)
             => services
-                .Tee(_ => _.AddSingleton<ICluster>(_ => 
-                                new Cluster(_.GetService<ClusterConfiguration>()
+                .Tee(_ => _.AddSingleton<ICluster>(svc => 
+                                new Cluster(svc.GetService<ClusterConfiguration>()
                                                 .Nodes
-                                                .Map(_ => new ClusterNode(_))
+                                                .Map(__ => new ClusterNode(__,
+                                                                           svc.GetService<IMessageSender>()))
                                                 .ToArray())))
                 .Tee(_ => _.AddSingleton<IStatusRepository, FileStatusRepository>())
                 .Tee(_ => _.AddSingleton<IElection, Election>())
                 .Tee(_ => _.AddSingleton<IAgent, Agent>())
                 .Tee(_ => _.AddSingleton<IMessageSerializer, ApplicationMessageSerializer>())
                 .Tee(_ => _.AddSingleton<IMessageListener, TcpMessageListener>())
+                .Tee(_ => _.AddSingleton<IMessageSender, TcpMessageSender>())
                 .Tee(_ => _.AddSingleton<ILeaderFailureDetector, LeaderFailureDetector>())
                 .Tee(_ => _.AddSingleton<ILocalNode, LocalNode>());
 

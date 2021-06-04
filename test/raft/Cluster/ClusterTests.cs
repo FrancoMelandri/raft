@@ -20,8 +20,11 @@ namespace RaftTest.Raft
         public void SetUp()
         {
             _node1 = new Mock<IClusterNode>();
+            _node1.Setup(m => m.Id).Returns(1);
             _node2 = new Mock<IClusterNode>();
+            _node2.Setup(m => m.Id).Returns(2);
             _node3 = new Mock<IClusterNode>();
+            _node3.Setup(m => m.Id).Returns(3);
 
             _sut = new Cluster(new[] { _node1.Object,
                                        _node2.Object,
@@ -33,13 +36,45 @@ namespace RaftTest.Raft
             => _sut.Nodes.Should().HaveCount(3);
 
         [Test]
-        public void SendBroadcastMessage_DoNothing()
-            => _sut.SendBroadcastMessage(new Message())
-                .Should().Be(Unit.Default);
+        public void SendBroadcastMessage_SendMessageToAllNodes()
+        {
+            var message = new Message();
+            _ = _sut.SendBroadcastMessage(message);
+
+            _node1
+                .Verify(m => m.SendMessage(message), Times.Once);
+            _node2
+                .Verify(m => m.SendMessage(message), Times.Once);
+            _node3
+                .Verify(m => m.SendMessage(message), Times.Once);
+        }
 
         [Test]
-        public void SendMessage_DoNothing()
-            => _sut.SendMessage(1, new Message())
-                .Should().Be(Unit.Default);
+        public void SendMessage_SendMessageToSingleNode()
+        {
+            var message = new Message();
+            _ = _sut.SendMessage(2, message);
+
+            _node1
+                .Verify(m => m.SendMessage(message), Times.Never);
+            _node2
+                .Verify(m => m.SendMessage(message), Times.Once);
+            _node3
+                .Verify(m => m.SendMessage(message), Times.Never);
+        }
+
+        [Test]
+        public void SendMessage_WhenNodeDoesnotExists_DoNothing()
+        {
+            var message = new Message();
+            _ = _sut.SendMessage(99, message);
+
+            _node1
+                .Verify(m => m.SendMessage(message), Times.Never);
+            _node2
+                .Verify(m => m.SendMessage(message), Times.Never);
+            _node3
+                .Verify(m => m.SendMessage(message), Times.Never);
+        }
     }
 }
