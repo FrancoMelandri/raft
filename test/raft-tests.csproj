@@ -20,7 +20,7 @@
 
 	<ItemGroup>
 		<ProjectReference Include="..\src\core\raft-core.csproj" />
-		<ProjectReference Include="..\src\raft\raft.csproj" />
+		<ProjectReference Include="..\src\raft\raft-impl.csproj" />
 	</ItemGroup>
 
 	<ItemGroup>

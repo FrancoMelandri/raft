@@ -24,7 +24,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "files", "files", "{9977F8ED
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "raft", "raft", "{4B92B534-D57C-4EA4-B08A-96F178EB948D}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "raft", "src\raft\raft.csproj", "{9EC1EDC3-902B-45A9-9365-D3251FAE6C2B}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "raft-impl", "src\raft\raft-impl.csproj", "{9EC1EDC3-902B-45A9-9365-D3251FAE6C2B}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "raft-tests", "test\raft-tests.csproj", "{27838E6A-B752-4E55-9B22-AD4AF3FC8002}"
 EndProject
