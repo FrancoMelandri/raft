@@ -40,11 +40,11 @@ namespace RaftCore.Node
             => new Status()
                 .Tee(status => status = _status);
 
-        protected Unit LogError(Error error)
+        public Unit LogError(Error error)
             => Unit.Default
                 .Tee(_ => _logger.Error($"{error.Code}: {error.Description}"));
 
-        protected Unit LogInformation(string message)
+        public Unit LogInformation(string message)
             => Unit.Default
                 .Tee(_ => _logger.Information(message));
     }
