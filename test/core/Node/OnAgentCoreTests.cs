@@ -23,17 +23,17 @@ namespace RaftTest.Core
             var status = new Status
             {
                 Log = new LogEntry[] {
-                        new LogEntry { Message = new Message(), Term = 0 }, // 0
-                        new LogEntry { Message = new Message(), Term = 0 }, // 1
-                        new LogEntry { Message = new Message(), Term = 1 }, // 2
-                        new LogEntry { Message = new Message(), Term = 1 }, // 3
-                        new LogEntry { Message = new Message(), Term = 2 }, // 4
-                        new LogEntry { Message = new Message(), Term = 2 }, // 5
+                        new LogEntry { Message = new Message(), Term = 0 },
+                        new LogEntry { Message = new Message(), Term = 0 },
+                        new LogEntry { Message = new Message(), Term = 1 },
+                        new LogEntry { Message = new Message(), Term = 1 },
+                        new LogEntry { Message = new Message(), Term = 2 },
+                        new LogEntry { Message = new Message(), Term = 2 },
 
-                        new LogEntry { Message = new Message(), Term = 2 }, // 6
-                        new LogEntry { Message = new Message(), Term = 2 }, // 7
-                        new LogEntry { Message = new Message(), Term = 2 }, // 8
-                        new LogEntry { Message = new Message(), Term = 2 }, // 9
+                        new LogEntry { Message = new Message(), Term = 2 },
+                        new LogEntry { Message = new Message(), Term = 2 },
+                        new LogEntry { Message = new Message(), Term = 2 },
+                        new LogEntry { Message = new Message(), Term = 2 }
                 },
                 CommitLenght = 6,
                 CurrentRole = States.Leader,
@@ -42,7 +42,7 @@ namespace RaftTest.Core
                 {
                     { 1, 0 },
                     { 2, 0 },
-                    { 3, 0 },
+                    { 3, 0 }
                 }
             };
 
@@ -59,17 +59,17 @@ namespace RaftTest.Core
             var status = new Status
             {
                 Log = new LogEntry[] {
-                        new LogEntry { Message = new Message(), Term = 0 }, // 0
-                        new LogEntry { Message = new Message(), Term = 0 }, // 1
-                        new LogEntry { Message = new Message(), Term = 1 }, // 2
-                        new LogEntry { Message = new Message(), Term = 1 }, // 3
-                        new LogEntry { Message = new Message(), Term = 2 }, // 4
-                        new LogEntry { Message = new Message(), Term = 2 }, // 5
+                        new LogEntry { Message = new Message(), Term = 0 },
+                        new LogEntry { Message = new Message(), Term = 0 },
+                        new LogEntry { Message = new Message(), Term = 1 },
+                        new LogEntry { Message = new Message(), Term = 1 },
+                        new LogEntry { Message = new Message(), Term = 2 },
+                        new LogEntry { Message = new Message(), Term = 2 },
 
-                        new LogEntry { Message = new Message(), Term = 2 }, // 6
-                        new LogEntry { Message = new Message(), Term = 2 }, // 7
-                        new LogEntry { Message = new Message(), Term = 2 }, // 8
-                        new LogEntry { Message = new Message(), Term = 2 }, // 9
+                        new LogEntry { Message = new Message(), Term = 2 },
+                        new LogEntry { Message = new Message(), Term = 2 },
+                        new LogEntry { Message = new Message(), Term = 2 },
+                        new LogEntry { Message = new Message(), Term = 2 }
                 },
                 CommitLenght = 6,
                 CurrentRole = States.Leader,
@@ -78,7 +78,7 @@ namespace RaftTest.Core
                 {
                     { 1, 6 },
                     { 2, 6 },
-                    { 3, 6 },
+                    { 3, 6 }
                 }
             };
 
@@ -95,16 +95,16 @@ namespace RaftTest.Core
             var status = new Status
             {
                 Log = new LogEntry[] {
-                        new LogEntry { Message = new Message(), Term = 0 }, // 0
-                        new LogEntry { Message = new Message(), Term = 0 }, // 1
-                        new LogEntry { Message = new Message(), Term = 1 }, // 2
-                        new LogEntry { Message = new Message(), Term = 1 }, // 3
-                        new LogEntry { Message = new Message(), Term = 2 }, // 4
-                        new LogEntry { Message = new Message(), Term = 2 }, // 5
-                        new LogEntry { Message = new Message(), Term = 2 }, // 6
-                        new LogEntry { Message = new Message(), Term = 2 }, // 7
-                        new LogEntry { Message = new Message(), Term = 2 }, // 8
-                        new LogEntry { Message = new Message(), Term = 2 }, // 9
+                        new LogEntry { Message = new Message(), Term = 0 },
+                        new LogEntry { Message = new Message(), Term = 0 },
+                        new LogEntry { Message = new Message(), Term = 1 },
+                        new LogEntry { Message = new Message(), Term = 1 },
+                        new LogEntry { Message = new Message(), Term = 2 },
+                        new LogEntry { Message = new Message(), Term = 2 },
+                        new LogEntry { Message = new Message(), Term = 2 },
+                        new LogEntry { Message = new Message(), Term = 2 },
+                        new LogEntry { Message = new Message(), Term = 2 },
+                        new LogEntry { Message = new Message(), Term = 2 }
                 },
                 CommitLenght = 5,
                 CurrentRole = States.Leader,
@@ -113,7 +113,7 @@ namespace RaftTest.Core
                 {
                     { 1, 6 },
                     { 2, 5 },
-                    { 3, 0 },
+                    { 3, 0 }
                 }
             };
 
@@ -130,16 +130,16 @@ namespace RaftTest.Core
             var status = new Status
             {
                 Log = new LogEntry[] {
-                        new LogEntry { Message = new Message(), Term = 0 }, // 0
-                        new LogEntry { Message = new Message(), Term = 0 }, // 1
-                        new LogEntry { Message = new Message(), Term = 1 }, // 2
-                        new LogEntry { Message = new Message(), Term = 1 }, // 3
-                        new LogEntry { Message = new Message(), Term = 2 }, // 4
-                        new LogEntry { Message = new Message(), Term = 2 }, // 5
-                        new LogEntry { Message = new Message(), Term = 2 }, // 6
-                        new LogEntry { Message = new Message(), Term = 2 }, // 7
-                        new LogEntry { Message = new Message(), Term = 2 }, // 8
-                        new LogEntry { Message = new Message(), Term = 2 }, // 9
+                        new LogEntry { Message = new Message(), Term = 0 },
+                        new LogEntry { Message = new Message(), Term = 0 },
+                        new LogEntry { Message = new Message(), Term = 1 },
+                        new LogEntry { Message = new Message(), Term = 1 },
+                        new LogEntry { Message = new Message(), Term = 2 },
+                        new LogEntry { Message = new Message(), Term = 2 },
+                        new LogEntry { Message = new Message(), Term = 2 },
+                        new LogEntry { Message = new Message(), Term = 2 },
+                        new LogEntry { Message = new Message(), Term = 2 },
+                        new LogEntry { Message = new Message(), Term = 2 }
                 },
                 CommitLenght = 5,
                 CurrentRole = States.Leader,
@@ -148,7 +148,7 @@ namespace RaftTest.Core
                 {
                     { 1, 6 },
                     { 2, 7 },
-                    { 3, 0 },
+                    { 3, 0 }
                 }
             };
 
@@ -165,16 +165,16 @@ namespace RaftTest.Core
             var status = new Status
             {
                 Log = new LogEntry[] {
-                        new LogEntry { Message = new Message(), Term = 0 }, // 0
-                        new LogEntry { Message = new Message(), Term = 0 }, // 1
-                        new LogEntry { Message = new Message(), Term = 1 }, // 2
-                        new LogEntry { Message = new Message(), Term = 1 }, // 3
-                        new LogEntry { Message = new Message(), Term = 2 }, // 4
-                        new LogEntry { Message = new Message(), Term = 2 }, // 5
-                        new LogEntry { Message = new Message(), Term = 2 }, // 6
-                        new LogEntry { Message = new Message(), Term = 2 }, // 7
-                        new LogEntry { Message = new Message(), Term = 2 }, // 8
-                        new LogEntry { Message = new Message(), Term = 2 }, // 9
+                        new LogEntry { Message = new Message(), Term = 0 },
+                        new LogEntry { Message = new Message(), Term = 0 },
+                        new LogEntry { Message = new Message(), Term = 1 },
+                        new LogEntry { Message = new Message(), Term = 1 },
+                        new LogEntry { Message = new Message(), Term = 2 },
+                        new LogEntry { Message = new Message(), Term = 2 },
+                        new LogEntry { Message = new Message(), Term = 2 },
+                        new LogEntry { Message = new Message(), Term = 2 },
+                        new LogEntry { Message = new Message(), Term = 2 },
+                        new LogEntry { Message = new Message(), Term = 2 }
                 },
                 CommitLenght = 5,
                 CurrentRole = States.Leader,
@@ -183,7 +183,7 @@ namespace RaftTest.Core
                 {
                     { 1, 7 },
                     { 2, 7 },
-                    { 3, 0 },
+                    { 3, 0 }
                 }
             };
 
@@ -200,16 +200,16 @@ namespace RaftTest.Core
             var status = new Status
             {
                 Log = new LogEntry[] {
-                        new LogEntry { Message = new Message(), Term = 0 }, // 0
-                        new LogEntry { Message = new Message(), Term = 0 }, // 1
-                        new LogEntry { Message = new Message(), Term = 1 }, // 2
-                        new LogEntry { Message = new Message(), Term = 1 }, // 3
-                        new LogEntry { Message = new Message(), Term = 2 }, // 4
-                        new LogEntry { Message = new Message(), Term = 2 }, // 5
-                        new LogEntry { Message = new Message(), Term = 2 }, // 6
-                        new LogEntry { Message = new Message(), Term = 2 }, // 7
-                        new LogEntry { Message = new Message(), Term = 2 }, // 8
-                        new LogEntry { Message = new Message(), Term = 2 }, // 9
+                        new LogEntry { Message = new Message(), Term = 0 },
+                        new LogEntry { Message = new Message(), Term = 0 },
+                        new LogEntry { Message = new Message(), Term = 1 },
+                        new LogEntry { Message = new Message(), Term = 1 },
+                        new LogEntry { Message = new Message(), Term = 2 },
+                        new LogEntry { Message = new Message(), Term = 2 },
+                        new LogEntry { Message = new Message(), Term = 2 },
+                        new LogEntry { Message = new Message(), Term = 2 },
+                        new LogEntry { Message = new Message(), Term = 2 },
+                        new LogEntry { Message = new Message(), Term = 2 }
                 },
                 CommitLenght = 5,
                 CurrentRole = States.Leader,
@@ -218,7 +218,7 @@ namespace RaftTest.Core
                 {
                     { 1, 7 },
                     { 2, 7 },
-                    { 3, 7 },
+                    { 3, 7 }
                 }
             };
 
@@ -235,16 +235,16 @@ namespace RaftTest.Core
             var status = new Status
             {
                 Log = new LogEntry[] {
-                        new LogEntry { Message = new Message(), Term = 0 }, // 0
-                        new LogEntry { Message = new Message(), Term = 0 }, // 1
-                        new LogEntry { Message = new Message(), Term = 1 }, // 2
-                        new LogEntry { Message = new Message(), Term = 1 }, // 3
-                        new LogEntry { Message = new Message(), Term = 2 }, // 4
-                        new LogEntry { Message = new Message(), Term = 2 }, // 5
-                        new LogEntry { Message = new Message(), Term = 2 }, // 6
-                        new LogEntry { Message = new Message(), Term = 2 }, // 7
-                        new LogEntry { Message = new Message(), Term = 2 }, // 8
-                        new LogEntry { Message = new Message(), Term = 2 }, // 9
+                        new LogEntry { Message = new Message(), Term = 0 },
+                        new LogEntry { Message = new Message(), Term = 0 },
+                        new LogEntry { Message = new Message(), Term = 1 },
+                        new LogEntry { Message = new Message(), Term = 1 },
+                        new LogEntry { Message = new Message(), Term = 2 },
+                        new LogEntry { Message = new Message(), Term = 2 },
+                        new LogEntry { Message = new Message(), Term = 2 },
+                        new LogEntry { Message = new Message(), Term = 2 },
+                        new LogEntry { Message = new Message(), Term = 2 },
+                        new LogEntry { Message = new Message(), Term = 2 }
                 },
                 CommitLenght = 7,
                 CurrentRole = States.Leader,
@@ -253,7 +253,7 @@ namespace RaftTest.Core
                 {
                     { 1, 7 },
                     { 2, 7 },
-                    { 3, 0 },
+                    { 3, 0 }
                 }
             };
 
@@ -270,16 +270,16 @@ namespace RaftTest.Core
             var status = new Status
             {
                 Log = new LogEntry[] {
-                        new LogEntry { Message = new Message(), Term = 0 }, // 0
-                        new LogEntry { Message = new Message(), Term = 0 }, // 1
-                        new LogEntry { Message = new Message(), Term = 1 }, // 2
-                        new LogEntry { Message = new Message(), Term = 1 }, // 3
-                        new LogEntry { Message = new Message(), Term = 1 }, // 4
-                        new LogEntry { Message = new Message(), Term = 1 }, // 5
-                        new LogEntry { Message = new Message(), Term = 1 }, // 6
-                        new LogEntry { Message = new Message(), Term = 2 }, // 7
-                        new LogEntry { Message = new Message(), Term = 2 }, // 8
-                        new LogEntry { Message = new Message(), Term = 2 }, // 9
+                        new LogEntry { Message = new Message(), Term = 0 },
+                        new LogEntry { Message = new Message(), Term = 0 },
+                        new LogEntry { Message = new Message(), Term = 1 },
+                        new LogEntry { Message = new Message(), Term = 1 },
+                        new LogEntry { Message = new Message(), Term = 1 },
+                        new LogEntry { Message = new Message(), Term = 1 },
+                        new LogEntry { Message = new Message(), Term = 1 },
+                        new LogEntry { Message = new Message(), Term = 2 },
+                        new LogEntry { Message = new Message(), Term = 2 },
+                        new LogEntry { Message = new Message(), Term = 2 }
                 },
                 CommitLenght = 5,
                 CurrentRole = States.Leader,
@@ -288,7 +288,7 @@ namespace RaftTest.Core
                 {
                     { 1, 7 },
                     { 2, 7 },
-                    { 3, 7 },
+                    { 3, 7 }
                 }
             };
 
