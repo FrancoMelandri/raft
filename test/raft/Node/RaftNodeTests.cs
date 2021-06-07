@@ -193,7 +193,7 @@ namespace RaftTest.Raft
         }
 
         [Test]
-        public void NotifyMessage_WhenNotVoteResponse_CallAgentReceivedVoteResponse()
+        public void NotifyMessage_WhenNotVoteResponse_DontCallAgentReceivedVoteResponse()
         {
             var message = new Message
             {
@@ -204,6 +204,34 @@ namespace RaftTest.Raft
 
             _agent
                 .Verify(m => m.OnReceivedVoteResponse(It.IsAny<VoteResponseMessage>()), Times.Never);
+        }
+
+        [Test]
+        public void NotifyMessage_WhenLogResponse_CallAgentReceivedLogReponse()
+        {
+            var message = new LogResponseMessage
+            {
+                Type = MessageType.LogResponse
+            };
+            _sut.NotifyMessage(message)
+                .Should().Be(Unit.Default);
+
+            _agent
+                .Verify(m => m.OnReceivedLogResponse(message), Times.Once);
+        }
+
+        [Test]
+        public void NotifyMessage_WhenNotLogResponse_DontCallAgentReceivedLogReponse()
+        {
+            var message = new Message
+            {
+                Type = MessageType.LogResponse
+            };
+            _sut.NotifyMessage(message)
+                .Should().Be(Unit.Default);
+
+            _agent
+                .Verify(m => m.OnReceivedLogResponse(It.IsAny<LogResponseMessage>()), Times.Never);
         }
     }
 }

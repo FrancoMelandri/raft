@@ -40,7 +40,7 @@ namespace Raft.Node
                 { MessageType.VoteRequest, _ => Unit.Default },
                 { MessageType.VoteResponse, HandleVoteResponse },
                 { MessageType.LogRequest, HandleLogRequest },
-                { MessageType.LogResponse, _ => Unit.Default }
+                { MessageType.LogResponse, HandleLogResponse }
             };
         }
 
@@ -87,6 +87,15 @@ namespace Raft.Node
                 .ToOption()
                 .Match(_ => _agent
                                 .OnReceivedVoteResponse(_)
+                                .Map(_ => Unit.Default),
+                        () => Unit.Default);
+
+        private Unit HandleLogResponse(Message message)
+            => message
+                .Map(_ => message as LogResponseMessage)
+                .ToOption()
+                .Match(_ => _agent
+                                .OnReceivedLogResponse(_)
                                 .Map(_ => Unit.Default),
                         () => Unit.Default);
     }

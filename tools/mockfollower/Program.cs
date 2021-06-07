@@ -47,13 +47,19 @@ namespace mockfollower
                 WriteLine($"Incoming message: {type}");
                 WriteLine($"With body: {body}");
 
-                if (type == 1)
-                    SendResponseToNode();
+                _ = type switch
+                {
+                    1 => SendVoteResponseGranted(), // VoteRequest
+                    3 => SendLogResponse(),         // LogRequest
+                    _ => NoResponse()
+                };
             }
         }
 
-        private static void SendResponseToNode()
+        private static int SendVoteResponseGranted()
         {
+            WriteLine("SendVoteResponseGranted");
+
             TcpClient client = new();
             client.Connect("localhost", 3000);
 
@@ -69,6 +75,34 @@ namespace mockfollower
 
             buffer = UTF8.GetBytes(message);
             client.GetStream().Write(buffer, 0, buffer.Length);
+
+            return type;
         }
+
+        private static int SendLogResponse()
+        {
+            WriteLine("SendLogResponse");
+
+            TcpClient client = new();
+            client.Connect("localhost", 3000);
+
+            var type = 4;
+            var message = "{\"Type\":4,\"NodeId\":2,\"Term\":1,\"Ack\":0,\"Success\":true}";
+
+            var header = message.Length.ToString().PadLeft(16, ' ');
+            var buffer = UTF8.GetBytes(header);
+            client.GetStream().Write(buffer, 0, buffer.Length);
+
+            buffer = UTF8.GetBytes(type.ToString());
+            client.GetStream().Write(buffer, 0, 1);
+
+            buffer = UTF8.GetBytes(message);
+            client.GetStream().Write(buffer, 0, buffer.Length);
+
+            return type;
+        }
+
+        private static int NoResponse()
+            => 0;
     }
 }
