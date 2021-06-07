@@ -16,5 +16,7 @@ namespace RaftCore.Constants
         public static readonly string NOTIFY_TO_APPLICATION = "Notify to application";
 
         public static readonly string SUCCESSFULL_LOG_RESPONSE = "Successfull log response";
+
+        public static readonly string GRANT_VOTE_REQUEST = "Grant the vote request";
     }
 }

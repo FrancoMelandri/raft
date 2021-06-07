@@ -7,7 +7,7 @@ namespace RaftCore
 {
     public static class Utils
     {
-        public static int LastEntryOrZero(LogEntry[] Log)
+        public static int LastEntryTermOrZero(LogEntry[] Log)
             => Log
                 .ToOption(_ => _.Length == 0)
                 .Map(_ => _[^1].Term)

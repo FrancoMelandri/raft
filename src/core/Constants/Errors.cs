@@ -16,5 +16,8 @@ namespace RaftCore.Constants
         public static readonly Error NotALeader = new("LR-0008", "node-is-not-leader");
         public static readonly Error LogNotSuccess = new("LR-0009", "log-response-not-success");
         public static readonly Error SentLegthIsWrong = new("LR-0010", "sent-length-is-wrong");
+
+        public static readonly Error LastTermAndLogAreWrong = new("VL-0001", "last-term-and-log-are-wrong");
+        public static readonly Error CurrentTermAndVotedFroreWrong = new("VL-0002", "current-term-and-votedfor-are-wrong");
     }
 }

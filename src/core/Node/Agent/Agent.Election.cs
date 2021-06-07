@@ -21,7 +21,7 @@ namespace RaftCore.Node
                 AckedLength = _status.AckedLength
             }
             .Tee(s => _status = s)
-            .Tee(s => LastEntryOrZero(s.Log)
+            .Tee(s => LastEntryTermOrZero(s.Log)
                             .Map(lastTerm => new VoteRequestMessage
                             {
                                 Type = MessageType.VoteRequest,

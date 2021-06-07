@@ -48,6 +48,9 @@ namespace RaftTest.Core
             status.CurrentTerm.Should().Be(11);
             status.VotedFor.Should().Be(-1);
             status.CurrentRole.Should().Be(States.Follower);
+
+            _logger
+                .Verify(m => m.Error("VL-0001: last-term-and-log-are-wrong"));
         }
 
         [Test]
@@ -90,6 +93,9 @@ namespace RaftTest.Core
             status.CurrentTerm.Should().Be(12);
             status.VotedFor.Should().Be(99);
             status.CurrentRole.Should().Be(States.Follower);
+
+            _logger
+                .Verify(m => m.Information("Grant the vote request for 99"));
         }
 
         [Test]
@@ -132,6 +138,9 @@ namespace RaftTest.Core
             status.CurrentTerm.Should().Be(12);
             status.VotedFor.Should().Be(99);
             status.CurrentRole.Should().Be(States.Follower);
+
+            _logger
+                .Verify(m => m.Information("Grant the vote request for 99"));
         }
 
         [Test]
@@ -173,6 +182,9 @@ namespace RaftTest.Core
             status.CurrentTerm.Should().Be(11);
             status.VotedFor.Should().Be(-1);
             status.CurrentRole.Should().Be(States.Follower);
+
+            _logger
+                .Verify(m => m.Error("VL-0001: last-term-and-log-are-wrong"));
         }
 
         [Test]
@@ -215,6 +227,9 @@ namespace RaftTest.Core
             status.CurrentTerm.Should().Be(12);
             status.VotedFor.Should().Be(99);
             status.CurrentRole.Should().Be(States.Follower);
+
+            _logger
+                .Verify(m => m.Information("Grant the vote request for 99"));
         }
 
         [Test]
@@ -257,6 +272,9 @@ namespace RaftTest.Core
             status.CurrentTerm.Should().Be(5);
             status.VotedFor.Should().Be(99);
             status.CurrentRole.Should().Be(States.Follower);
+
+            _logger
+                .Verify(m => m.Information("Grant the vote request for 99"));
         }
 
         [Test]
@@ -299,6 +317,9 @@ namespace RaftTest.Core
             status.CurrentTerm.Should().Be(6);
             status.VotedFor.Should().Be(1);
             status.CurrentRole.Should().Be(States.Follower);
+
+            _logger
+                .Verify(m => m.Error("VL-0002: current-term-and-votedfor-are-wrong"));
         }
 
         [TestCase(-1)]

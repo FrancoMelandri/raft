@@ -1,5 +1,6 @@
 ﻿using FluentAssertions;
 using NUnit.Framework;
+using RaftCore;
 using RaftCore.Models;
 using RaftCore.Node;
 
@@ -42,9 +43,29 @@ namespace RaftTest.Core.Checks
                     new LogEntry{ Term = 5 }
                 }
             };
-            VoteRequesChecks
-                .ValidateLog(message, status)
-                .IsRight.Should().BeTrue();
+            var result = VoteRequesChecks.ValidateLog(message, status);
+
+            result.IsRight.Should().BeTrue();
+        }
+
+        [Test]
+        public void ValidateLog_WhenLastTerm_GT_LastLogTerm_ReturnSError()
+        {
+            var message = new VoteRequestMessage
+            {
+                LastTerm = 3
+            };
+            var status = new Status
+            {
+                Log = new LogEntry[]
+                {
+                    new LogEntry{ Term = 4 }
+                }
+            };
+            var result = VoteRequesChecks.ValidateLog(message, status);
+
+            result.IsLeft.Should().BeTrue();
+            result.OnLeft(_ => _.Should().BeEquivalentTo(new Error("VL-0001", "last-term-and-log-are-wrong")));
         }
 
         [Test]
@@ -63,9 +84,10 @@ namespace RaftTest.Core.Checks
                     new LogEntry{ Term = 5 }
                 }
             };
-            VoteRequesChecks
-                .ValidateLog(message, status)
-                .IsLeft.Should().BeTrue();
+            var result = VoteRequesChecks.ValidateLog(message, status);
+
+            result.IsLeft.Should().BeTrue();
+            result.OnLeft(_ => _.Should().BeEquivalentTo(new Error("VL-0001", "last-term-and-log-are-wrong")));
         }
 
         [Test]
@@ -115,9 +137,10 @@ namespace RaftTest.Core.Checks
                 CurrentTerm = 4,
                 VotedFor = 1
             };
-            VoteRequesChecks
-                .ValidateTerm(message, status)
-                .IsLeft.Should().BeTrue();
+            var result = VoteRequesChecks.ValidateTerm(message, status);
+
+            result.IsLeft.Should().BeTrue();
+            result.OnLeft(_ => _.Should().BeEquivalentTo(new Error("VL-0002", "current-term-and-votedfor-are-wrong")));
         }
     }
 }

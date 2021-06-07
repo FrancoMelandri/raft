@@ -2,6 +2,7 @@
 using TinyFp;
 using TinyFp.Extensions;
 using static RaftCore.Constants.MessageConstants;
+using static RaftCore.Constants.Logs;
 using static RaftCore.Node.VoteResponseChecks;
 using static RaftCore.Node.VoteRequesChecks;
 
@@ -13,7 +14,7 @@ namespace RaftCore.Node
             => ValidateLog(message, _status)
                 .Bind(_ => ValidateTerm(message, _status))
                 .Match(_ => ReceivedVoteRequestGrantResponse(message),
-                       _ => ReceivedVoteRequestDontGrantResponse(message))
+                       _ => LogError(_).Map(_ => ReceivedVoteRequestDontGrantResponse(message)))
                 .Map(_ => _status);
 
         private Unit ReceivedVoteRequestGrantResponse(VoteRequestMessage message)
@@ -36,7 +37,8 @@ namespace RaftCore.Node
                     NodeId = _nodeConfiguration.Id,
                     CurrentTerm = _status.CurrentTerm,
                     Granted = GRANT
-                }));
+                }))
+                .Tee(_ => LogInformation($"{GRANT_VOTE_REQUEST} for {message.NodeId}"));
 
         private Unit ReceivedVoteRequestDontGrantResponse(VoteRequestMessage message)
             => _cluster.SendMessage(message.NodeId, new VoteResponseMessage
