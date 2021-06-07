@@ -71,6 +71,9 @@ namespace RaftTest.Core
 
             status.SentLength[1].Should().Be(3);
             status.AckedLength[1].Should().Be(3);
+
+            _logger
+                .Verify(m => m.Information("Successfull log response from 1"));
         }
 
         [Test]

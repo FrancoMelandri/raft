@@ -3,6 +3,7 @@ using TinyFp.Extensions;
 using static RaftCore.Node.LogResponseChecks;
 using static RaftCore.Node.Checks;
 using static RaftCore.Constants.NodeConstants;
+using static RaftCore.Constants.Logs;
 
 namespace RaftCore.Node
 {
@@ -53,7 +54,8 @@ namespace RaftCore.Node
                     AckedLength = s.AckedLength
                 })
                 .Tee(s => _status = s)
-                .Tee(s => CommitLogEntries(s));
+                .Tee(s => CommitLogEntries(s))
+                .Tee(s => LogInformation($"{SUCCESSFULL_LOG_RESPONSE} from {message.NodeId}"));
 
         private Status HandleUnSuccessLogResponse(LogResponseMessage message, Status status)
             => IsSentLengthGreaterThanZero(message, status)

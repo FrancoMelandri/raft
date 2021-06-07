@@ -14,5 +14,7 @@ namespace RaftCore.Constants
         public static readonly string LOG_TRUNCATED = "Log was trucated";
         public static readonly string LOG_APPEND_ENTRIES = "Append new entries to log";
         public static readonly string NOTIFY_TO_APPLICATION = "Notify to application";
+
+        public static readonly string SUCCESSFULL_LOG_RESPONSE = "Successfull log response";
     }
 }
