@@ -28,6 +28,8 @@ namespace RaftTest.Core
             status.CurrentRole.Should().Be(States.Follower);
             status.VotedFor.Should().Be(-1);
             status.CurrentTerm.Should().Be(12);
+            _logger
+                .Verify(m => m.Error("LR-0001: term-is-not-greater"), Times.Once);
         }
 
         [Test]
@@ -47,6 +49,8 @@ namespace RaftTest.Core
             var statusResult = _sut.OnReceivedLogResponse(logResponse);
 
             statusResult.Should().BeEquivalentTo(status);
+            _logger
+                .Verify(m => m.Error("LR-0001: term-is-not-greater"), Times.Never);
         }
 
         [Test]

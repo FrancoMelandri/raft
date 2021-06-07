@@ -1,13 +1,14 @@
 ﻿using TinyFp;
 using TinyFp.Extensions;
 using static TinyFp.Prelude;
+using static RaftCore.Constants.Errors;
 
 namespace RaftCore.Node
 {
     public static class Checks
     {
-        public static Either<string, Status> IsLeader(Status status)
-            => status.CurrentRole.ToEither(_ => status, _ => _ != States.Leader, "");
+        public static Either<Error, Status> IsLeader(Status status)
+            => status.CurrentRole.ToEither(_ => status, _ => _ != States.Leader, NotALeader);
 
         public static Either<string, Status> IsApplicationToBeNotified(Status status, int ready)
             => ready > 0 &&

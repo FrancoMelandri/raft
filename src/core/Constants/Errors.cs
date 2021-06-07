@@ -12,5 +12,9 @@ namespace RaftCore.Constants
         public static readonly Error CurrentTermNotOk = new("LR-0004", "current-term-is-not-ok");
         public static readonly Error EntriesLogLengthNotOk = new("LR-0005", "entries-length-not-ok");
         public static readonly Error EntrieTermIsNotOk = new("LR-0006", "entries-term-not-ok");
+        public static readonly Error TermNotEqual = new("LR-0007", "term-is-not-equal");
+        public static readonly Error NotALeader = new("LR-0008", "node-is-not-leader");
+        public static readonly Error LogNotSuccess = new("LR-0009", "log-response-not-success");
+        public static readonly Error SentLegthIsWrong = new("LR-0010", "sent-length-is-wrong");
     }
 }

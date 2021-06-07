@@ -9,11 +9,11 @@ namespace RaftCore.Node
     public partial class Agent
     {
         public Status OnReceivedLogResponse(LogResponseMessage message)
-            => IsTermGreater(message, _status)
-                .Match(s => HandleReceivedLogResponseKo(message, s), 
-                        _ => HandleReceivedLogResponseOk(message, _status));
+            => IsTermLessOrEqualGreater(message, _status)
+                .Match(s => HandleReceivedLogResponseOk(message, s), 
+                       _ => LogError(_).Map(_ =>  HandleReceivedLogResponseBackToFollower(message, _status)));
 
-        private Status HandleReceivedLogResponseKo(LogResponseMessage message, Status status)
+        private Status HandleReceivedLogResponseBackToFollower(LogResponseMessage message, Status status)
             => new Status 
             {
                 CurrentTerm = message.Term,
@@ -33,8 +33,8 @@ namespace RaftCore.Node
                 .Bind(s => IsLeader(s))
                 .Match(s => IsSuccessLogReponse(message, status)
                                 .Match(_ => HandleSuccessLogResponse(message, s), 
-                                       _ => HandleUnSuccessLogResponse(message, s)),
-                       _ => status);
+                                       _ => LogError(_).Map(_ => HandleUnSuccessLogResponse(message, s))),
+                       _ => LogError(_).Map(_ => status));
 
         private Status HandleSuccessLogResponse(LogResponseMessage message, Status status)
             => status
@@ -73,7 +73,7 @@ namespace RaftCore.Node
                             })
                             .Tee(s => _status = s)
                             .Tee(s => ReplicateLog(s, message.NodeId)), 
-                       _ => status);
+                       _ => LogError(_).Map(_ => status));
 
     }
 }

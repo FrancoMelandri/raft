@@ -1,30 +1,31 @@
 ﻿using RaftCore.Models;
 using TinyFp;
 using static TinyFp.Prelude;
+using static RaftCore.Constants.Errors;
 
 namespace RaftCore.Node
 {
     public static class LogResponseChecks
     {
-        public static Either<string, Status> IsTermGreater(LogResponseMessage message, Status status)
-            => message.Term > status.CurrentTerm ?
-                Right<string, Status>(status) :
-                Left<string, Status>("");
+        public static Either<Error, Status> IsTermLessOrEqualGreater(LogResponseMessage message, Status status)
+            => message.Term <= status.CurrentTerm ?
+                Right<Error, Status>(status) :
+                Left<Error, Status>(TermIsNotGreater);
 
-        public static Either<string, Status> IsTermEqual(LogResponseMessage message, Status status)
+        public static Either<Error, Status> IsTermEqual(LogResponseMessage message, Status status)
             => message.Term == status.CurrentTerm ?
-                Right<string, Status>(status) :
-                Left<string, Status>("");
+                Right<Error, Status>(status) :
+                Left<Error, Status>(TermNotEqual);
 
-        public static Either<string, Status> IsSentLengthGreaterThanZero(LogResponseMessage message, Status status)
+        public static Either<Error, Status> IsSentLengthGreaterThanZero(LogResponseMessage message, Status status)
             => status.SentLength.ContainsKey(message.NodeId) && 
                status.SentLength[message.NodeId] > 0 ?
-                Right<string, Status>(status) :
-                Left<string, Status>("");
+                Right<Error, Status>(status) :
+                Left<Error, Status>(SentLegthIsWrong);
 
-        public static Either<string, Status> IsSuccessLogReponse(LogResponseMessage message, Status status)
+        public static Either<Error, Status> IsSuccessLogReponse(LogResponseMessage message, Status status)
             => message.Success ?
-                Right<string, Status>(status) :
-                Left<string, Status>("");
+                Right<Error, Status>(status) :
+                Left<Error, Status>(LogNotSuccess);
     }
 }

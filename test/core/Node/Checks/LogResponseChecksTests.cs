@@ -1,5 +1,6 @@
 ﻿using FluentAssertions;
 using NUnit.Framework;
+using RaftCore;
 using RaftCore.Models;
 using RaftCore.Node;
 using System.Collections.Generic;
@@ -11,24 +12,26 @@ namespace RaftTest.Core.Checks
     public class LogResponseChecksTests
     {
         [Test]
-        public void IsTermGreater_WhenTerm_GT_CurrentTerm_ReturnStatus()
+        public void IsTermLessOrEqualGreater_WhenTerm_GT_CurrentTerm_ReturnError()
         {
             var message = new LogResponseMessage
             {
-                Term = 5
+                Term = 4
             };
             var status = new Status
             {
-                CurrentTerm = 4
+                CurrentTerm = 3
             };
-            LogResponseChecks
-                .IsTermGreater(message, status)
-                .IsRight.Should().BeTrue();
+            var result = LogResponseChecks
+                .IsTermLessOrEqualGreater(message, status);
+
+            result.IsLeft.Should().BeTrue();
+            result.OnLeft(_ => _.Should().BeEquivalentTo(new Error("LR-0001", "term-is-not-greater")));
         }
 
         [TestCase(5)]
         [TestCase(6)]
-        public void IsTermGreater_WhenTerm_LE_CurrentTerm_ReturnError(int current)
+        public void IsTermLessOrEqualGreater_WhenTerm_LE_CurrentTerm_ReturnOk(int current)
         {
             var message = new LogResponseMessage
             {
@@ -39,8 +42,8 @@ namespace RaftTest.Core.Checks
                 CurrentTerm = current
             };
             LogResponseChecks
-                .IsTermGreater(message, status)
-                .IsLeft.Should().BeTrue();
+                .IsTermLessOrEqualGreater(message, status)
+                .IsRight.Should().BeTrue();
         }
 
         [Test]
@@ -71,9 +74,10 @@ namespace RaftTest.Core.Checks
             {
                 CurrentTerm = current
             };
-            LogResponseChecks
-                .IsTermEqual(message, status)
-                .IsLeft.Should().BeTrue();
+            var result = LogResponseChecks.IsTermEqual(message, status);
+
+            result.IsLeft.Should().BeTrue();
+            result.OnLeft(_ => _.Should().BeEquivalentTo(new Error("LR-0007", "term-is-not-equal")));
         }
 
         [Test]
@@ -109,9 +113,10 @@ namespace RaftTest.Core.Checks
                     { 1, 0 }
                 }
             };
-            LogResponseChecks
-                .IsSentLengthGreaterThanZero(message, status)
-                .IsLeft.Should().BeTrue();
+            var result = LogResponseChecks.IsSentLengthGreaterThanZero(message, status);
+
+            result.IsLeft.Should().BeTrue();
+            result.OnLeft(_ => _.Should().BeEquivalentTo(new Error("LR-0010", "sent-length-is-wrong")));
         }
 
         [Test]
@@ -128,9 +133,10 @@ namespace RaftTest.Core.Checks
                     { 2, 1 }
                 }
             };
-            LogResponseChecks
-                .IsSentLengthGreaterThanZero(message, status)
-                .IsLeft.Should().BeTrue();
+            var result = LogResponseChecks.IsSentLengthGreaterThanZero(message, status);
+
+            result.IsLeft.Should().BeTrue();
+            result.OnLeft(_ => _.Should().BeEquivalentTo(new Error("LR-0010", "sent-length-is-wrong")));
         }
 
         [Test]
@@ -158,9 +164,10 @@ namespace RaftTest.Core.Checks
             var status = new Status
             {
             };
-            LogResponseChecks
-                .IsSuccessLogReponse(message, status)
-                .IsLeft.Should().BeTrue();
+            var result = LogResponseChecks.IsSuccessLogReponse(message, status);
+
+            result.IsLeft.Should().BeTrue();
+            result.OnLeft(_ => _.Should().BeEquivalentTo(new Error("LR-0009", "log-response-not-success")));
         }
     }
 }
