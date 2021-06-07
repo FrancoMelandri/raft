@@ -233,5 +233,33 @@ namespace RaftTest.Raft
             _agent
                 .Verify(m => m.OnReceivedLogResponse(It.IsAny<LogResponseMessage>()), Times.Never);
         }
+
+        [Test]
+        public void NotifyMessage_WhenVoteRequest_CallAgentReceivedVoteRequest()
+        {
+            var message = new VoteRequestMessage
+            {
+                Type = MessageType.VoteRequest
+            };
+            _sut.NotifyMessage(message)
+                .Should().Be(Unit.Default);
+
+            _agent
+                .Verify(m => m.OnReceivedVoteRequest(message), Times.Once);
+        }
+
+        [Test]
+        public void NotifyMessage_WhenNotVoteRequest_DontCallAgentReceivedVoteRequest()
+        {
+            var message = new Message
+            {
+                Type = MessageType.VoteRequest
+            };
+            _sut.NotifyMessage(message)
+                .Should().Be(Unit.Default);
+
+            _agent
+                .Verify(m => m.OnReceivedVoteRequest(It.IsAny<VoteRequestMessage>()), Times.Never);
+        }
     }
 }

@@ -37,7 +37,7 @@ namespace Raft.Node
             _messageActions = new Dictionary<MessageType, Func<Message, Unit>>
             {
                 { MessageType.None, _ => Unit.Default },
-                { MessageType.VoteRequest, _ => Unit.Default },
+                { MessageType.VoteRequest, HandleVoteRequest },
                 { MessageType.VoteResponse, HandleVoteResponse },
                 { MessageType.LogRequest, HandleLogRequest },
                 { MessageType.LogResponse, HandleLogResponse }
@@ -96,6 +96,15 @@ namespace Raft.Node
                 .ToOption()
                 .Match(_ => _agent
                                 .OnReceivedLogResponse(_)
+                                .Map(_ => Unit.Default),
+                        () => Unit.Default);
+
+        private Unit HandleVoteRequest(Message message)
+            => message
+                .Map(_ => message as VoteRequestMessage)
+                .ToOption()
+                .Match(_ => _agent
+                                .OnReceivedVoteRequest(_)
                                 .Map(_ => Unit.Default),
                         () => Unit.Default);
     }
