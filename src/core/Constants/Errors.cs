@@ -19,5 +19,9 @@ namespace RaftCore.Constants
 
         public static readonly Error LastTermAndLogAreWrong = new("VL-0001", "last-term-and-log-are-wrong");
         public static readonly Error CurrentTermAndVotedFroreWrong = new("VL-0002", "current-term-and-votedfor-are-wrong");
+
+        public static readonly Error VoteIsNotValid = new("VR-0001", "vote-is-not-valid");
+        public static readonly Error TermIsNotValid = new("VR-0002", "term-is-not-valid");
+        public static readonly Error QuorumNotReached = new("VR-0003", "quorum-not-reached");
     }
 }

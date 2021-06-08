@@ -11,9 +11,9 @@ namespace RaftCore.Node
     public partial class Agent
     {
         public Status OnReceivedVoteResponse(VoteResponseMessage message)
-            => ValidateVoteGrant(_status, message)
+            => ValidateVoteGrant(message, _status)
                 .Match(_ => ReceivedVoteResponseGranted(message),
-                       _ => ValidateTerm(_status, message)
+                       _ => ValidateTerm(message, _status)
                                 .Match(_ => ReceivedVoteResponseNoGrantedUpdateStatus(message),
                                         _ => Unit.Default))
                 .Map(_ => _status);
