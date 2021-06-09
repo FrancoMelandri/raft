@@ -15,7 +15,7 @@
 	</ItemGroup>
 
 	<ItemGroup>
-	  <ProjectReference Include="..\src\raft\raft-impl.csproj" />
+	  <ProjectReference Include="..\..\src\raft\raft-impl.csproj" />
 	</ItemGroup>
 
 	<ItemGroup>
