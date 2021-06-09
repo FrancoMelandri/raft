@@ -6,7 +6,7 @@ using RaftCore.Cluster;
 using RaftCore.Models;
 using RaftCore.Node;
 
-namespace RaftTest.Core.Checks
+namespace RaftTest.Core
 {
     [TestFixture]
     public class VoteResponseChecksTests

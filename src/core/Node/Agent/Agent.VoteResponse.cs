@@ -4,6 +4,7 @@ using RaftCore.Models;
 using TinyFp;
 using TinyFp.Extensions;
 using static RaftCore.Constants.NodeConstants;
+using static RaftCore.Constants.Logs;
 using static RaftCore.Node.VoteResponseChecks;
 
 namespace RaftCore.Node
@@ -32,7 +33,7 @@ namespace RaftCore.Node
                     AckedLength = _status.AckedLength
                 }
                 .Map(s => ValidateVotesQuorum(s, _cluster)
-                            .Match(_ => ReceivedVoteResponseGrantedPromoteAsLeader(s),
+                            .Match(_ => LogInformation(PROMOTED_AS_LEADER).Map(_ =>  ReceivedVoteResponseGrantedPromoteAsLeader(s)),
                                     _ => s))
                 .Tee(s => _status = s)
                 .Map(_ => Unit.Default);

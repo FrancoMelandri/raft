@@ -277,6 +277,9 @@ namespace RaftTest.Core
             _cluster
                 .Verify(m => m.SendMessage(42,
                                             It.IsAny<LogRequestMessage>()), Times.Never);
+
+            _logger
+                .Verify(m => m.Information("Node was prototed as LEADER"), Times.Once);
         }
     }
 }

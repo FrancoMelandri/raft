@@ -3,7 +3,7 @@ using NUnit.Framework;
 using RaftCore.Models;
 using RaftCore.Node;
 
-namespace RaftTest.Core.Checks
+namespace RaftTest.Core
 {
 
     [TestFixture]

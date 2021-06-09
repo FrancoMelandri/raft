@@ -18,5 +18,6 @@ namespace RaftCore.Constants
         public static readonly string SUCCESSFULL_LOG_RESPONSE = "Successfull log response";
 
         public static readonly string GRANT_VOTE_REQUEST = "Grant the vote request";
+        public static readonly string PROMOTED_AS_LEADER = "Node was prototed as LEADER";
     }
 }

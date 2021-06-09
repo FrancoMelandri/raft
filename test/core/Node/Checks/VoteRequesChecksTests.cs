@@ -4,7 +4,7 @@ using RaftCore;
 using RaftCore.Models;
 using RaftCore.Node;
 
-namespace RaftTest.Core.Checks
+namespace RaftTest.Core
 {
 
     [TestFixture]
