@@ -23,5 +23,7 @@ namespace RaftCore.Constants
         public static readonly Error VoteIsNotValid = new("VR-0001", "vote-is-not-valid");
         public static readonly Error TermIsNotValid = new("VR-0002", "term-is-not-valid");
         public static readonly Error QuorumNotReached = new("VR-0003", "quorum-not-reached");
+
+        public static readonly Error ElectionObserverNotRegitsred = new("EL-0001", "election-observer-not-registered");
     }
 }
