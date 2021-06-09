@@ -33,7 +33,7 @@ namespace RaftTest.Raft
             _ = _sut.Stop();
 
             _leaderFailureObserver
-                .Verify(m => m.NotifyFailure(), Times.Once);
+                .Verify(m => m.NotifyFLeaderailure(), Times.Once);
         }
 
         [Test]
@@ -46,7 +46,7 @@ namespace RaftTest.Raft
             _ = _sut.Stop();
 
             _leaderFailureObserver
-                .Verify(m => m.NotifyFailure(), Times.Never);
+                .Verify(m => m.NotifyFLeaderailure(), Times.Never);
         }
 
         [Test]
@@ -70,7 +70,7 @@ namespace RaftTest.Raft
             _ = _sut.Stop();
 
             _leaderFailureObserver
-                .Verify(m => m.NotifyFailure(), Times.Never);
+                .Verify(m => m.NotifyFLeaderailure(), Times.Never);
         }
     }
 }

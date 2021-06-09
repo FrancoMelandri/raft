@@ -66,7 +66,7 @@ namespace Raft.Node
                 .Match(_ => _[message.Type](message), 
                       () => Unit.Default);
 
-        public Unit NotifyFailure()
+        public Unit NotifyFLeaderailure()
             => _agent
                 .OnLeaderHasFailed()
                 .Map( _ => Unit.Default);

@@ -140,7 +140,7 @@ namespace RaftTest.Raft
         [Test]
         public void NotifyFailure_CallAgentLeaderHasFailed()
         {
-            _ = _sut.NotifyFailure();
+            _ = _sut.NotifyFLeaderailure();
 
             _agent
                 .Verify(m => m.OnLeaderHasFailed(), Times.Once);

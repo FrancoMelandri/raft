@@ -35,6 +35,6 @@ namespace Raft.Node
                 .Tee(_ => _timer.Change(Timeout.Infinite, Timeout.Infinite));
 
         private void TimeoutCallback(object? state)
-            => _leaderFailureObserver.NotifyFailure();
+            => _leaderFailureObserver.NotifyFLeaderailure();
     }
 }

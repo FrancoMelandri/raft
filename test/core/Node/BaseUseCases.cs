@@ -13,6 +13,7 @@ namespace RaftTest.Core
         protected Agent _sut;
         protected Mock<ICluster> _cluster;
         protected Mock<IElection> _election;
+        protected Mock<IElectionObserver> _electionObserver;
         protected Mock<ILeader> _leader;
         protected Mock<IApplication> _application;
         protected Mock<ILogger> _logger;
@@ -34,11 +35,13 @@ namespace RaftTest.Core
 
             _cluster = new Mock<ICluster>();
             _election = new Mock<IElection>();
+            _electionObserver = new Mock<IElectionObserver>();
             _leader = new Mock<ILeader>();
             _application = new Mock<IApplication>();
             _logger = new Mock<ILogger>();
             _sut = Agent.Create(_cluster.Object,
                                 _election.Object,
+                                _electionObserver.Object,
                                 _leader.Object,
                                 _application.Object,
                                 _logger.Object);
