@@ -5,6 +5,8 @@ namespace Raft.Node
 {
     public class Election : IElection
     {
+        private IElectionObserver _electionObserver;
+
         public Unit Stop()
             => Unit.Default;
 

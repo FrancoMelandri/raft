@@ -31,7 +31,7 @@ namespace RaftCore.Node
                                 LastTerm = lastTerm
                             })
                             .Tee(_ => _cluster.SendBroadcastMessage(_))
-                            .Tee(_ => _election.Start()))
+                            .Tee(_ => Election.Start()))
             .Map(_ => _status)
             .Tee(_ => _logger.Information(LEADER_HAS_FAILED));
 

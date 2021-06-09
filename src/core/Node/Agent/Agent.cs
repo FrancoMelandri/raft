@@ -10,7 +10,7 @@ namespace RaftCore.Node
     {
         private Status _status;
         private readonly ICluster _cluster;
-        private readonly IElection _election;
+        public IElection Election { get; }
         private readonly ILeader _leader;
         private readonly IApplication _application;
         private readonly ILogger _logger;
@@ -23,7 +23,7 @@ namespace RaftCore.Node
                      ILogger logger)
         {
             _cluster = cluster;
-            _election = election;
+            Election = election;
             _leader = leader;
             _application = application;
             _logger = logger;

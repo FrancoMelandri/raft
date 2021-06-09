@@ -53,6 +53,7 @@ namespace Raft.Node
                        () => _agent.OnInitialise(_nodeConfiguration))
                 .Tee(_ => _messageListener.Start(this))
                 .Tee(_ => _leaderFailure.Start(this))
+                .Tee(_ => _agent.Election.RegisterObserver(this))
                 .Map(_ => Unit.Default);
 
         public Unit Deinitialise()

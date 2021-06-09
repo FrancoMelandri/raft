@@ -18,6 +18,7 @@ namespace RaftTest.Raft
         private Mock<IStatusRepository> _statusRepository;
         private Mock<IMessageListener> _messageListener;
         private Mock<ILeaderFailureDetector> _leaderFailure;
+        private Mock<IElection> _election;
 
         [SetUp]
         public void SetUp()
@@ -27,6 +28,10 @@ namespace RaftTest.Raft
                 Id = 1,
             };
             _agent = new Mock<IAgent>();
+            _election = new Mock<IElection>();
+            _agent
+                .Setup(m => m.Election)
+                .Returns(_election.Object);
             _statusRepository = new Mock<IStatusRepository>();
             _messageListener = new Mock<IMessageListener>();
             _leaderFailure = new Mock<ILeaderFailureDetector>();
@@ -58,6 +63,8 @@ namespace RaftTest.Raft
                 .Verify(m => m.Start(_sut), Times.Once);
             _leaderFailure
                 .Verify(m => m.Start(_sut), Times.Once);
+            _election
+                .Verify(m => m.RegisterObserver(_sut), Times.Once);
         }
 
         [Test]
@@ -101,6 +108,8 @@ namespace RaftTest.Raft
                 .Verify(m => m.Start(_sut), Times.Once);
             _leaderFailure
                 .Verify(m => m.Start(_sut), Times.Once);
+            _election
+                .Verify(m => m.RegisterObserver(_sut), Times.Once);
         }
 
         [Test]

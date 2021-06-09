@@ -53,7 +53,7 @@ namespace RaftCore.Node
                     AckedLength = _status.AckedLength
                 }
                 .Tee(s => _status = s)
-                .Map(_ => _election.Stop())
+                .Map(_ => Election.Stop())
                 .Map(_ => _leader.Stop());
 
         private Status ReceivedVoteResponseGrantedPromoteAsLeader(Status status)
@@ -69,7 +69,7 @@ namespace RaftCore.Node
                     SentLength = status.SentLength,
                     AckedLength = status.AckedLength
                 }
-                .Tee(_ => _election.Stop())
+                .Tee(_ => Election.Stop())
                 .Tee(_ => _leader.Start(this))
                 .Tee(ReceivedVoteResponseGrantedUpdateFollowers);
 
