@@ -147,6 +147,15 @@ namespace RaftTest.Raft
         }
 
         [Test]
+        public void NotifyElectionTimeout_CallElectionTimeout()
+        {
+            _ = _sut.NotifyElectionTimeout();
+
+            _agent
+                .Verify(m => m.OnElectionTimeOut(), Times.Once);
+        }
+
+        [Test]
         public void NotifyMessage_WhenLogRequest_CallAgentReceivedLogRequest_And_ResetLeaderDetector()
         {
             var message = new LogRequestMessage

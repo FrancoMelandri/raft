@@ -9,9 +9,11 @@ using System.Collections.Generic;
 
 namespace Raft.Node
 {
+
     public class LocalNode : ILocalNode,
                              IMessageObserver,
-                             ILeaderFailureObserver
+                             ILeaderFailureObserver,
+                             IElectionObserver
     {
         private Dictionary<MessageType, Func<Message, Unit>> _messageActions;
 
@@ -70,6 +72,11 @@ namespace Raft.Node
             => _agent
                 .OnLeaderHasFailed()
                 .Map( _ => Unit.Default);
+
+        public Unit NotifyElectionTimeout()
+            => _agent
+                .OnElectionTimeOut()
+                .Map(_ => Unit.Default);
 
         private Unit HandleLogRequest(Message message)
             => message

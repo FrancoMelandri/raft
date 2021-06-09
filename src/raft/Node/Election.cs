@@ -10,5 +10,8 @@ namespace Raft.Node
 
         public Unit Start()
             => Unit.Default;
+
+        public Unit RegisterObserver(IElectionObserver electionObserver)
+            => Unit.Default;
     }
 }

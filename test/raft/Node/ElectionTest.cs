@@ -15,6 +15,12 @@ namespace RaftTest.Raft
                 .Should().Be(Unit.Default);
 
         [Test]
+        public void RegisterObserver_DoNothing()
+            => new Election()
+                .RegisterObserver(null)
+                .Should().Be(Unit.Default);
+
+        [Test]
         public void Cancel_DoNothing()
             => new Election()
                 .Stop()
