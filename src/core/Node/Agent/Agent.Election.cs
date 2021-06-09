@@ -8,6 +8,12 @@ namespace RaftCore.Node
     public partial class Agent
     {
         public Status OnLeaderHasFailed()
+            => OnStartVoteRequestPhase(LEADER_HAS_FAILED);
+
+        public Status OnElectionTimeOut()
+            => OnStartVoteRequestPhase(ELECTION_TIMEOUT);
+
+        private Status OnStartVoteRequestPhase(string log)
             => new Status
             {
                 CurrentTerm = _status.CurrentTerm + 1,
@@ -33,10 +39,7 @@ namespace RaftCore.Node
                             .Tee(_ => _cluster.SendBroadcastMessage(_))
                             .Tee(_ => Election.Start()))
             .Map(_ => _status)
-            .Tee(_ => _logger.Information(LEADER_HAS_FAILED));
+            .Tee(_ => _logger.Information(log));
 
-        public Status OnElectionTimeOut()
-            => OnLeaderHasFailed()
-                .Tee(_ => _logger.Information(ELECTION_TIMEOUT));
-    }   
+    }
 }
