@@ -15,8 +15,9 @@ namespace RaftCore.Node
             => ValidateVoteGrant(message, _status)
                 .Match(_ => ReceivedVoteResponseGranted(message),
                        _ => ValidateTerm(message, _status)
-                                .Match(_ => ReceivedVoteResponseNoGrantedUpdateStatus(message),
-                                        _ => Unit.Default))
+                                .Match(__ => LogInformation($"{VOTE_NOT_GRANTED} {message.NodeId}")
+                                                .Map(___ => ReceivedVoteResponseNoGrantedUpdateStatus(message)),
+                                       __ => LogError(__).Map(___ =>  Unit.Default)))
                 .Map(_ => _status);
 
         private Unit ReceivedVoteResponseGranted(VoteResponseMessage message)
@@ -33,8 +34,8 @@ namespace RaftCore.Node
                     AckedLength = _status.AckedLength
                 }
                 .Map(s => ValidateVotesQuorum(s, _cluster)
-                            .Match(_ => LogInformation(PROMOTED_AS_LEADER).Map(_ =>  ReceivedVoteResponseGrantedPromoteAsLeader(s)),
-                                    _ => s))
+                            .Match(_ => LogInformation(PROMOTED_AS_LEADER).Map(__ =>  ReceivedVoteResponseGrantedPromoteAsLeader(s)),
+                                   _ => LogError(_).Map(__ => s)))
                 .Tee(s => _status = s)
                 .Map(_ => Unit.Default);
 

@@ -52,6 +52,8 @@ namespace RaftTest.Core
                 .Verify(m => m.Stop(), Times.Never);
             _leader
                 .Verify(m => m.Stop(), Times.Never);
+            _logger
+                .Verify(m => m.Error("VR-0002: term-is-not-valid"), Times.Once);
         }
 
         [Test]
@@ -95,6 +97,8 @@ namespace RaftTest.Core
                 .Verify(m => m.Stop(), Times.Once);
             _leader
                 .Verify(m => m.Stop(), Times.Once);
+            _logger
+                .Verify(m => m.Information("Vote was not granted by: 99"), Times.Once);
         }
 
         [Test]
@@ -139,6 +143,8 @@ namespace RaftTest.Core
                 .Verify(m => m.Stop(), Times.Never);
             _leader
                 .Verify(m => m.Stop(), Times.Never);
+            _logger
+                .Verify(m => m.Error("VR-0002: term-is-not-valid"), Times.Once);
         }
 
         [Test]
@@ -183,6 +189,8 @@ namespace RaftTest.Core
                 .Verify(m => m.Stop(), Times.Never);
             _leader
                 .Verify(m => m.Stop(), Times.Never);
+            _logger
+                .Verify(m => m.Error("VR-0002: term-is-not-valid"), Times.Once);
         }
 
         [Test]
@@ -230,6 +238,8 @@ namespace RaftTest.Core
                 .Verify(m => m.Stop(), Times.Never);
             _leader
                 .Verify(m => m.Stop(), Times.Never);
+            _logger
+                .Verify(m => m.Error("VR-0003: quorum-not-reached"), Times.Once);
         }
 
         [Test]

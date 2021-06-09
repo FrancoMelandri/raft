@@ -19,5 +19,6 @@ namespace RaftCore.Constants
 
         public static readonly string GRANT_VOTE_REQUEST = "Grant the vote request";
         public static readonly string PROMOTED_AS_LEADER = "Node was prototed as LEADER";
+        public static readonly string VOTE_NOT_GRANTED = "Vote was not granted by:";
     }
 }
